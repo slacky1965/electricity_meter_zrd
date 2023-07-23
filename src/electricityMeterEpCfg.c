@@ -94,6 +94,7 @@ const u16 electricityMeter_outClusterList[] =
 #endif
     ZCL_CLUSTER_SE_METERING,
     ZCL_CLUSTER_GEN_TIME,
+    ZCL_CLUSTER_MS_ELECTRICAL_MEASUREMENT,
 };
 
 /**
@@ -207,20 +208,48 @@ zcl_seAttr_t g_zcl_seAttrs = {
 };
 
 const zclAttrInfo_t se_attrTbl[] = {
-    {ZCL_ATTRID_CURRENT_TIER_1_SUMMATION_DELIVERD,  ZCL_DATA_TYPE_UINT48,       ACCESS_CONTROL_READ,    (u8*)&g_zcl_seAttrs.tariff_1},
-    {ZCL_ATTRID_CURRENT_TIER_2_SUMMATION_DELIVERD,  ZCL_DATA_TYPE_UINT48,       ACCESS_CONTROL_READ,    (u8*)&g_zcl_seAttrs.tariff_2},
-    {ZCL_ATTRID_CURRENT_TIER_3_SUMMATION_DELIVERD,  ZCL_DATA_TYPE_UINT48,       ACCESS_CONTROL_READ,    (u8*)&g_zcl_seAttrs.tariff_3},
-    {ZCL_ATTRID_CURRENT_TIER_4_SUMMATION_DELIVERD,  ZCL_DATA_TYPE_UINT48,       ACCESS_CONTROL_READ,    (u8*)&g_zcl_seAttrs.tariff_4},
-    {ZCL_ATTRID_UNIT_OF_MEASURE,                    ZCL_DATA_TYPE_UINT8,        ACCESS_CONTROL_READ,    (u8*)&g_zcl_seAttrs.unit_of_measure},
-    {ZCL_ATTRID_MULTIPLIER,                         ZCL_DATA_TYPE_UINT24,       ACCESS_CONTROL_READ,    (u8*)&g_zcl_seAttrs.multiplier},
-    {ZCL_ATTRID_DIVISOR,                            ZCL_DATA_TYPE_UINT24,       ACCESS_CONTROL_READ,    (u8*)&g_zcl_seAttrs.divisor},
-    {ZCL_ATTRID_SUMMATION_FORMATTING,               ZCL_DATA_TYPE_BITMAP8,      ACCESS_CONTROL_READ,    (u8*)&g_zcl_seAttrs.summation_formatting},
-    {ZCL_ATTRID_REMAINING_BATTERY_LIFE,             ZCL_DATA_TYPE_UINT8,        ACCESS_CONTROL_READ,    (u8*)&g_zcl_seAttrs.battery_percentage},
-    {ZCL_ATTRID_METER_SERIAL_NUMBER,                ZCL_DATA_TYPE_OCTET_STR,    ACCESS_CONTROL_READ,    (u8*)&g_zcl_seAttrs.serial_number},
-    {ZCL_ATTRID_METERING_DEVICE_TYPE,               ZCL_DATA_TYPE_BITMAP8,      ACCESS_CONTROL_READ,    (u8*)&g_zcl_seAttrs.device_type},
+    {ZCL_ATTRID_CURRENT_TIER_1_SUMMATION_DELIVERD,  ZCL_DATA_TYPE_UINT48,       ACCESS_CONTROL_READ | ACCESS_CONTROL_REPORTABLE,    (u8*)&g_zcl_seAttrs.tariff_1},
+    {ZCL_ATTRID_CURRENT_TIER_2_SUMMATION_DELIVERD,  ZCL_DATA_TYPE_UINT48,       ACCESS_CONTROL_READ | ACCESS_CONTROL_REPORTABLE,    (u8*)&g_zcl_seAttrs.tariff_2},
+    {ZCL_ATTRID_CURRENT_TIER_3_SUMMATION_DELIVERD,  ZCL_DATA_TYPE_UINT48,       ACCESS_CONTROL_READ | ACCESS_CONTROL_REPORTABLE,    (u8*)&g_zcl_seAttrs.tariff_3},
+    {ZCL_ATTRID_CURRENT_TIER_4_SUMMATION_DELIVERD,  ZCL_DATA_TYPE_UINT48,       ACCESS_CONTROL_READ | ACCESS_CONTROL_REPORTABLE,    (u8*)&g_zcl_seAttrs.tariff_4},
+    {ZCL_ATTRID_UNIT_OF_MEASURE,                    ZCL_DATA_TYPE_UINT8,        ACCESS_CONTROL_READ,                                (u8*)&g_zcl_seAttrs.unit_of_measure},
+    {ZCL_ATTRID_MULTIPLIER,                         ZCL_DATA_TYPE_UINT24,       ACCESS_CONTROL_READ,                                (u8*)&g_zcl_seAttrs.multiplier},
+    {ZCL_ATTRID_DIVISOR,                            ZCL_DATA_TYPE_UINT24,       ACCESS_CONTROL_READ,                                (u8*)&g_zcl_seAttrs.divisor},
+    {ZCL_ATTRID_SUMMATION_FORMATTING,               ZCL_DATA_TYPE_BITMAP8,      ACCESS_CONTROL_READ,                                (u8*)&g_zcl_seAttrs.summation_formatting},
+    {ZCL_ATTRID_REMAINING_BATTERY_LIFE,             ZCL_DATA_TYPE_UINT8,        ACCESS_CONTROL_READ | ACCESS_CONTROL_REPORTABLE,    (u8*)&g_zcl_seAttrs.battery_percentage},
+    {ZCL_ATTRID_METER_SERIAL_NUMBER,                ZCL_DATA_TYPE_OCTET_STR,    ACCESS_CONTROL_READ,                                (u8*)&g_zcl_seAttrs.serial_number},
+    {ZCL_ATTRID_METERING_DEVICE_TYPE,               ZCL_DATA_TYPE_BITMAP8,      ACCESS_CONTROL_READ,                                (u8*)&g_zcl_seAttrs.device_type},
+
+    { ZCL_ATTRID_GLOBAL_CLUSTER_REVISION,           ZCL_DATA_TYPE_UINT16,       ACCESS_CONTROL_READ,                                (u8*)&zcl_attr_global_clusterRevision},
 };
 
 #define ZCL_SE_ATTR_NUM    sizeof(se_attrTbl) / sizeof(zclAttrInfo_t)
+
+zcl_msAttr_t g_zcl_msAttrs = {
+    .type = 0x09,               // bit0: Active measurement (AC). bit3: Phase A measurement
+    .current = 0xffff,
+    .current_multiplier = 1,
+    .current_divisor = 1,
+    .voltage = 0xffff,
+    .voltage_multiplier = 1,
+    .voltage_divisor = 1,
+};
+
+const zclAttrInfo_t ms_attrTbl[] = {
+    {ZCL_ATTRID_MEASUREMENT_TYPE,           ZCL_DATA_TYPE_BITMAP32, ACCESS_CONTROL_READ,                                (u8*)&g_zcl_msAttrs.type},
+    {ZCL_ATTRID_LINE_CURRENT,               ZCL_DATA_TYPE_UINT16,   ACCESS_CONTROL_READ | ACCESS_CONTROL_REPORTABLE,    (u8*)&g_zcl_msAttrs.current},
+    {ZCL_ATTRID_AC_CURRENT_MULTIPLIER,      ZCL_DATA_TYPE_UINT16,   ACCESS_CONTROL_READ | ACCESS_CONTROL_REPORTABLE,    (u8*)&g_zcl_msAttrs.current_multiplier},
+    {ZCL_ATTRID_AC_CURRENT_DIVISOR,         ZCL_DATA_TYPE_UINT16,   ACCESS_CONTROL_READ | ACCESS_CONTROL_REPORTABLE,    (u8*)&g_zcl_msAttrs.current_divisor},
+    {ZCL_ATTRID_RMS_VOLTAGE,                ZCL_DATA_TYPE_UINT16,   ACCESS_CONTROL_READ | ACCESS_CONTROL_REPORTABLE,    (u8*)&g_zcl_msAttrs.voltage},
+    {ZCL_ATTRID_AC_VOLTAGE_MULTIPLIER,      ZCL_DATA_TYPE_UINT16,   ACCESS_CONTROL_READ | ACCESS_CONTROL_REPORTABLE,    (u8*)&g_zcl_msAttrs.voltage_multiplier},
+    {ZCL_ATTRID_AC_CURRENT_DIVISOR,         ZCL_DATA_TYPE_UINT16,   ACCESS_CONTROL_READ | ACCESS_CONTROL_REPORTABLE,    (u8*)&g_zcl_msAttrs.voltage_divisor},
+
+    { ZCL_ATTRID_GLOBAL_CLUSTER_REVISION,   ZCL_DATA_TYPE_UINT16,   ACCESS_CONTROL_READ,                                (u8*)&zcl_attr_global_clusterRevision},
+};
+
+#define ZCL_MS_ATTR_NUM    sizeof(ms_attrTbl) / sizeof(zclAttrInfo_t)
+//ZCL_CLUSTER_MS_ELECTRICAL_MEASUREMENT
+
 
 #ifdef ZCL_GROUP
 /* Group */
@@ -281,6 +310,7 @@ const zcl_specClusterInfo_t g_electricityMeterClusterList[] =
 #endif
 	{ZCL_CLUSTER_GEN_TIME,      MANUFACTURER_CODE_NONE, ZCL_TIME_ATTR_NUM,      time_attrTbl,       zcl_time_register,      electricityMeter_timeCb},
     {ZCL_CLUSTER_SE_METERING,   MANUFACTURER_CODE_NONE, ZCL_SE_ATTR_NUM,        se_attrTbl,         zcl_metering_register,  electricityMeter_meteringCb},
+    {ZCL_CLUSTER_MS_ELECTRICAL_MEASUREMENT,   MANUFACTURER_CODE_NONE, ZCL_MS_ATTR_NUM, ms_attrTbl,  zcl_electricalMeasure_register,  NULL},
 };
 
 u8 ELECTRICITY_METER_CB_CLUSTER_NUM = (sizeof(g_electricityMeterClusterList)/sizeof(g_electricityMeterClusterList[0]));

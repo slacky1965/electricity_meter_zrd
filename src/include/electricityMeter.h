@@ -90,6 +90,16 @@ typedef struct {
     u8  device_type;
 } zcl_seAttr_t;
 
+typedef struct {
+    u32 type;
+    u16 current;
+    u16 voltage;
+    u16 voltage_multiplier;
+    u16 voltage_divisor;
+    u16 current_multiplier;
+    u16 current_divisor;
+} zcl_msAttr_t;
+
 ///**
 // *  @brief Defined for group cluster attributes
 // */

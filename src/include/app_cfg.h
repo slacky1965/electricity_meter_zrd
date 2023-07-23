@@ -205,6 +205,7 @@ extern "C" {
 #endif
 #define ZCL_TIME_SUPPORT                            1
 #define ZCL_METERING_SUPPORT                        1
+#define ZCL_ELECTRICAL_MEASUREMENT_SUPPORT          1
 
 
 
