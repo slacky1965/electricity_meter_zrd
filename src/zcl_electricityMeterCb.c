@@ -33,6 +33,7 @@
 
 #include "app_ui.h"
 #include "electricityMeter.h"
+#include "se_custom_attr.h"
 
 /**********************************************************************
  * LOCAL CONSTANTS
@@ -165,8 +166,50 @@ static void electricityMeter_zclReadRspCmd(zclReadRspCmd_t *pReadRspCmd)
  */
 static void electricityMeter_zclWriteReqCmd(u16 clusterId, zclWriteCmd_t *pWriteReqCmd)
 {
-//	u8 numAttr = pWriteReqCmd->numAttr;
-//	zclWriteRec_t *attr = pWriteReqCmd->attrList;
+
+//    printf("electricityMeter_zclWriteReqCmd()\r\n");
+
+
+
+	u8 numAttr = pWriteReqCmd->numAttr;
+	zclWriteRec_t *attr = pWriteReqCmd->attrList;
+
+	if (clusterId == ZCL_CLUSTER_SE_METERING) {
+	    for (u8 i = 0; i < numAttr; i++) {
+	        if (attr[i].attrID == ZCL_ATTRID_CUSTOM_DEVICE_ADDRESS && attr[i].dataType == ZCL_DATA_TYPE_UINT32) {
+	            u32 device_address = BUILD_U32(attr->attrData[0], attr->attrData[1], attr->attrData[2], attr->attrData[3]);
+	            if (em_config.device_address != device_address) {
+	                em_config.device_address = device_address;
+	                write_config();
+#if UART_PRINTF_MODE && DEBUG_LEVEL
+	                printf("New device address: %d\r\n", em_config.device_address);
+#endif
+	                zcl_setAttrVal(ELECTRICITY_METER_EP1, ZCL_CLUSTER_SE_METERING, ZCL_ATTRID_CUSTOM_DEVICE_ADDRESS, (u8*)&device_address);
+	            }
+	        } else if (attr[i].attrID == ZCL_ATTRID_CUSTOM_DEVICE_MANUFACTURER && attr[i].attrData) {
+	            device_model_t model = *attr[i].attrData;
+	            set_device_model(model);
+                zcl_setAttrVal(ELECTRICITY_METER_EP1, ZCL_CLUSTER_SE_METERING, ZCL_ATTRID_CUSTOM_DEVICE_MANUFACTURER, (u8*)&model);
+	        } else if (attr[i].attrID == ZCL_ATTRID_CUSTOM_MEASUREMENT_PERIOD && attr[i].dataType == ZCL_DATA_TYPE_UINT8) {
+	            u8 period_in_min = *attr[i].attrData;
+	            if (period_in_min == 0) period_in_min = 1;
+	            u16 period_in_sec = period_in_min * 60;
+	            if (em_config.measurement_period != period_in_sec) {
+	                em_config.measurement_period = period_in_sec;
+	                write_config();
+#if UART_PRINTF_MODE && DEBUG_LEVEL
+                    printf("New measurement period: %d sec\r\n", em_config.measurement_period);
+#endif
+                    zcl_setAttrVal(ELECTRICITY_METER_EP1, ZCL_CLUSTER_SE_METERING, ZCL_ATTRID_CUSTOM_MEASUREMENT_PERIOD, (u8*)&period_in_min);
+                    if (g_electricityMeterCtx.timerMeasurementEvt) {
+                        TL_ZB_TIMER_CANCEL(&g_electricityMeterCtx.timerMeasurementEvt);
+                    }
+                    g_electricityMeterCtx.timerMeasurementEvt = TL_ZB_TIMER_SCHEDULE(measure_meterCb, NULL, em_config.measurement_period * 1000);
+	            }
+	        }
+	    }
+	}
+
 //
 //	if(clusterId == ZCL_CLUSTER_GEN_ON_OFF){
 //		for(u8 i = 0; i < numAttr; i++){

@@ -47,6 +47,7 @@ INCLUDE_PATHS := \
 -I$(SDK_PATH)/zbhci \
 -I$(SRC_PATH) \
 -I$(SRC_PATH)/include \
+-I$(SRC_PATH)/devices/include \
 -I$(SRC_PATH)/common \
 -I./common 
  
@@ -115,11 +116,11 @@ sizedummy \
 all: pre-build main-build
 
 flash: $(BIN_FILE)
-	@python3 $(TOOLS_PATH)/TlsrPgm.py -p$(DOWNLOAD_PORT) -t50 -a2550 -m -w we 0 $(BIN_FILE)
+	@python3 $(TOOLS_PATH)/TlsrPgm.py -b921600 -p$(DOWNLOAD_PORT) -t50 -a2550 -m -w we 0 $(BIN_FILE)
 #	@python3 $(TOOLS_PATH)/TlsrComProg.py -p$(DOWNLOAD_PORT) -f $(TOOLS_PATH)/floader.bin we 0 $(BIN_FILE)
 	
 erase-flash:
-	@python3 $(TOOLS_PATH)/TlsrPgm.py -p$(DOWNLOAD_PORT) -t50 -a2550 ea
+	@python3 $(TOOLS_PATH)/TlsrPgm.py -b921600 -p$(DOWNLOAD_PORT) -t50 -a2550 ea
 #	@python3 $(TOOLS_PATH)/TlsrComProg.py -p$(DOWNLOAD_PORT) -f $(TOOLS_PATH)/floader.bin ea
 
 reset:

@@ -1,6 +1,9 @@
 #ifndef SRC_INCLUDE_ELECTRICITYMETER_H_
 #define SRC_INCLUDE_ELECTRICITYMETER_H_
 
+#include "app_utility.h"
+#include "device.h"
+
 /**********************************************************************
  * CONSTANT
  */
@@ -17,9 +20,20 @@ typedef struct{
     u8 key[16]; /* the key used */
 }app_linkKey_info_t;
 
+typedef struct {
+    ev_timer_event_t *timerReportMinEvt;
+    ev_timer_event_t *timerReportMaxEvt;
+    reportCfgInfo_t  *pEntry;
+    u32               time_posted;
+} app_reporting_t;
+
 typedef struct{
     ev_timer_event_t *timerLedEvt;
     ev_timer_event_t *timerLedStatusEvt;
+//    ev_timer_event_t *timerForcedReportEvt;
+    ev_timer_event_t *timerStopReportEvt;
+    ev_timer_event_t *timerMeasurementEvt;
+    ev_timer_event_t *timerNoJoinedEvt;
 
     button_t button;
 
@@ -31,7 +45,7 @@ typedef struct{
     u8  state;
 
     bool bdbFindBindFlg;
-    bool lightAttrsChanged;
+//    bool lightAttrsChanged;
 
     app_linkKey_info_t tcLinkKey;
 }app_ctx_t;
@@ -62,14 +76,6 @@ typedef struct{
     u16 identifyTime;
 }zcl_identifyAttr_t;
 
-/**
- *  @brief Defined for power configuration cluster attributes
- */
-typedef struct{
-    u16 mainsVoltage;
-    u8  mainsFrequency;
-}zcl_powerAttr_t;
-
 typedef struct {
     u32 time_utc;
 } zcl_timeAttr_t;
@@ -86,8 +92,11 @@ typedef struct {
                                 // Bits 3 to 6: Number of Digits to the left of the Decimal Point
                                 // Bit  7:      If set, suppress leading zeros
     u8  battery_percentage;
-    u8  serial_number[ZCL_BASIC_MAX_LENGTH];
+    u8  serial_number[DATA_MAX_LEN+1];
     u8  device_type;
+    u8  device_model;
+    u32 device_address;
+    u8  measurement_period;
 } zcl_seAttr_t;
 
 typedef struct {
@@ -100,101 +109,17 @@ typedef struct {
     u16 current_divisor;
 } zcl_msAttr_t;
 
-///**
-// *  @brief Defined for group cluster attributes
-// */
-//typedef struct{
-//    u8  nameSupport;
-//}zcl_groupAttr_t;
-//
-///**
-// *  @brief Defined for scene cluster attributes
-// */
-//typedef struct{
-//    u8   sceneCount;
-//    u8   currentScene;
-//    u8   nameSupport;
-//    bool sceneValid;
-//    u16  currentGroup;
-//}zcl_sceneAttr_t;
-//
-///**
-// *  @brief Defined for on/off cluster attributes
-// */
-//typedef struct{
-//    u16  onTime;
-//    u16  offWaitTime;
-//    u8   startUpOnOff;
-//    bool onOff;
-//    bool globalSceneControl;
-//}zcl_onOffAttr_t;
-//
-///**
-// *  @brief Defined for level cluster attributes
-// */
-//typedef struct{
-//    u16 remainingTime;
-//    u8  curLevel;
-//    u8  startUpCurrentLevel;
-//}zcl_levelAttr_t;
-//
-///**
-// *  @brief Defined for color control cluster attributes
-// */
-//typedef struct{
-//    u8  colorMode;
-//    u8  options;
-//    u8  enhancedColorMode;
-//    u8  numOfPrimaries;
-//    u16 colorCapabilities;
-//#if COLOR_RGB_SUPPORT
-//    u8  currentHue;
-//    u8  currentSaturation;
-//    u8  colorLoopActive;
-//    u8  colorLoopDirection;
-//    u16 colorLoopTime;
-//    u16 colorLoopStartEnhancedHue;
-//    u16 colorLoopStoredEnhancedHue;
-//#elif COLOR_CCT_SUPPORT
-//    u16 colorTemperatureMireds;
-//    u16 colorTempPhysicalMinMireds;
-//    u16 colorTempPhysicalMaxMireds;
-//    u16 startUpColorTemperatureMireds;
-//#endif
-//}zcl_lightColorCtrlAttr_t;
-//
-///**
-// *  @brief Defined for saving on/off attributes
-// */
-//typedef struct {
-//    u8  onOff;
-//    u8  startUpOnOff;
-//}zcl_nv_onOff_t;
-//
-///**
-// *  @brief Defined for saving level attributes
-// */
-//typedef struct {
-//    u8  curLevel;
-//    u8  startUpCurLevel;
-//}zcl_nv_level_t;
-//
-///**
-// *  @brief Defined for saving color control attributes
-// */
-//typedef struct {
-//#if COLOR_RGB_SUPPORT
-//    u8  currentHue;
-//    u8  currentSaturation;
-//#elif COLOR_CCT_SUPPORT
-//    u16 colorTemperatureMireds;
-//    u16 startUpColorTemperatureMireds;
-//#endif
-//}zcl_nv_colorCtrl_t;
+typedef struct {
+    s16 temperature;
+    u8  alarm_mask;         /* bit0 = 0 (low alarm is disabled), bit1 = 1 (high alarm is enabled) */
+    s16 high_threshold;     /* 70 in degrees Celsius                                              */
+} zcl_tempAttr_t;
+
 
 /**********************************************************************
  * GLOBAL VARIABLES
  */
+extern app_reporting_t app_reporting[ZCL_REPORTING_TABLE_NUM];
 extern app_ctx_t g_electricityMeterCtx;
 
 extern bdb_commissionSetting_t g_bdbCommissionSetting;
@@ -212,16 +137,6 @@ extern const af_simple_descriptor_t sampleTestDesc;
 extern zcl_basicAttr_t g_zcl_basicAttrs;
 extern zcl_identifyAttr_t g_zcl_identifyAttrs;
 extern zcl_seAttr_t g_zcl_seAttrs;
-//extern zcl_groupAttr_t g_zcl_groupAttrs;
-//extern zcl_sceneAttr_t g_zcl_sceneAttrs;
-//extern zcl_onOffAttr_t g_zcl_onOffAttrs;
-//extern zcl_levelAttr_t g_zcl_levelAttrs;
-//extern zcl_lightColorCtrlAttr_t g_zcl_colorCtrlAttrs;
-
-#define zcl_sceneAttrGet()      &g_zcl_sceneAttrs
-#define zcl_onoffAttrGet()      &g_zcl_onOffAttrs
-#define zcl_levelAttrGet()      &g_zcl_levelAttrs
-#define zcl_colorAttrGet()      &g_zcl_colorCtrlAttrs
 
 /**********************************************************************
  * FUNCTIONS
@@ -230,10 +145,10 @@ void electricityMeter_zclProcessIncomingMsg(zclIncoming_t *pInHdlrMsg);
 
 status_t electricityMeter_basicCb(zclIncomingAddrInfo_t *pAddrInfo, u8 cmdId, void *cmdPayload);
 status_t electricityMeter_identifyCb(zclIncomingAddrInfo_t *pAddrInfo, u8 cmdId, void *cmdPayload);
-status_t electricityMeter_sceneCb(zclIncomingAddrInfo_t *pAddrInfo, u8 cmdId, void *cmdPayload);
-status_t electricityMeter_onOffCb(zclIncomingAddrInfo_t *pAddrInfo, u8 cmdId, void *cmdPayload);
-status_t electricityMeter_levelCb(zclIncomingAddrInfo_t *pAddrInfo, u8 cmdId, void *cmdPayload);
-status_t electricityMeter_colorCtrlCb(zclIncomingAddrInfo_t *pAddrInfo, u8 cmdId, void *cmdPayload);
+//status_t electricityMeter_sceneCb(zclIncomingAddrInfo_t *pAddrInfo, u8 cmdId, void *cmdPayload);
+//status_t electricityMeter_onOffCb(zclIncomingAddrInfo_t *pAddrInfo, u8 cmdId, void *cmdPayload);
+//status_t electricityMeter_levelCb(zclIncomingAddrInfo_t *pAddrInfo, u8 cmdId, void *cmdPayload);
+//status_t electricityMeter_colorCtrlCb(zclIncomingAddrInfo_t *pAddrInfo, u8 cmdId, void *cmdPayload);
 status_t electricityMeter_timeCb(zclIncomingAddrInfo_t *pAddrInfo, u8 cmdId, void *cmdPayload);
 status_t electricityMeter_meteringCb(zclIncomingAddrInfo_t *pAddrInfo, u8 cmdId, void *cmdPayload);
 

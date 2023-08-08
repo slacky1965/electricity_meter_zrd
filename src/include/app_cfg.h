@@ -39,7 +39,7 @@ extern "C" {
 
 /* for reporting */
 #define REPORTING_MIN       60              /* 1 min            */
-#define REPORTING_MAX       300             /* 5 min           */
+#define REPORTING_MAX       300             /* 5 min            */
 
 ///* for polling */
 //#define LONG_POLL           REPORTING_MIN
@@ -62,6 +62,7 @@ extern "C" {
 #define	UART_PRINTF_MODE				ON
 #define USB_PRINTF_MODE         		OFF
 #define DEBUG_LEVEL                     ON
+#define UART_DEBUG                      ON
 
 /* PM */
 #define PM_ENABLE						OFF
@@ -193,19 +194,20 @@ extern "C" {
 /**********************************************************************
  * ZCL cluster support setting
  */
-#define ZCL_ON_OFF_SUPPORT                          0
-#define ZCL_LEVEL_CTRL_SUPPORT                      0
-#define ZCL_GROUP_SUPPORT                           0
-#define ZCL_SCENE_SUPPORT                           0
-#define ZCL_OTA_SUPPORT                             1
-#define ZCL_GP_SUPPORT                              1
-#define ZCL_WWAH_SUPPORT                            0
+//#define ZCL_ON_OFF_SUPPORT                          OFF
+//#define ZCL_LEVEL_CTRL_SUPPORT                      OFF
+//#define ZCL_GROUP_SUPPORT                           OFF
+//#define ZCL_SCENE_SUPPORT                           OFF
+#define ZCL_OTA_SUPPORT                             ON
+#define ZCL_GP_SUPPORT                              ON
+//#define ZCL_WWAH_SUPPORT                            OFF
 #if TOUCHLINK_SUPPORT
-#define ZCL_ZLL_COMMISSIONING_SUPPORT               1
+#define ZCL_ZLL_COMMISSIONING_SUPPORT               ON
 #endif
-#define ZCL_TIME_SUPPORT                            1
-#define ZCL_METERING_SUPPORT                        1
-#define ZCL_ELECTRICAL_MEASUREMENT_SUPPORT          1
+#define ZCL_TIME_SUPPORT                            ON
+#define ZCL_METERING_SUPPORT                        ON
+#define ZCL_ELECTRICAL_MEASUREMENT_SUPPORT          ON
+#define ZCL_DEV_TEMPERATURE_CFG_SUPPORT             ON
 
 
 

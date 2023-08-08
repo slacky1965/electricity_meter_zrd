@@ -31,6 +31,7 @@
 
 #include "app_ui.h"
 #include "electricityMeter.h"
+#include "se_custom_attr.h"
 
 
 /**********************************************************************
@@ -66,6 +67,7 @@ const u16 electricityMeter_inClusterList[] =
     ZCL_CLUSTER_GEN_POLL_CONTROL,
 #endif
     ZCL_CLUSTER_SE_METERING,
+    ZCL_CLUSTER_GEN_DEVICE_TEMP_CONFIG,
 };
 
 /**
@@ -204,7 +206,9 @@ zcl_seAttr_t g_zcl_seAttrs = {
     .summation_formatting = 0,
     .battery_percentage = 100,
     .serial_number = {8,'1','1','1','1','1','1','1','1'},
-    .device_type = 0,           // Electric Metering
+    .device_model = 0,           // Electric Metering
+    .device_address = 0,
+    .measurement_period = DEFAULT_MEASUREMENT_PERIOD,
 };
 
 const zclAttrInfo_t se_attrTbl[] = {
@@ -213,12 +217,15 @@ const zclAttrInfo_t se_attrTbl[] = {
     {ZCL_ATTRID_CURRENT_TIER_3_SUMMATION_DELIVERD,  ZCL_DATA_TYPE_UINT48,       ACCESS_CONTROL_READ | ACCESS_CONTROL_REPORTABLE,    (u8*)&g_zcl_seAttrs.tariff_3},
     {ZCL_ATTRID_CURRENT_TIER_4_SUMMATION_DELIVERD,  ZCL_DATA_TYPE_UINT48,       ACCESS_CONTROL_READ | ACCESS_CONTROL_REPORTABLE,    (u8*)&g_zcl_seAttrs.tariff_4},
     {ZCL_ATTRID_UNIT_OF_MEASURE,                    ZCL_DATA_TYPE_UINT8,        ACCESS_CONTROL_READ,                                (u8*)&g_zcl_seAttrs.unit_of_measure},
-    {ZCL_ATTRID_MULTIPLIER,                         ZCL_DATA_TYPE_UINT24,       ACCESS_CONTROL_READ,                                (u8*)&g_zcl_seAttrs.multiplier},
-    {ZCL_ATTRID_DIVISOR,                            ZCL_DATA_TYPE_UINT24,       ACCESS_CONTROL_READ,                                (u8*)&g_zcl_seAttrs.divisor},
+    {ZCL_ATTRID_MULTIPLIER,                         ZCL_DATA_TYPE_UINT24,       ACCESS_CONTROL_READ | ACCESS_CONTROL_REPORTABLE,    (u8*)&g_zcl_seAttrs.multiplier},
+    {ZCL_ATTRID_DIVISOR,                            ZCL_DATA_TYPE_UINT24,       ACCESS_CONTROL_READ | ACCESS_CONTROL_REPORTABLE,    (u8*)&g_zcl_seAttrs.divisor},
     {ZCL_ATTRID_SUMMATION_FORMATTING,               ZCL_DATA_TYPE_BITMAP8,      ACCESS_CONTROL_READ,                                (u8*)&g_zcl_seAttrs.summation_formatting},
     {ZCL_ATTRID_REMAINING_BATTERY_LIFE,             ZCL_DATA_TYPE_UINT8,        ACCESS_CONTROL_READ | ACCESS_CONTROL_REPORTABLE,    (u8*)&g_zcl_seAttrs.battery_percentage},
-    {ZCL_ATTRID_METER_SERIAL_NUMBER,                ZCL_DATA_TYPE_OCTET_STR,    ACCESS_CONTROL_READ,                                (u8*)&g_zcl_seAttrs.serial_number},
+    {ZCL_ATTRID_METER_SERIAL_NUMBER,                ZCL_DATA_TYPE_OCTET_STR,    ACCESS_CONTROL_READ | ACCESS_CONTROL_REPORTABLE,    (u8*)&g_zcl_seAttrs.serial_number},
     {ZCL_ATTRID_METERING_DEVICE_TYPE,               ZCL_DATA_TYPE_BITMAP8,      ACCESS_CONTROL_READ,                                (u8*)&g_zcl_seAttrs.device_type},
+    {ZCL_ATTRID_CUSTOM_DEVICE_MANUFACTURER,         ZCL_DATA_TYPE_ENUM8,        ACCESS_CONTROL_READ | ACCESS_CONTROL_WRITE,         (u8*)&g_zcl_seAttrs.device_model},
+    {ZCL_ATTRID_CUSTOM_DEVICE_ADDRESS,              ZCL_DATA_TYPE_UINT32,       ACCESS_CONTROL_READ | ACCESS_CONTROL_WRITE,         (u8*)&g_zcl_seAttrs.device_address},
+    {ZCL_ATTRID_CUSTOM_MEASUREMENT_PERIOD,          ZCL_DATA_TYPE_UINT8,        ACCESS_CONTROL_READ | ACCESS_CONTROL_WRITE,         (u8*)&g_zcl_seAttrs.measurement_period},
 
     { ZCL_ATTRID_GLOBAL_CLUSTER_REVISION,           ZCL_DATA_TYPE_UINT16,       ACCESS_CONTROL_READ,                                (u8*)&zcl_attr_global_clusterRevision},
 };
@@ -248,7 +255,22 @@ const zclAttrInfo_t ms_attrTbl[] = {
 };
 
 #define ZCL_MS_ATTR_NUM    sizeof(ms_attrTbl) / sizeof(zclAttrInfo_t)
-//ZCL_CLUSTER_MS_ELECTRICAL_MEASUREMENT
+
+zcl_tempAttr_t g_zcl_tempAttrs = {
+        .temperature    = 22,
+        .alarm_mask     = 0x02, /* bit0 = 0 (low alarm is disabled), bit1 = 1 (high alarm is enabled) */
+        .high_threshold = 70,   /* 70 in degrees Celsius                                              */
+};
+
+const zclAttrInfo_t temp_attrTbl[] = {
+        {ZCL_ATTRID_DEV_TEMP_CURR_TEMP,     ZCL_DATA_TYPE_INT16,    ACCESS_CONTROL_READ | ACCESS_CONTROL_REPORTABLE,    (u8*)&g_zcl_tempAttrs.temperature},
+        {ZCL_ATTRID_DEV_TEMP_ALARM_MASK,    ZCL_DATA_TYPE_BITMAP8,  ACCESS_CONTROL_READ | ACCESS_CONTROL_WRITE,         (u8*)&g_zcl_tempAttrs.alarm_mask},
+        {ZCL_ATTRID_DEV_TEMP_HIGHT_THRE,    ZCL_DATA_TYPE_INT16,    ACCESS_CONTROL_READ | ACCESS_CONTROL_WRITE,         (u8*)&g_zcl_tempAttrs.high_threshold},
+
+        { ZCL_ATTRID_GLOBAL_CLUSTER_REVISION,   ZCL_DATA_TYPE_UINT16,   ACCESS_CONTROL_READ,                            (u8*)&zcl_attr_global_clusterRevision},
+};
+
+#define ZCL_TEMP_ATTR_NUM    sizeof(temp_attrTbl) / sizeof(zclAttrInfo_t)
 
 
 #ifdef ZCL_GROUP
@@ -300,17 +322,18 @@ const zclAttrInfo_t scene_attrTbl[] =
  */
 const zcl_specClusterInfo_t g_electricityMeterClusterList[] =
 {
-	{ZCL_CLUSTER_GEN_BASIC,     MANUFACTURER_CODE_NONE, ZCL_BASIC_ATTR_NUM, 	basic_attrTbl,  	zcl_basic_register,		electricityMeter_basicCb},
-	{ZCL_CLUSTER_GEN_IDENTIFY,	MANUFACTURER_CODE_NONE, ZCL_IDENTIFY_ATTR_NUM,  identify_attrTbl,   zcl_identify_register,  electricityMeter_identifyCb},
+	{ZCL_CLUSTER_GEN_BASIC,                 MANUFACTURER_CODE_NONE, ZCL_BASIC_ATTR_NUM, 	basic_attrTbl,  	zcl_basic_register,		electricityMeter_basicCb},
+	{ZCL_CLUSTER_GEN_IDENTIFY,	            MANUFACTURER_CODE_NONE, ZCL_IDENTIFY_ATTR_NUM,  identify_attrTbl,   zcl_identify_register,  electricityMeter_identifyCb},
 #ifdef ZCL_GROUP
-	{ZCL_CLUSTER_GEN_GROUPS,	MANUFACTURER_CODE_NONE, ZCL_GROUP_ATTR_NUM, 	group_attrTbl,  	zcl_group_register,		NULL},
+	{ZCL_CLUSTER_GEN_GROUPS,	            MANUFACTURER_CODE_NONE, ZCL_GROUP_ATTR_NUM, 	group_attrTbl,  	zcl_group_register,		NULL},
 #endif
 #ifdef ZCL_SCENE
-	{ZCL_CLUSTER_GEN_SCENES,	MANUFACTURER_CODE_NONE, ZCL_SCENE_ATTR_NUM,		scene_attrTbl,		zcl_scene_register,		electricityMeter_sceneCb},
+	{ZCL_CLUSTER_GEN_SCENES,	            MANUFACTURER_CODE_NONE, ZCL_SCENE_ATTR_NUM,		scene_attrTbl,		zcl_scene_register,		electricityMeter_sceneCb},
 #endif
-	{ZCL_CLUSTER_GEN_TIME,      MANUFACTURER_CODE_NONE, ZCL_TIME_ATTR_NUM,      time_attrTbl,       zcl_time_register,      electricityMeter_timeCb},
-    {ZCL_CLUSTER_SE_METERING,   MANUFACTURER_CODE_NONE, ZCL_SE_ATTR_NUM,        se_attrTbl,         zcl_metering_register,  electricityMeter_meteringCb},
-    {ZCL_CLUSTER_MS_ELECTRICAL_MEASUREMENT,   MANUFACTURER_CODE_NONE, ZCL_MS_ATTR_NUM, ms_attrTbl,  zcl_electricalMeasure_register,  NULL},
+	{ZCL_CLUSTER_GEN_TIME,                  MANUFACTURER_CODE_NONE, ZCL_TIME_ATTR_NUM,      time_attrTbl,       zcl_time_register,      electricityMeter_timeCb},
+    {ZCL_CLUSTER_SE_METERING,               MANUFACTURER_CODE_NONE, ZCL_SE_ATTR_NUM,        se_attrTbl,         zcl_metering_register,  electricityMeter_meteringCb},
+    {ZCL_CLUSTER_MS_ELECTRICAL_MEASUREMENT, MANUFACTURER_CODE_NONE, ZCL_MS_ATTR_NUM,        ms_attrTbl,         zcl_electricalMeasure_register,  NULL},
+    {ZCL_CLUSTER_GEN_DEVICE_TEMP_CONFIG,    MANUFACTURER_CODE_NONE, ZCL_TEMP_ATTR_NUM,      temp_attrTbl,       zcl_devTemperatureCfg_register,  NULL},
 };
 
 u8 ELECTRICITY_METER_CB_CLUSTER_NUM = (sizeof(g_electricityMeterClusterList)/sizeof(g_electricityMeterClusterList[0]));

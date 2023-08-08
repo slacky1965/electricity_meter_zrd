@@ -1,11 +1,15 @@
 # Add inputs and outputs from these tool invocations to the build variables
 OUT_DIR += \
 /$(SRC_PATH) \
-/$(SRC_PATH)/common
+/$(SRC_PATH)/common \
+/$(SRC_PATH)/devices
  
 OBJS += \
 $(OUT_PATH)/$(SRC_PATH)/common/main.o \
+$(OUT_PATH)/$(SRC_PATH)/devices/device.o \
+$(OUT_PATH)/$(SRC_PATH)/devices/kaskad_1_mt.o \
 $(OUT_PATH)/$(SRC_PATH)/app_ui.o \
+$(OUT_PATH)/$(SRC_PATH)/app_uart.o \
 $(OUT_PATH)/$(SRC_PATH)/electricityMeterEpCfg.o \
 $(OUT_PATH)/$(SRC_PATH)/zcl_electricityMeterCb.o \
 $(OUT_PATH)/$(SRC_PATH)/zb_appCb.o \

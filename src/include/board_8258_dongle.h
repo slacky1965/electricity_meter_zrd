@@ -80,6 +80,12 @@ extern "C" {
 /*******************************************************************************************************
 *********************8258Dongle with 48 Pins: Start*****************************************************
 *******************************************************************************************************/
+
+/**************************** Configure UART ***************************************/
+#define UART_BAUD_RATE          9600
+#define UART_TX_GPIO            UART_TX_PD7
+#define UART_RX_GPIO            UART_RX_PA0
+
 //KEY
 #define	BUTTON 					    GPIO_PD6
 #define PD6_FUNC					AS_GPIO
@@ -94,26 +100,6 @@ extern "C" {
 #define PD5_OUTPUT_ENABLE			0
 #define PD5_INPUT_ENABLE			1
 #define	PULL_WAKEUP_SRC_PD5			PM_PIN_PULLUP_1M //PM_PIN_PULLUP_10K
-
-/************************* Configure counters ***************************************/
-#define LITERS_PER_PULSE        10              /* How many liters per one pulse */
-#define COUNTERS_OVERFLOW       100000000       /* counters overflow             */
-
-/************************* Configure HOT GPIO ***************************************/
-#define HOT_GPIO                GPIO_PB2
-#define PB2_INPUT_ENABLE        ON
-#define PB2_DATA_OUT            OFF
-#define PB2_OUTPUT_ENABLE       OFF
-#define PB2_FUNC                AS_GPIO
-#define PULL_WAKEUP_SRC_PB2     PM_PIN_PULLUP_1M
-
-/************************* Configure COLD GPIO **************************************/
-#define COLD_GPIO               GPIO_PB3
-#define PB3_INPUT_ENABLE        ON
-#define PB3_DATA_OUT            OFF
-#define PB3_OUTPUT_ENABLE       OFF
-#define PB3_FUNC                AS_GPIO
-#define PULL_WAKEUP_SRC_PB3     PM_PIN_PULLUP_1M
 
 
 //LED

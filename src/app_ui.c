@@ -30,6 +30,7 @@
 #include "zb_api.h"
 #include "zcl_include.h"
 #include "gp.h"
+#include "app_uart.h"
 
 #include "app_ui.h"
 #include "electricityMeter.h"
@@ -144,6 +145,27 @@ s32 getTimeCb(void *arg) {
     return 0;
 }
 
+s32 getTemperatureCb(void *arg) {
+
+    u16 temperature = adc_temp_result();
+
+    zcl_setAttrVal(ELECTRICITY_METER_EP1, ZCL_CLUSTER_GEN_DEVICE_TEMP_CONFIG, ZCL_ATTRID_DEV_TEMP_CURR_TEMP, (u8*)&temperature);
+
+    return 0;
+}
+
+s32 measure_meterCb(void *arg) {
+
+    s32 period = DEFAULT_MEASUREMENT_PERIOD * 1000;
+
+    if (em_config.device_model && measure_meter) {
+        if (measure_meter()) {
+            period = em_config.measurement_period * 1000;
+        }
+    }
+
+    return period;
+}
 
 static s32 delayedMcuResetCb(void *arg) {
 
@@ -432,14 +454,13 @@ static void init_default_config() {
     em_config.new_ota = 0;
     em_config.flash_addr_start = config_addr_start;
     em_config.flash_addr_end = config_addr_end;
+    em_config.measurement_period = DEFAULT_MEASUREMENT_PERIOD;
     default_config = true;
     write_config();
 }
 
 static void write_restore_config() {
     em_config.crc = checksum((u8*)&(em_config), sizeof(em_config_t));
-//    flash_erase(GEN_USER_CFG_DATA);
-//    flash_write(GEN_USER_CFG_DATA, sizeof(em_config_t), (u8*)&(em_config));
     nv_flashWriteNew(1, NV_MODULE_APP,  NV_ITEM_APP_USER_CFG, sizeof(em_config_t), (u8*)&em_config);
 
 #if UART_PRINTF_MODE && DEBUG_LEVEL
@@ -461,7 +482,6 @@ void init_config(u8 print) {
 #endif
 
     st = nv_flashReadNew(1, NV_MODULE_APP,  NV_ITEM_APP_USER_CFG, sizeof(em_config_t), (u8*)&config_restore);
-    //flash_read(GEN_USER_CFG_DATA, sizeof(em_config_t), (u8*)&config_restore);
 
     u16 crc = checksum((u8*)&config_restore, sizeof(em_config_t));
 
@@ -563,3 +583,43 @@ void write_config() {
 
 }
 
+/**********************************************************************
+ *  For internal temperature sensor. Only TLSR8258
+ */
+
+#if defined(MCU_CORE_8258)
+
+void adc_temp_init() {
+
+    drv_adc_init();
+    adc_set_resolution(ADC_MISC_CHN, RES14);
+    adc_set_vref_chn_misc(ADC_VREF_1P2V);
+    adc_set_ain_channel_differential_mode(ADC_MISC_CHN, TEMSENSORP, TEMSENSORN);
+    adc_set_vref_vbat_divider(ADC_VBAT_DIVIDER_OFF);//set Vbat divider select,
+    adc_set_ain_pre_scaler(ADC_PRESCALER_1F8);
+
+    drv_adc_enable(ON);
+
+    //enable temperature sensor
+//    analog_write(0x00, (analog_read(0x00)&0xef));
+    analog_write(0x07, analog_read(0x07)&0xEF);
+}
+
+
+s16 adc_temp_result() {
+    s16 adc_temp_value;
+    u32 adc_data;
+
+    adc_data = drv_get_adc_data();
+
+    if (adc_data > 255) adc_data = 255;
+
+    //printf("adc_data: %d\r\n", adc_data);
+
+    adc_temp_value = ((adc_data*100 - 130*100)/54 - 40); // * 100 ;
+//    adc_temp_value |= (adc_data*100 - 130*100)%54;
+
+    return adc_temp_value;
+}
+
+#endif

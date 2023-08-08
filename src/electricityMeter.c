@@ -35,8 +35,9 @@
 
 #include "app_ui.h"
 #include "electricityMeter.h"
-//#include "electricityMeterCtrl.h"
-#include "factory_reset.h"
+#include "app_uart.h"
+#include "device.h"
+//#include "factory_reset.h"
 
 /**********************************************************************
  * LOCAL CONSTANTS
@@ -54,6 +55,9 @@
 /**********************************************************************
  * GLOBAL VARIABLES
  */
+
+app_reporting_t app_reporting[ZCL_REPORTING_TABLE_NUM];
+
 app_ctx_t g_electricityMeterCtx = {
         .timerLedStatusEvt = NULL,
 };
@@ -118,6 +122,197 @@ ev_timer_event_t *electricityMeterAttrsStoreTimerEvt = NULL;
  * FUNCTIONS
  */
 
+extern void reportAttr(reportCfgInfo_t *pEntry);
+
+/**********************************************************************
+ * Custom reporting application
+ */
+
+static void app_reporting_init() {
+
+    TL_SETSTRUCTCONTENT(app_reporting, 0);
+
+    for (u8 i = 0; i < ZCL_REPORTING_TABLE_NUM; i++) {
+        reportCfgInfo_t *pEntry = &reportingTab.reportCfgInfo[i];
+//        printf("(%d) used: %s\r\n", i, pEntry->used?"true":"false");
+        if (pEntry->used) {
+//            printf("(%d) endPoint: %d\r\n", i, pEntry->endPoint);
+//            printf("(%d) clusterID: 0x%x\r\n", i, pEntry->clusterID);
+//            printf("(%d) attrID: 0x%x\r\n", i, pEntry->attrID);
+//            printf("(%d) dataType: 0x%x\r\n", i, pEntry->dataType);
+//            printf("(%d) minInterval: %d\r\n", i, pEntry->minInterval);
+//            printf("(%d) maxInterval: %d\r\n", i, pEntry->maxInterval);
+            app_reporting[i].pEntry = pEntry;
+        }
+    }
+}
+
+static u8 app_reportableChangeValueChk(u8 dataType, u8 *curValue, u8 *prevValue, u8 *reportableChange) {
+    u8 needReport = false;
+
+    switch(dataType) {
+        case ZCL_DATA_TYPE_UINT48:
+        {
+            u64 P = BUILD_U48(prevValue[0], prevValue[1], prevValue[2], prevValue[3], prevValue[4], prevValue[5]);
+            u64 C = BUILD_U48(curValue[0], curValue[1], curValue[2], curValue[3], curValue[4], curValue[5]);
+            u64 R = BUILD_U48(reportableChange[0], reportableChange[1], reportableChange[2], reportableChange[3], reportableChange[4], reportableChange[5]);
+            if(P >= C){
+                needReport = ((P - C) > R) ? true : false;
+            }else{
+                needReport = ((C - P) > R) ? true : false;
+            }
+            break;
+        }
+        default:
+            break;
+    }
+
+    return needReport;
+}
+
+static s32 app_reportMinAttrTimerCb(void *arg) {
+    app_reporting_t *app_reporting = (app_reporting_t*)arg;
+    reportCfgInfo_t *pEntry = app_reporting->pEntry;
+
+    zclAttrInfo_t *pAttrEntry = zcl_findAttribute(pEntry->endPoint, pEntry->clusterID, pEntry->attrID);
+    if(!pAttrEntry){
+        //should not happen.
+        ZB_EXCEPTION_POST(SYS_EXCEPTTION_ZB_ZCL_ENTRY);
+        app_reporting->timerReportMinEvt = NULL;
+        return -1;
+    }
+
+    if (pEntry->minInterval == pEntry->maxInterval) {
+        reportAttr(pEntry);
+        app_reporting->time_posted = clock_time();
+#if UART_PRINTF_MODE && DEBUG_LEVEL
+        printf("Report has been sent. endPoint: %d, clusterID: 0x%x, attrID: 0x%x, minInterval: %d, maxInterval: %d\r\n",
+                pEntry->endPoint, pEntry->clusterID, pEntry->attrID, pEntry->minInterval, pEntry->maxInterval);
+#endif
+        return 0;
+    }
+
+    u8 len = zcl_getAttrSize(pAttrEntry->type, pAttrEntry->data);
+
+
+    len = (len>8) ? (8):(len);
+
+    if( (!zcl_analogDataType(pAttrEntry->type) && (memcmp(pEntry->prevData, pAttrEntry->data, len) != SUCCESS)) ||
+                    ((zcl_analogDataType(pAttrEntry->type) && reportableChangeValueChk(pAttrEntry->type,
+                    pAttrEntry->data, pEntry->prevData, pEntry->reportableChange))) ||
+                    ((zcl_analogDataType(pAttrEntry->type) && pAttrEntry->type == ZCL_DATA_TYPE_UINT48 &&
+                    app_reportableChangeValueChk(pAttrEntry->type, pAttrEntry->data, pEntry->prevData, pEntry->reportableChange)))) {
+        reportAttr(pEntry);
+        app_reporting->time_posted = clock_time();
+#if UART_PRINTF_MODE && DEBUG_LEVEL
+        printf("Report has been sent. endPoint: %d, clusterID: 0x%x, attrID: 0x%x, minInterval: %d, maxInterval: %d\r\n",
+                pEntry->endPoint, pEntry->clusterID, pEntry->attrID, pEntry->minInterval, pEntry->maxInterval);
+#endif
+    }
+
+    return 0;
+}
+
+static s32 app_reportMaxAttrTimerCb(void *arg) {
+    app_reporting_t *app_reporting = (app_reporting_t*)arg;
+    reportCfgInfo_t *pEntry = app_reporting->pEntry;
+
+    if (clock_time_exceed(app_reporting->time_posted, pEntry->minInterval*1000*1000)) {
+        if (app_reporting->timerReportMinEvt) {
+            TL_ZB_TIMER_CANCEL(&app_reporting->timerReportMinEvt);
+        }
+#if UART_PRINTF_MODE && DEBUG_LEVEL
+        printf("Report has been sent. endPoint: %d, clusterID: 0x%x, attrID: 0x%x, minInterval: %d, maxInterval: %d\r\n",
+                pEntry->endPoint, pEntry->clusterID, pEntry->attrID, pEntry->minInterval, pEntry->maxInterval);
+#endif
+        reportAttr(pEntry);
+    }
+
+    return 0;
+}
+
+static void app_reportAttrTimerStart() {
+    if(zcl_reportingEntryActiveNumGet()) {
+        for(u8 i = 0; i < ZCL_REPORTING_TABLE_NUM; i++) {
+            reportCfgInfo_t *pEntry = &reportingTab.reportCfgInfo[i];
+            app_reporting[i].pEntry = pEntry;
+            if(pEntry->used && (pEntry->maxInterval != 0xFFFF) && (pEntry->minInterval || pEntry->maxInterval)){
+                if(zb_bindingTblSearched(pEntry->clusterID, pEntry->endPoint)) {
+                    if (!app_reporting[i].timerReportMinEvt) {
+                        if (pEntry->minInterval && pEntry->maxInterval && pEntry->minInterval <= pEntry->maxInterval) {
+#if UART_PRINTF_MODE && DEBUG_LEVEL
+                            printf("Start minTimer. endPoint: %d, clusterID: 0x%x, attrID: 0x%x, min: %d, max: %d\r\n", pEntry->endPoint, pEntry->clusterID, pEntry->attrID, pEntry->minInterval, pEntry->maxInterval);
+#endif
+                            app_reporting[i].timerReportMinEvt = TL_ZB_TIMER_SCHEDULE(app_reportMinAttrTimerCb, &app_reporting[i], pEntry->minInterval*1000);
+                        }
+                    }
+                    if (!app_reporting[i].timerReportMaxEvt) {
+                        if (pEntry->maxInterval) {
+                            if (pEntry->minInterval < pEntry->maxInterval) {
+                                if (pEntry->maxInterval != pEntry->minInterval && pEntry->maxInterval > pEntry->minInterval) {
+#if UART_PRINTF_MODE && DEBUG_LEVEL
+                                    printf("Start maxTimer. endPoint: %d, clusterID: 0x%x, attrID: 0x%x, min: %d, max: %d\r\n", pEntry->endPoint, pEntry->clusterID, pEntry->attrID, pEntry->minInterval, pEntry->maxInterval);
+#endif
+                                    app_reporting[i].timerReportMaxEvt = TL_ZB_TIMER_SCHEDULE(app_reportMaxAttrTimerCb, &app_reporting[i], pEntry->maxInterval*1000);
+                                }
+                            }
+                        } else {
+                            app_reportMinAttrTimerCb(&app_reporting[i]);
+                        }
+
+                    }
+                }
+            }
+        }
+    }
+}
+
+void app_reportNoMinLimit(void)
+{
+    if(zcl_reportingEntryActiveNumGet()){
+        zclAttrInfo_t *pAttrEntry = NULL;
+        u16 len = 0;
+
+        for(u8 i = 0; i < ZCL_REPORTING_TABLE_NUM; i++){
+            reportCfgInfo_t *pEntry = &reportingTab.reportCfgInfo[i];
+            if(pEntry->used && (pEntry->maxInterval != 0xFFFF) && (pEntry->minInterval == 0)){
+                //there is no minimum limit
+                pAttrEntry = zcl_findAttribute(pEntry->endPoint, pEntry->clusterID, pEntry->attrID);
+                if(!pAttrEntry){
+                    //should not happen.
+                    ZB_EXCEPTION_POST(SYS_EXCEPTTION_ZB_ZCL_ENTRY);
+                    return;
+                }
+
+                len = zcl_getAttrSize(pAttrEntry->type, pAttrEntry->data);
+                len = (len>8) ? (8):(len);
+
+                if( (!zcl_analogDataType(pAttrEntry->type) && (memcmp(pEntry->prevData, pAttrEntry->data, len) != SUCCESS)) ||
+                        ((zcl_analogDataType(pAttrEntry->type) && reportableChangeValueChk(pAttrEntry->type,
+                        pAttrEntry->data, pEntry->prevData, pEntry->reportableChange))) ||
+                        ((zcl_analogDataType(pAttrEntry->type) && pAttrEntry->type == ZCL_DATA_TYPE_UINT48 &&
+                        app_reportableChangeValueChk(pAttrEntry->type, pAttrEntry->data, pEntry->prevData, pEntry->reportableChange)))) {
+
+                    reportAttr(pEntry);
+                    app_reporting->time_posted = clock_time();
+#if UART_PRINTF_MODE && DEBUG_LEVEL
+                    printf("Report has been sent. endPoint: %d, clusterID: 0x%x, attrID: 0x%x, minInterval: %d, maxInterval: %d\r\n",
+                            pEntry->endPoint, pEntry->clusterID, pEntry->attrID, pEntry->minInterval, pEntry->maxInterval);
+#endif
+                    if (app_reporting[i].timerReportMaxEvt) {
+                        TL_ZB_TIMER_CANCEL(&app_reporting[i].timerReportMaxEvt);
+                    }
+                    app_reporting[i].timerReportMaxEvt = TL_ZB_TIMER_SCHEDULE(app_reportMaxAttrTimerCb, &app_reporting[i], pEntry->maxInterval*1000);
+#if UART_PRINTF_MODE && DEBUG_LEVEL
+                    printf("Start maxTimer. endPoint: %d, clusterID: 0x%x, attrID: 0x%x, min: %d, max: %d\r\n", pEntry->endPoint, pEntry->clusterID, pEntry->attrID, pEntry->minInterval, pEntry->maxInterval);
+#endif
+                }
+            }
+        }
+    }
+}
+
+
 /*********************************************************************
  * @fn      stack_init
  *
@@ -156,13 +351,7 @@ void user_app_init(void)
 
 	/* Register endPoint */
 	af_endpointRegister(ELECTRICITY_METER_EP1, (af_simple_descriptor_t *)&electricityMeter_simpleDesc, zcl_rx_handler, NULL);
-#if AF_TEST_ENABLE
-	/* A sample of AF data handler. */
-	af_endpointRegister(SAMPLE_TEST_ENDPOINT, (af_simple_descriptor_t *)&sampleTestDesc, afTest_rx_handler, afTest_dataSendConfirm);
-#endif
 
-	/* Initialize or restore attributes, this must before 'zcl_register()' */
-//	zcl_electricityMeterAttrsInit();
 	zcl_reportingTabInit();
 
 	/* Register ZCL specific cluster information */
@@ -178,88 +367,59 @@ void user_app_init(void)
     ota_init(OTA_TYPE_CLIENT, (af_simple_descriptor_t *)&electricityMeter_simpleDesc, &electricityMeter_otaInfo, &electricityMeter_otaCb);
 #endif
 
+    app_uart_init();
     init_config(true);
     init_button();
 
+    adc_temp_init();
+
     g_electricityMeterCtx.timerLedStatusEvt = TL_ZB_TIMER_SCHEDULE(flashLedStatusCb, NULL, TIMEOUT_5SEC);
     TL_ZB_TIMER_SCHEDULE(getTimeCb, NULL, TIMEOUT_5MIN);
+    getTemperatureCb(NULL);
+    TL_ZB_TIMER_SCHEDULE(getTemperatureCb, NULL, TIMEOUT_15SEC);
 
+    set_device_model(em_config.device_model);
+
+    g_electricityMeterCtx.timerMeasurementEvt = TL_ZB_TIMER_SCHEDULE(measure_meterCb, NULL, TIMEOUT_5SEC /*DEFAULT_MEASUREMENT_PERIOD * 1000*/);
 }
 
 
+static void report_handler(void) {
+    if(zb_isDeviceJoinedNwk()) {
 
-s32 electricityMeterAttrsStoreTimerCb(void *arg)
-{
-//	zcl_onOffAttr_save();
-//	zcl_levelAttr_save();
-//	zcl_colorCtrlAttr_save();
+        if (g_electricityMeterCtx.timerStopReportEvt) return;
 
-	electricityMeterAttrsStoreTimerEvt = NULL;
-	return -1;
+        if(zcl_reportingEntryActiveNumGet()) {
+
+            app_reportNoMinLimit();
+
+            //start report timers
+            app_reportAttrTimerStart();
+        }
+    }
 }
 
-void electricityMeterAttrsStoreTimerStart(void)
-{
-	if(electricityMeterAttrsStoreTimerEvt){
-		TL_ZB_TIMER_CANCEL(&electricityMeterAttrsStoreTimerEvt);
-	}
-	electricityMeterAttrsStoreTimerEvt = TL_ZB_TIMER_SCHEDULE(electricityMeterAttrsStoreTimerCb, NULL, 200);
-}
-
-void electricityMeterAttrsChk(void)
-{
-	if(g_electricityMeterCtx.lightAttrsChanged){
-	    g_electricityMeterCtx.lightAttrsChanged = FALSE;
-		if(zb_isDeviceJoinedNwk()){
-			electricityMeterAttrsStoreTimerStart();
-		}
-	}
-}
-
-void report_handler(void)
-{
-	if(zb_isDeviceJoinedNwk()){
-		if(zcl_reportingEntryActiveNumGet()){
-			u16 second = 1;//TODO: fix me
-
-			reportNoMinLimit();
-
-			//start report timer
-			reportAttrTimerStart(second);
-		}else{
-			//stop report timer
-			reportAttrTimerStop();
-		}
-	}
-}
 
 void app_task(void)
 {
 
     button_handler();
 
-	localPermitJoinState();
+//	localPermitJoinState();
 	if(BDB_STATE_GET() == BDB_STATE_IDLE){
 		//factroyRst_handler();
 
 		report_handler();
-
-#if 0/* NOTE: If set to '1', the latest status of lighting will be stored. */
-		electricityMeterAttrsChk();
-#endif
 	}
 }
 
 static void electricityMeterSysException(void)
 {
-//	zcl_onOffAttr_save();
-//	zcl_levelAttr_save();
-//	zcl_colorCtrlAttr_save();
 
 #if 1
 	SYSTEM_RESET();
 #else
-	led_on(LED_POWER);
+	led_on(LED_STATUS);
 	while(1);
 #endif
 }
@@ -304,10 +464,17 @@ void user_init(bool isRetention)
 		g_bdbCommissionSetting.linkKey.tcLinkKey.key = g_electricityMeterCtx.tcLinkKey.key;
 	}
 
-    /* Set default reporting configuration */
     u8 reportableChange = 0x00;
-    bdb_defaultReportingCfg(ELECTRICITY_METER_EP1, HA_PROFILE_ID, ZCL_CLUSTER_GEN_ON_OFF, ZCL_ATTRID_ONOFF,
-    						0x0000, 0x003c, (u8 *)&reportableChange);
+    bdb_defaultReportingCfg(ELECTRICITY_METER_EP1, HA_PROFILE_ID, ZCL_CLUSTER_GEN_DEVICE_TEMP_CONFIG, ZCL_ATTRID_DEV_TEMP_CURR_TEMP,
+            REPORTING_MIN, REPORTING_MAX, (u8 *)&reportableChange);
+//    bdb_defaultReportingCfg(ELECTRICITY_METER_EP1, HA_PROFILE_ID, ZCL_CLUSTER_GEN_POWER_CFG, ZCL_ATTRID_BATTERY_PERCENTAGE_REMAINING,
+//            REPORTING_MIN, REPORTING_MAX, (u8 *)&reportableChange);
+//    bdb_defaultReportingCfg(ELECTRICITY_METER_EP1, HA_PROFILE_ID, ZCL_CLUSTER_SE_METERING, ZCL_ATTRID_CURRENT_SUMMATION_DELIVERD,
+//            0, REPORTING_MIN, (u8 *)&reportableChange);
+
+    /* custom reporting application (non SDK) */
+    app_reporting_init();
+
 
     /* Initialize BDB */
 	bdb_init((af_simple_descriptor_t *)&electricityMeter_simpleDesc, &g_bdbCommissionSetting, &g_zbBdbCb, 1);
