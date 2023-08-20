@@ -206,6 +206,7 @@ zcl_seAttr_t g_zcl_seAttrs = {
     .summation_formatting = 0,
     .battery_percentage = 100,
     .serial_number = {8,'1','1','1','1','1','1','1','1'},
+    .date_release = {10,'1','4','.','1','0','.','1','9','6','5'},
     .device_model = 0,           // Electric Metering
     .device_address = 0,
     .measurement_period = DEFAULT_MEASUREMENT_PERIOD,
@@ -226,6 +227,7 @@ const zclAttrInfo_t se_attrTbl[] = {
     {ZCL_ATTRID_CUSTOM_DEVICE_MANUFACTURER,         ZCL_DATA_TYPE_ENUM8,        ACCESS_CONTROL_READ | ACCESS_CONTROL_WRITE,         (u8*)&g_zcl_seAttrs.device_model},
     {ZCL_ATTRID_CUSTOM_DEVICE_ADDRESS,              ZCL_DATA_TYPE_UINT32,       ACCESS_CONTROL_READ | ACCESS_CONTROL_WRITE,         (u8*)&g_zcl_seAttrs.device_address},
     {ZCL_ATTRID_CUSTOM_MEASUREMENT_PERIOD,          ZCL_DATA_TYPE_UINT8,        ACCESS_CONTROL_READ | ACCESS_CONTROL_WRITE,         (u8*)&g_zcl_seAttrs.measurement_period},
+    {ZCL_ATTRID_CUSTOM_DATE_RELEASE,                ZCL_DATA_TYPE_OCTET_STR,    ACCESS_CONTROL_READ | ACCESS_CONTROL_REPORTABLE,    (u8*)&g_zcl_seAttrs.date_release},
 
     { ZCL_ATTRID_GLOBAL_CLUSTER_REVISION,           ZCL_DATA_TYPE_UINT16,       ACCESS_CONTROL_READ,                                (u8*)&zcl_attr_global_clusterRevision},
 };
@@ -240,6 +242,9 @@ zcl_msAttr_t g_zcl_msAttrs = {
     .voltage = 0xffff,
     .voltage_multiplier = 1,
     .voltage_divisor = 1,
+    .power = 0xffff,
+    .power_multiplier = 1,
+    .power_divisor = 1,
 };
 
 const zclAttrInfo_t ms_attrTbl[] = {
@@ -250,6 +255,9 @@ const zclAttrInfo_t ms_attrTbl[] = {
     {ZCL_ATTRID_RMS_VOLTAGE,                ZCL_DATA_TYPE_UINT16,   ACCESS_CONTROL_READ | ACCESS_CONTROL_REPORTABLE,    (u8*)&g_zcl_msAttrs.voltage},
     {ZCL_ATTRID_AC_VOLTAGE_MULTIPLIER,      ZCL_DATA_TYPE_UINT16,   ACCESS_CONTROL_READ | ACCESS_CONTROL_REPORTABLE,    (u8*)&g_zcl_msAttrs.voltage_multiplier},
     {ZCL_ATTRID_AC_CURRENT_DIVISOR,         ZCL_DATA_TYPE_UINT16,   ACCESS_CONTROL_READ | ACCESS_CONTROL_REPORTABLE,    (u8*)&g_zcl_msAttrs.voltage_divisor},
+    {ZCL_ATTRID_APPARENT_POWER,             ZCL_DATA_TYPE_UINT16,   ACCESS_CONTROL_READ | ACCESS_CONTROL_REPORTABLE,    (u8*)&g_zcl_msAttrs.power},
+    {ZCL_ATTRID_AC_POWER_MULTIPLIER,        ZCL_DATA_TYPE_UINT16,   ACCESS_CONTROL_READ | ACCESS_CONTROL_REPORTABLE,    (u8*)&g_zcl_msAttrs.power_multiplier},
+    {ZCL_ATTRID_AC_POWER_DIVISOR,           ZCL_DATA_TYPE_UINT16,   ACCESS_CONTROL_READ | ACCESS_CONTROL_REPORTABLE,    (u8*)&g_zcl_msAttrs.power_divisor},
 
     { ZCL_ATTRID_GLOBAL_CLUSTER_REVISION,   ZCL_DATA_TYPE_UINT16,   ACCESS_CONTROL_READ,                                (u8*)&zcl_attr_global_clusterRevision},
 };
