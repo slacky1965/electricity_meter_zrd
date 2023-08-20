@@ -1,9 +1,13 @@
 #include "tl_common.h"
+#include "zcl_include.h"
 
+#include "config.h"
 #include "device.h"
 #include "kaskad_1_mt.h"
 #include "app_uart.h"
 #include "app_ui.h"
+#include "se_custom_attr.h"
+#include "electricityMeter.h"
 
 #define START       0x73
 #define BOUNDARY    0x55
@@ -271,7 +275,6 @@ static pkt_error_t response_meter(command_t command) {
                     response_status_t *status = (response_status_t*)&response_pkt.header.password_status;
                     if (status->error == PKT_OK) {
                         if (response_pkt.header.address_from == em_config.device_address) {
-                            printf("response_pkt.header.command: 0x%x, command: 0x%x\r\n", response_pkt.header.command, (command & 0xff));
                             if (response_pkt.header.command == (command & 0xff)) {
                                 pkt_error_no = PKT_OK;
                             } else {
@@ -340,34 +343,57 @@ static void get_tariffs_data() {
 
         pkt_tariffs_t *tariffs_response = (pkt_tariffs_t*)pkt->data;
 
-        u32 tariff = tariffs_response->tariff_1;
+        u64 tariff = tariffs_response->tariff_1 & 0xffffffffffff;
+        u64 last_tariff;
 
-//        if (meter.tariff_1 < tariff) {
-//            meter.tariff_1 = tariff;
-//            tariff_changed = true;
-//            tariff1_notify = NOTIFY_MAX;
-//        }
+        zcl_getAttrVal(ELECTRICITY_METER_EP1, ZCL_CLUSTER_SE_METERING, ZCL_ATTRID_CURRENT_TIER_1_SUMMATION_DELIVERD, &attr_len, (u8*)&attr_data);
+        last_tariff = fromPtoInteger(attr_len, attr_data);
 
-        tariff = tariffs_response->tariff_2;
-
-//        if (meter.tariff_2 < tariff) {
-//            meter.tariff_2 = tariff;
-//            tariff_changed = true;
-//            tariff2_notify = NOTIFY_MAX;
-//        }
-
-        tariff = tariffs_response->tariff_3;
-
-//        if (meter.tariff_3 < tariff) {
-//            meter.tariff_3 = tariff;
-//            tariff_changed = true;
-//            tariff3_notify = NOTIFY_MAX;
-//        }
+        if (tariff > last_tariff) {
+            zcl_setAttrVal(ELECTRICITY_METER_EP1, ZCL_CLUSTER_SE_METERING, ZCL_ATTRID_CURRENT_TIER_1_SUMMATION_DELIVERD, (u8*)&tariff);
+        }
 
 #if UART_PRINTF_MODE
-//        printf("tariff1: %d\r\n", meter.tariff_1);
-//        printf("tariff2: %d\r\n", meter.tariff_2);
-//        printf("tariff3: %d\r\n", meter.tariff_3);
+        printf("tariff1: %d\r\n", tariff);
+#endif
+
+        tariff = tariffs_response->tariff_2 & 0xffffffffffff;
+
+        zcl_getAttrVal(ELECTRICITY_METER_EP1, ZCL_CLUSTER_SE_METERING, ZCL_ATTRID_CURRENT_TIER_2_SUMMATION_DELIVERD, &attr_len, (u8*)&attr_data);
+        last_tariff = fromPtoInteger(attr_len, attr_data);
+
+        if (tariff > last_tariff) {
+            zcl_setAttrVal(ELECTRICITY_METER_EP1, ZCL_CLUSTER_SE_METERING, ZCL_ATTRID_CURRENT_TIER_2_SUMMATION_DELIVERD, (u8*)&tariff);
+        }
+
+#if UART_PRINTF_MODE
+        printf("tariff2: %d\r\n", tariff);
+#endif
+
+        tariff = tariffs_response->tariff_3 & 0xffffffffffff;
+
+        zcl_getAttrVal(ELECTRICITY_METER_EP1, ZCL_CLUSTER_SE_METERING, ZCL_ATTRID_CURRENT_TIER_3_SUMMATION_DELIVERD, &attr_len, (u8*)&attr_data);
+        last_tariff = fromPtoInteger(attr_len, attr_data);
+
+        if (tariff > last_tariff) {
+            zcl_setAttrVal(ELECTRICITY_METER_EP1, ZCL_CLUSTER_SE_METERING, ZCL_ATTRID_CURRENT_TIER_3_SUMMATION_DELIVERD, (u8*)&tariff);
+        }
+
+#if UART_PRINTF_MODE
+        printf("tariff3: %d\r\n", tariff);
+#endif
+
+        tariff = tariffs_response->tariff_4 & 0xffffffffffff;
+
+        zcl_getAttrVal(ELECTRICITY_METER_EP1, ZCL_CLUSTER_SE_METERING, ZCL_ATTRID_CURRENT_TIER_4_SUMMATION_DELIVERD, &attr_len, (u8*)&attr_data);
+        last_tariff = fromPtoInteger(attr_len, attr_data);
+
+        if (tariff > last_tariff) {
+            zcl_setAttrVal(ELECTRICITY_METER_EP1, ZCL_CLUSTER_SE_METERING, ZCL_ATTRID_CURRENT_TIER_4_SUMMATION_DELIVERD, (u8*)&tariff);
+        }
+
+#if UART_PRINTF_MODE
+        printf("tariff4: %d\r\n", tariff);
 #endif
 
     }
@@ -400,14 +426,17 @@ static void get_amps_data() {
         /* current has 2 bytes in the home assistant */
         while (amps > 0xffff) amps /= 10;
 
-//        if (meter.amps != amps) {
-//            meter.amps = amps;
-//            pva_changed = true;
-//            ampere_notify = NOTIFY_MAX;
-//        }
+        u16 current = amps & 0xffff;
+
+        zcl_getAttrVal(ELECTRICITY_METER_EP1, ZCL_CLUSTER_MS_ELECTRICAL_MEASUREMENT, ZCL_ATTRID_LINE_CURRENT, &attr_len, (u8*)&attr_data);
+        u16 last_amps = fromPtoInteger(attr_len, attr_data);
+
+        if (current != last_amps) {
+            zcl_setAttrVal(ELECTRICITY_METER_EP1, ZCL_CLUSTER_MS_ELECTRICAL_MEASUREMENT, ZCL_ATTRID_LINE_CURRENT, (u8*)&current);
+        }
 
 #if UART_PRINTF_MODE
-        printf("phase: %d, amps: %d\r\n", amps_response->phase_num, amps);
+        printf("phase: %d, amps: %d\r\n", amps_response->phase_num, current);
 #endif
 
     }
@@ -425,11 +454,12 @@ static void get_voltage_data() {
 
         pkt_volts_t *volts_response = (pkt_volts_t*)pkt->data;
 
-//        if (meter.voltage != volts_response->volts) {
-//            meter.voltage = volts_response->volts;
-//            pva_changed = true;
-//            voltage_notify = NOTIFY_MAX;
-//        }
+        zcl_getAttrVal(ELECTRICITY_METER_EP1, ZCL_CLUSTER_MS_ELECTRICAL_MEASUREMENT, ZCL_ATTRID_RMS_VOLTAGE, &attr_len, (u8*)&attr_data);
+        u16 last_volts = fromPtoInteger(attr_len, attr_data);
+
+        if (volts_response->volts != last_volts) {
+            zcl_setAttrVal(ELECTRICITY_METER_EP1, ZCL_CLUSTER_MS_ELECTRICAL_MEASUREMENT, ZCL_ATTRID_RMS_VOLTAGE, (u8*)&volts_response->volts);
+        }
 
 #if UART_PRINTF_MODE
         printf("phase: %d, volts: %d\r\n", volts_response->phase_num, volts_response->volts);
@@ -455,14 +485,19 @@ static void get_power_data() {
 
         power = from24to32(power_response->power);
 
-//        if (meter.power != power) {
-//            meter.power = power;
-//            pva_changed = true;
-//            power_notify = NOTIFY_MAX;
-//        }
+        while (power > 0xffff) power /= 10;
+
+        u16 pwr = power & 0xffff;
+
+        zcl_getAttrVal(ELECTRICITY_METER_EP1, ZCL_CLUSTER_MS_ELECTRICAL_MEASUREMENT, ZCL_ATTRID_APPARENT_POWER, &attr_len, (u8*)&attr_data);
+        u16 last_pwr = fromPtoInteger(attr_len, attr_data);
+
+        if (pwr != last_pwr) {
+            zcl_setAttrVal(ELECTRICITY_METER_EP1, ZCL_CLUSTER_MS_ELECTRICAL_MEASUREMENT, ZCL_ATTRID_APPARENT_POWER, (u8*)&pwr);
+        }
 
 #if UART_PRINTF_MODE
-        printf("power: %d\r\n", power);
+        printf("power: %d\r\n", pwr);
 #endif
     }
 }
@@ -479,17 +514,14 @@ void get_serial_number_data_kaskad1mt() {
 
         pkt_data31_t *serial_number_response = (pkt_data31_t*)pkt;
 
-#if UART_PRINTF_MODE
-        printf("Serial Number: %s\r\n", serial_number_response->data);
-#endif
+        u8 serial_number[SE_ATTR_SN_SIZE+1] = {0};
 
-//        if (memcmp(meter.serial_number, serial_number_response->data, DATA_MAX_LEN) != 0) {
-//            meter.serial_number_len = sprintf((char*)meter.serial_number, "%s", serial_number_response->data);
-//            memcpy(serial_number_notify.serial_number, meter.serial_number,
-//                   meter.serial_number_len > sizeof(serial_number_notify.serial_number)?
-//                   sizeof(serial_number_notify.serial_number):meter.serial_number_len);
-//            sn_notify = NOTIFY_MAX;
-//        }
+        if (set_zcl_str(serial_number_response->data, serial_number, SE_ATTR_SN_SIZE)) {
+            zcl_setAttrVal(ELECTRICITY_METER_EP1, ZCL_CLUSTER_SE_METERING, ZCL_ATTRID_METER_SERIAL_NUMBER, (u8*)&serial_number);
+#if UART_PRINTF_MODE
+            printf("Serial Number: %s\r\n", serial_number+1);
+#endif
+        }
     }
 }
 
@@ -505,19 +537,15 @@ void get_date_release_data_kaskad1mt() {
 
         pkt_data31_t *date_release_response = (pkt_data31_t*)pkt;
 
+        u8 date_release[DATA_MAX_LEN+2] = {0};
+
+        if (set_zcl_str(date_release_response->data, date_release, DATA_MAX_LEN+1)) {
+            zcl_setAttrVal(ELECTRICITY_METER_EP1, ZCL_CLUSTER_SE_METERING, ZCL_ATTRID_CUSTOM_DATE_RELEASE, (u8*)&date_release);
 #if UART_PRINTF_MODE
-        printf("Date of release: %s", date_release_response->data);
+            printf("Date of release: %s\r\n", date_release+1);
 #endif
-
-//        if (memcpy(meter.date_release, date_release_response->data, DATA_MAX_LEN) != 0) {
-//            meter.date_release_len = sprintf((char*)meter.date_release, "%s", date_release_response->data);
-//            memcpy(date_release_notify.date_release, meter.date_release,
-//                   meter.date_release_len > sizeof(date_release_notify.date_release)?
-//                   sizeof(date_release_notify.date_release):meter.date_release_len);
-//            dr_notify = NOTIFY_MAX;
-//        }
+        }
     }
-
 }
 
 static void get_resbat_data() {
@@ -532,22 +560,23 @@ static void get_resbat_data() {
 
         pkt_resbat_t *resbat = (pkt_resbat_t*)pkt->data;
 
-#if UART_PRINTF_MODE
-        printf("Resource battery: %d.%d\r\n", (resbat->worktime*100)/resbat->lifetime,
-                                             ((resbat->worktime*100)%resbat->lifetime)*100/resbat->lifetime);
-#endif
-
         u8 battery_level = (resbat->worktime*100)/resbat->lifetime;
 
         if (((resbat->worktime*100)%resbat->lifetime) >= (resbat->lifetime/2)) {
             battery_level++;
         }
 
-//        if (meter.battery_level != battery_level) {
-//            meter.battery_level = battery_level;
-//            pva_changed = true;
-//        }
+        zcl_getAttrVal(ELECTRICITY_METER_EP1, ZCL_CLUSTER_SE_METERING, ZCL_ATTRID_REMAINING_BATTERY_LIFE, &attr_len, (u8*)&attr_data);
+        u8 last_bl = fromPtoInteger(attr_len, attr_data);
 
+        if (battery_level != last_bl) {
+            zcl_setAttrVal(ELECTRICITY_METER_EP1, ZCL_CLUSTER_SE_METERING, ZCL_ATTRID_REMAINING_BATTERY_LIFE, (u8*)&battery_level);
+        }
+
+#if UART_PRINTF_MODE
+        printf("Resource battery: %d.%d\r\n", (resbat->worktime*100)/resbat->lifetime,
+                                             ((resbat->worktime*100)%resbat->lifetime)*100/resbat->lifetime);
+#endif
     }
 }
 
@@ -579,7 +608,17 @@ u8 measure_meter_kaskad1mt() {
         get_power_data();              /* get power            */
         get_amps_data();               /* get amps             */
 
+        fault_measure_counter = 0;
         ret = true;
+    } else {
+        fault_measure_counter++;
+
+        if (fault_measure_counter == 10) {
+#if UART_PRINTF_MODE
+            printf("Fault get data from device. Restart!!!\r\n");
+#endif
+            zb_resetDevice();
+        }
     }
 
     return ret;

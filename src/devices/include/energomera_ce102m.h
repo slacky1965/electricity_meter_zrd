@@ -15,27 +15,27 @@ typedef enum _command_t {
 } command_t;
 
 typedef struct __attribute__((packed)) _ce102m_status_t {
-    uint32_t current_tariff             :3;     /* 0-2      */
-    uint32_t stat_battery               :1;     /* 3        */
-    uint32_t reserve                    :3;     /* 4-6      */
-    uint32_t energy_direction           :1;     /* 7        */
-    uint32_t load_characteristic        :1;     /* 8        */
-    uint32_t time_correction            :1;     /* 9        */
-    uint32_t current_voltage            :2;     /* 10-11    */
-    uint32_t stat_time                  :1;     /* 12       */
-    uint32_t reserve2                   :1;     /* 13       */
-    uint32_t seasonal_time              :1;     /* 14       */
-    uint32_t reserve3                   :1;     /* 15       */
-    uint32_t energy_params_error        :1;     /* 16       */
-    uint32_t dvkz                       :1;     /* 17       */
-    uint32_t reserve4                   :1;     /* 18       */
-    uint32_t exp_date_battery           :1;     /* 19       */
-    uint32_t progmem_crc_error          :1;     /* 20       */
-    uint32_t metrolog_params_crc_error  :1;     /* 21       */
-    uint32_t reserve5                   :2;     /* 22-23    */
-    uint32_t schedule_tariffs           :4;     /* 24-27    */
-    uint32_t schedule_tariffs_error     :1;     /* 28       */
-    uint32_t reserve6                   :3;     /* 29-31    */
+    u32 current_tariff             :3;     /* 0-2      */
+    u32 stat_battery               :1;     /* 3        */
+    u32 reserve                    :3;     /* 4-6      */
+    u32 energy_direction           :1;     /* 7        */
+    u32 load_characteristic        :1;     /* 8        */
+    u32 time_correction            :1;     /* 9        */
+    u32 current_voltage            :2;     /* 10-11    */
+    u32 stat_time                  :1;     /* 12       */
+    u32 reserve2                   :1;     /* 13       */
+    u32 seasonal_time              :1;     /* 14       */
+    u32 reserve3                   :1;     /* 15       */
+    u32 energy_params_error        :1;     /* 16       */
+    u32 dvkz                       :1;     /* 17       */
+    u32 reserve4                   :1;     /* 18       */
+    u32 exp_date_battery           :1;     /* 19       */
+    u32 progmem_crc_error          :1;     /* 20       */
+    u32 metrolog_params_crc_error  :1;     /* 21       */
+    u32 reserve5                   :2;     /* 22-23    */
+    u32 schedule_tariffs           :4;     /* 24-27    */
+    u32 schedule_tariffs_error     :1;     /* 28       */
+    u32 reserve6                   :3;     /* 29-31    */
 } ce102m_status_t;
 
 
