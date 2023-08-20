@@ -62,7 +62,7 @@ extern "C" {
 #define	UART_PRINTF_MODE				ON
 #define USB_PRINTF_MODE         		OFF
 #define DEBUG_LEVEL                     ON
-#define UART_DEBUG                      ON
+#define UART_DEBUG                      OFF
 
 /* PM */
 #define PM_ENABLE						OFF
