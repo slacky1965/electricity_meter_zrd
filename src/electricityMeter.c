@@ -33,6 +33,7 @@
 #include "ota.h"
 #include "gp.h"
 
+#include "config.h"
 #include "app_ui.h"
 #include "electricityMeter.h"
 #include "app_uart.h"
@@ -373,14 +374,21 @@ void user_app_init(void)
 
     adc_temp_init();
 
+    /* start timer for flash status led */
     g_electricityMeterCtx.timerLedStatusEvt = TL_ZB_TIMER_SCHEDULE(flashLedStatusCb, NULL, TIMEOUT_5SEC);
+
+    /* start timer check net from coordinator - get time */
     TL_ZB_TIMER_SCHEDULE(getTimeCb, NULL, TIMEOUT_5MIN);
+
+    /* start timer for control internal temperature */
     getTemperatureCb(NULL);
     TL_ZB_TIMER_SCHEDULE(getTemperatureCb, NULL, TIMEOUT_15SEC);
 
+    /* set device model */
     set_device_model(em_config.device_model);
 
-    g_electricityMeterCtx.timerMeasurementEvt = TL_ZB_TIMER_SCHEDULE(measure_meterCb, NULL, TIMEOUT_5SEC /*DEFAULT_MEASUREMENT_PERIOD * 1000*/);
+    /* start timer get data from device */
+    g_electricityMeterCtx.timerMeasurementEvt = TL_ZB_TIMER_SCHEDULE(measure_meterCb, NULL, TIMEOUT_5SEC);
 }
 
 
@@ -467,10 +475,15 @@ void user_init(bool isRetention)
     u8 reportableChange = 0x00;
     bdb_defaultReportingCfg(ELECTRICITY_METER_EP1, HA_PROFILE_ID, ZCL_CLUSTER_GEN_DEVICE_TEMP_CONFIG, ZCL_ATTRID_DEV_TEMP_CURR_TEMP,
             REPORTING_MIN, REPORTING_MAX, (u8 *)&reportableChange);
-//    bdb_defaultReportingCfg(ELECTRICITY_METER_EP1, HA_PROFILE_ID, ZCL_CLUSTER_GEN_POWER_CFG, ZCL_ATTRID_BATTERY_PERCENTAGE_REMAINING,
-//            REPORTING_MIN, REPORTING_MAX, (u8 *)&reportableChange);
-//    bdb_defaultReportingCfg(ELECTRICITY_METER_EP1, HA_PROFILE_ID, ZCL_CLUSTER_SE_METERING, ZCL_ATTRID_CURRENT_SUMMATION_DELIVERD,
-//            0, REPORTING_MIN, (u8 *)&reportableChange);
+    /* Set default reporting configuration */
+    bdb_defaultReportingCfg(ELECTRICITY_METER_EP1, HA_PROFILE_ID, ZCL_CLUSTER_SE_METERING, ZCL_ATTRID_CURRENT_TIER_1_SUMMATION_DELIVERD,
+            0, 60, (u8 *)&reportableChange);
+    bdb_defaultReportingCfg(ELECTRICITY_METER_EP1, HA_PROFILE_ID, ZCL_CLUSTER_SE_METERING, ZCL_ATTRID_CURRENT_TIER_2_SUMMATION_DELIVERD,
+            0, 60, (u8 *)&reportableChange);
+    bdb_defaultReportingCfg(ELECTRICITY_METER_EP1, HA_PROFILE_ID, ZCL_CLUSTER_SE_METERING, ZCL_ATTRID_CURRENT_TIER_3_SUMMATION_DELIVERD,
+            0, 60, (u8 *)&reportableChange);
+    bdb_defaultReportingCfg(ELECTRICITY_METER_EP1, HA_PROFILE_ID, ZCL_CLUSTER_SE_METERING, ZCL_ATTRID_CURRENT_TIER_4_SUMMATION_DELIVERD,
+            0, 60, (u8 *)&reportableChange);
 
     /* custom reporting application (non SDK) */
     app_reporting_init();
