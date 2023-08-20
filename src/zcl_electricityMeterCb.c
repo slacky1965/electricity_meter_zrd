@@ -31,6 +31,7 @@
 #include "zcl_include.h"
 #include "ota.h"
 
+#include "config.h"
 #include "app_ui.h"
 #include "electricityMeter.h"
 #include "se_custom_attr.h"
