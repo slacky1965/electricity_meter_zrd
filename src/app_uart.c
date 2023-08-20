@@ -1,6 +1,8 @@
 #include "tl_common.h"
 
 #include "app_uart.h"
+#include "config.h"
+#include "device.h"
 
 uart_data_t rec_buff = {0,  {0, } };
 u8  uart_buff[UART_BUFF_SIZE];
@@ -67,9 +69,22 @@ static void app_uartRecvCb() {
 }
 
 void app_uart_init() {
+
+    u32 baudrate = 9600;
+
     flush_buff_uart();
     drv_uart_pin_set(UART_TX_PD7, UART_RX_PA0);
-    drv_uart_init(9600, (u8*)&rec_buff, sizeof(uart_data_t), app_uartRecvCb);
+
+    switch (em_config.device_model) {
+        case DEVICE_KASKAD_11:
+            baudrate = 2400;
+            break;
+        default:
+            baudrate = 9600;
+            break;
+    }
+
+    drv_uart_init(baudrate, (u8*)&rec_buff, sizeof(uart_data_t), app_uartRecvCb);
 }
 
 size_t write_bytes_to_uart(u8 *data, size_t len) {
