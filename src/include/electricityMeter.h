@@ -92,7 +92,8 @@ typedef struct {
                                 // Bits 3 to 6: Number of Digits to the left of the Decimal Point
                                 // Bit  7:      If set, suppress leading zeros
     u8  battery_percentage;
-    u8  serial_number[DATA_MAX_LEN+1];
+    u8  serial_number[1+24];
+    u8  date_release[1+DATA_MAX_LEN];
     u8  device_type;
     u8  device_model;
     u32 device_address;
@@ -102,11 +103,14 @@ typedef struct {
 typedef struct {
     u32 type;
     u16 current;
+    u16 current_multiplier;
+    u16 current_divisor;
     u16 voltage;
     u16 voltage_multiplier;
     u16 voltage_divisor;
-    u16 current_multiplier;
-    u16 current_divisor;
+    u16 power;
+    u16 power_multiplier;
+    u16 power_divisor;
 } zcl_msAttr_t;
 
 typedef struct {
