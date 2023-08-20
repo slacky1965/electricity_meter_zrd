@@ -166,6 +166,8 @@ clean:
 clean-project:
 	-$(RM) $(FLASH_IMAGE) $(ELFS) $(SIZEDUMMY) $(LST_FILE) $(ELF_FILE) $(PROJECT_NAME)_$(VERSION_RELEASE).$(VERSION_BUILD).bin
 	-$(RM) -R $(OUT_PATH)/$(SRC_PATH)/*.o
+	-$(RM) -R $(OUT_PATH)/$(SRC_PATH)/common/*.o
+	-$(RM) -R $(OUT_PATH)/$(SRC_PATH)/devices/*.o
 	-@echo ' '
 	
 pre-build:
