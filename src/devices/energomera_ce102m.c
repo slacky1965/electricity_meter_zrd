@@ -540,7 +540,7 @@ static void get_amps_data() {
 }
 
 
-void get_serial_number_data_energomera_ce102m() {
+static void get_serial_number_data_energomera_ce102m() {
 
     u8 *sn, *p_str;
 
@@ -562,7 +562,7 @@ void get_serial_number_data_energomera_ce102m() {
 
 }
 
-void get_date_release_data_energomera_ce102m() {
+static void get_date_release_data_energomera_ce102m() {
     u8 dr[] = "xx.xx.xxxx";
     u8 date_release[DATA_MAX_LEN+2] = {0};
 
