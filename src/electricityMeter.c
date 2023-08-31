@@ -146,14 +146,14 @@ static void app_reporting_init() {
             app_reporting[i].pEntry = pEntry;
         }
     }
+//    sleep_ms(0xffffffff);
 }
 
 static u8 app_reportableChangeValueChk(u8 dataType, u8 *curValue, u8 *prevValue, u8 *reportableChange) {
     u8 needReport = false;
 
     switch(dataType) {
-        case ZCL_DATA_TYPE_UINT48:
-        {
+        case ZCL_DATA_TYPE_UINT48: {
             u64 P = BUILD_U48(prevValue[0], prevValue[1], prevValue[2], prevValue[3], prevValue[4], prevValue[5]);
             u64 C = BUILD_U48(curValue[0], curValue[1], curValue[2], curValue[3], curValue[4], curValue[5]);
             u64 R = BUILD_U48(reportableChange[0], reportableChange[1], reportableChange[2], reportableChange[3], reportableChange[4], reportableChange[5]);
@@ -165,6 +165,7 @@ static u8 app_reportableChangeValueChk(u8 dataType, u8 *curValue, u8 *prevValue,
             break;
         }
         default:
+            needReport = reportableChangeValueChk(dataType, curValue, prevValue, reportableChange);
             break;
     }
 
@@ -187,7 +188,7 @@ static s32 app_reportMinAttrTimerCb(void *arg) {
         reportAttr(pEntry);
         app_reporting->time_posted = clock_time();
 #if UART_PRINTF_MODE && DEBUG_LEVEL
-        printf("Report has been sent. endPoint: %d, clusterID: 0x%x, attrID: 0x%x, minInterval: %d, maxInterval: %d\r\n",
+        printf("1.Report Min_Interval has been sent. endPoint: %d, clusterID: 0x%x, attrID: 0x%x, minInterval: %d, maxInterval: %d\r\n",
                 pEntry->endPoint, pEntry->clusterID, pEntry->attrID, pEntry->minInterval, pEntry->maxInterval);
 #endif
         return 0;
@@ -206,7 +207,7 @@ static s32 app_reportMinAttrTimerCb(void *arg) {
         reportAttr(pEntry);
         app_reporting->time_posted = clock_time();
 #if UART_PRINTF_MODE && DEBUG_LEVEL
-        printf("Report has been sent. endPoint: %d, clusterID: 0x%x, attrID: 0x%x, minInterval: %d, maxInterval: %d\r\n",
+        printf("2.Report Min_Interval has been sent. endPoint: %d, clusterID: 0x%x, attrID: 0x%x, minInterval: %d, maxInterval: %d\r\n",
                 pEntry->endPoint, pEntry->clusterID, pEntry->attrID, pEntry->minInterval, pEntry->maxInterval);
 #endif
     }
@@ -223,7 +224,7 @@ static s32 app_reportMaxAttrTimerCb(void *arg) {
             TL_ZB_TIMER_CANCEL(&app_reporting->timerReportMinEvt);
         }
 #if UART_PRINTF_MODE && DEBUG_LEVEL
-        printf("Report has been sent. endPoint: %d, clusterID: 0x%x, attrID: 0x%x, minInterval: %d, maxInterval: %d\r\n",
+        printf("Report Max_Interval has been sent. endPoint: %d, clusterID: 0x%x, attrID: 0x%x, minInterval: %d, maxInterval: %d\r\n",
                 pEntry->endPoint, pEntry->clusterID, pEntry->attrID, pEntry->minInterval, pEntry->maxInterval);
 #endif
         reportAttr(pEntry);
@@ -233,10 +234,15 @@ static s32 app_reportMaxAttrTimerCb(void *arg) {
 }
 
 static void app_reportAttrTimerStart() {
+    static u8 first = 1;
+
     if(zcl_reportingEntryActiveNumGet()) {
         for(u8 i = 0; i < ZCL_REPORTING_TABLE_NUM; i++) {
             reportCfgInfo_t *pEntry = &reportingTab.reportCfgInfo[i];
             app_reporting[i].pEntry = pEntry;
+            if (first) {
+                first = 0;
+            }
             if(pEntry->used && (pEntry->maxInterval != 0xFFFF) && (pEntry->minInterval || pEntry->maxInterval)){
                 if(zb_bindingTblSearched(pEntry->clusterID, pEntry->endPoint)) {
                     if (!app_reporting[i].timerReportMinEvt) {
@@ -289,24 +295,25 @@ void app_reportNoMinLimit(void)
                 len = (len>8) ? (8):(len);
 
                 if( (!zcl_analogDataType(pAttrEntry->type) && (memcmp(pEntry->prevData, pAttrEntry->data, len) != SUCCESS)) ||
-                        ((zcl_analogDataType(pAttrEntry->type) && reportableChangeValueChk(pAttrEntry->type,
-                        pAttrEntry->data, pEntry->prevData, pEntry->reportableChange))) ||
-                        ((zcl_analogDataType(pAttrEntry->type) && pAttrEntry->type == ZCL_DATA_TYPE_UINT48 &&
-                        app_reportableChangeValueChk(pAttrEntry->type, pAttrEntry->data, pEntry->prevData, pEntry->reportableChange)))) {
+                        ((zcl_analogDataType(pAttrEntry->type) && app_reportableChangeValueChk(pAttrEntry->type,
+                        pAttrEntry->data, pEntry->prevData, pEntry->reportableChange)))) {
 
-                    reportAttr(pEntry);
-                    app_reporting->time_posted = clock_time();
+                    if(zb_bindingTblSearched(pEntry->clusterID, pEntry->endPoint)){
+                        reportAttr(pEntry);
+
+                        app_reporting[i].time_posted = clock_time();
 #if UART_PRINTF_MODE && DEBUG_LEVEL
-                    printf("Report has been sent. endPoint: %d, clusterID: 0x%x, attrID: 0x%x, minInterval: %d, maxInterval: %d\r\n",
-                            pEntry->endPoint, pEntry->clusterID, pEntry->attrID, pEntry->minInterval, pEntry->maxInterval);
+                        printf("Report No_Min_Limit has been sent. endPoint: %d, clusterID: 0x%x, attrID: 0x%x, minInterval: %d, maxInterval: %d\r\n",
+                                pEntry->endPoint, pEntry->clusterID, pEntry->attrID, pEntry->minInterval, pEntry->maxInterval);
 #endif
-                    if (app_reporting[i].timerReportMaxEvt) {
-                        TL_ZB_TIMER_CANCEL(&app_reporting[i].timerReportMaxEvt);
+                        if (app_reporting[i].timerReportMaxEvt) {
+                            TL_ZB_TIMER_CANCEL(&app_reporting[i].timerReportMaxEvt);
+                        }
+                        app_reporting[i].timerReportMaxEvt = TL_ZB_TIMER_SCHEDULE(app_reportMaxAttrTimerCb, &app_reporting[i], pEntry->maxInterval*1000);
+#if UART_PRINTF_MODE && DEBUG_LEVEL
+                        printf("Start maxTimer. endPoint: %d, clusterID: 0x%x, attrID: 0x%x, min: %d, max: %d\r\n", pEntry->endPoint, pEntry->clusterID, pEntry->attrID, pEntry->minInterval, pEntry->maxInterval);
+#endif
                     }
-                    app_reporting[i].timerReportMaxEvt = TL_ZB_TIMER_SCHEDULE(app_reportMaxAttrTimerCb, &app_reporting[i], pEntry->maxInterval*1000);
-#if UART_PRINTF_MODE && DEBUG_LEVEL
-                    printf("Start maxTimer. endPoint: %d, clusterID: 0x%x, attrID: 0x%x, min: %d, max: %d\r\n", pEntry->endPoint, pEntry->clusterID, pEntry->attrID, pEntry->minInterval, pEntry->maxInterval);
-#endif
                 }
             }
         }
@@ -393,11 +400,13 @@ void user_app_init(void)
 
 
 static void report_handler(void) {
+
     if(zb_isDeviceJoinedNwk()) {
 
         if (g_electricityMeterCtx.timerStopReportEvt) return;
 
         if(zcl_reportingEntryActiveNumGet()) {
+
 
             app_reportNoMinLimit();
 
@@ -472,10 +481,14 @@ void user_init(bool isRetention)
 		g_bdbCommissionSetting.linkKey.tcLinkKey.key = g_electricityMeterCtx.tcLinkKey.key;
 	}
 
+	/* Set default reporting configuration */
     u8 reportableChange = 0x00;
+
+    /* Device temperature */
     bdb_defaultReportingCfg(ELECTRICITY_METER_EP1, HA_PROFILE_ID, ZCL_CLUSTER_GEN_DEVICE_TEMP_CONFIG, ZCL_ATTRID_DEV_TEMP_CURR_TEMP,
-            REPORTING_MIN, REPORTING_MAX, (u8 *)&reportableChange);
-    /* Set default reporting configuration */
+            0, 30, (u8 *)&reportableChange);
+
+    /* 4 tariffs and divisor, multiplier */
     bdb_defaultReportingCfg(ELECTRICITY_METER_EP1, HA_PROFILE_ID, ZCL_CLUSTER_SE_METERING, ZCL_ATTRID_CURRENT_TIER_1_SUMMATION_DELIVERD,
             0, 60, (u8 *)&reportableChange);
     bdb_defaultReportingCfg(ELECTRICITY_METER_EP1, HA_PROFILE_ID, ZCL_CLUSTER_SE_METERING, ZCL_ATTRID_CURRENT_TIER_2_SUMMATION_DELIVERD,
@@ -483,6 +496,34 @@ void user_init(bool isRetention)
     bdb_defaultReportingCfg(ELECTRICITY_METER_EP1, HA_PROFILE_ID, ZCL_CLUSTER_SE_METERING, ZCL_ATTRID_CURRENT_TIER_3_SUMMATION_DELIVERD,
             0, 60, (u8 *)&reportableChange);
     bdb_defaultReportingCfg(ELECTRICITY_METER_EP1, HA_PROFILE_ID, ZCL_CLUSTER_SE_METERING, ZCL_ATTRID_CURRENT_TIER_4_SUMMATION_DELIVERD,
+            0, 60, (u8 *)&reportableChange);
+    bdb_defaultReportingCfg(ELECTRICITY_METER_EP1, HA_PROFILE_ID, ZCL_CLUSTER_SE_METERING, ZCL_ATTRID_MULTIPLIER,
+            0, 60, (u8 *)&reportableChange);
+    bdb_defaultReportingCfg(ELECTRICITY_METER_EP1, HA_PROFILE_ID, ZCL_CLUSTER_SE_METERING, ZCL_ATTRID_DIVISOR,
+            0, 60, (u8 *)&reportableChange);
+
+    /* Voltage and divisor, multiplier */
+    bdb_defaultReportingCfg(ELECTRICITY_METER_EP1, HA_PROFILE_ID, ZCL_CLUSTER_MS_ELECTRICAL_MEASUREMENT, ZCL_ATTRID_RMS_VOLTAGE,
+            0, 60, (u8 *)&reportableChange);
+    bdb_defaultReportingCfg(ELECTRICITY_METER_EP1, HA_PROFILE_ID, ZCL_CLUSTER_MS_ELECTRICAL_MEASUREMENT, ZCL_ATTRID_AC_VOLTAGE_MULTIPLIER,
+            0, 60, (u8 *)&reportableChange);
+    bdb_defaultReportingCfg(ELECTRICITY_METER_EP1, HA_PROFILE_ID, ZCL_CLUSTER_MS_ELECTRICAL_MEASUREMENT, ZCL_ATTRID_AC_VOLTAGE_DIVISOR,
+            0, 60, (u8 *)&reportableChange);
+
+    /* Current and divisor, multiplier */
+    bdb_defaultReportingCfg(ELECTRICITY_METER_EP1, HA_PROFILE_ID, ZCL_CLUSTER_MS_ELECTRICAL_MEASUREMENT, ZCL_ATTRID_LINE_CURRENT,
+            0, 60, (u8 *)&reportableChange);
+    bdb_defaultReportingCfg(ELECTRICITY_METER_EP1, HA_PROFILE_ID, ZCL_CLUSTER_MS_ELECTRICAL_MEASUREMENT, ZCL_ATTRID_AC_CURRENT_MULTIPLIER,
+            0, 60, (u8 *)&reportableChange);
+    bdb_defaultReportingCfg(ELECTRICITY_METER_EP1, HA_PROFILE_ID, ZCL_CLUSTER_MS_ELECTRICAL_MEASUREMENT, ZCL_ATTRID_AC_CURRENT_DIVISOR,
+            0, 60, (u8 *)&reportableChange);
+
+    /* Power and divisor, multiplier */
+    bdb_defaultReportingCfg(ELECTRICITY_METER_EP1, HA_PROFILE_ID, ZCL_CLUSTER_MS_ELECTRICAL_MEASUREMENT, ZCL_ATTRID_APPARENT_POWER,
+            0, 60, (u8 *)&reportableChange);
+    bdb_defaultReportingCfg(ELECTRICITY_METER_EP1, HA_PROFILE_ID, ZCL_CLUSTER_MS_ELECTRICAL_MEASUREMENT, ZCL_ATTRID_AC_POWER_MULTIPLIER,
+            0, 60, (u8 *)&reportableChange);
+    bdb_defaultReportingCfg(ELECTRICITY_METER_EP1, HA_PROFILE_ID, ZCL_CLUSTER_MS_ELECTRICAL_MEASUREMENT, ZCL_ATTRID_AC_POWER_DIVISOR,
             0, 60, (u8 *)&reportableChange);
 
     /* custom reporting application (non SDK) */
