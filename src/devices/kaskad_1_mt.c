@@ -602,7 +602,7 @@ u8 measure_meter_kaskad1mt() {
             get_date_release_data_kaskad1mt();
             new_start = false;
         }
-        get_tariffs_data();            /* get 3 tariffs        */
+        get_tariffs_data();            /* get 4 tariffs        */
         get_resbat_data();             /* get resource battery */
         get_voltage_data();            /* get voltage net ~220 */
         get_power_data();              /* get power            */
