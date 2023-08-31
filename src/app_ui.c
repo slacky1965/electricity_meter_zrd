@@ -156,7 +156,7 @@ static s32 delayedFactoryResetCb(void *arg) {
 
     //printf("factory reset\r\n");
     zb_factoryReset();
-    zb_resetDevice();
+//    zb_resetDevice();
     return -1;
 }
 
