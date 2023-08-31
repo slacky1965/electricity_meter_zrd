@@ -48,9 +48,6 @@ typedef enum _pkt_error_t {
     PKT_ERR_UART
 } pkt_error_t;
 
-
-//extern u8 release_month;
-//extern u8 release_year;
 u16 attr_len;
 u8 attr_data[8];
 extern u8 new_start;
@@ -65,17 +62,9 @@ u8 set_device_model(device_model_t model);
 
 s32 measure_meterCb(void *arg);
 u8 measure_meter_kaskad1mt();
-//void get_serial_number_data_kaskad1mt();
-//void get_date_release_data_kaskad1mt();
-//void measure_meter_kaskad11();
-//void get_serial_number_data_kaskad11();
-//void get_date_release_data_kaskad11();
+u8 measure_meter_kaskad11();
 u8 measure_meter_mercury206();
-//void get_serial_number_data_mercury206();
-//void get_date_release_data_mercury206();
 u8 measure_meter_energomera_ce102m();
-//void get_serial_number_data_energomera_ce102m();
-//void get_date_release_data_energomera_ce102m();
 //void measure_meter_energomera_ce102();
 
 #endif /* SRC_INCLUDE_DEVICE_H_ */
