@@ -2,7 +2,8 @@
 #include "zb_api.h"
 #include "zcl_include.h"
 
-
+#include "app_ui.h"
+#include "electricityMeter.h"
 #include "device.h"
 #include "config.h"
 #include "app_uart.h"
@@ -10,8 +11,6 @@
 u16 attr_len;
 u8 attr_data[8];
 u8 new_start = true;
-//u8 tariff_changed = true;
-//u8 pva_changed = true;
 pkt_error_t pkt_error_no;
 measure_meter_f measure_meter = NULL;
 u8 fault_measure_counter = 0;
@@ -39,6 +38,12 @@ u8 device_model[DEVICE_MAX][32] = {
 u8 set_device_model(device_model_t model) {
     u8 save = false;
     new_start = true;
+    u32 energy_divisor = 1, energy_multiplier = 1;
+    u16 voltage_multiplier = 1, voltage_divisor = 1;
+    u16 current_multiplier = 1, current_divisor = 1;
+    u16 power_multiplier = 1, power_divisor = 1;
+
+
 
     switch (model) {
         case DEVICE_KASKAD_1_MT:
@@ -50,6 +55,9 @@ u8 set_device_model(device_model_t model) {
             break;
         case DEVICE_MERCURY_206:
             measure_meter = measure_meter_mercury206;
+            energy_divisor = 100;
+            voltage_divisor = 10;
+            current_divisor = 100;
             break;
         case DEVICE_ENERGOMERA_CE102M:
             measure_meter = measure_meter_energomera_ce102m;
@@ -67,6 +75,15 @@ u8 set_device_model(device_model_t model) {
         printf("New device model '%s'\r\n", device_model[model]);
 #endif
     }
+
+    zcl_setAttrVal(ELECTRICITY_METER_EP1, ZCL_CLUSTER_SE_METERING, ZCL_ATTRID_MULTIPLIER, (u8*)&energy_multiplier);
+    zcl_setAttrVal(ELECTRICITY_METER_EP1, ZCL_CLUSTER_SE_METERING, ZCL_ATTRID_DIVISOR, (u8*)&energy_divisor);
+    zcl_setAttrVal(ELECTRICITY_METER_EP1, ZCL_CLUSTER_MS_ELECTRICAL_MEASUREMENT, ZCL_ATTRID_AC_VOLTAGE_MULTIPLIER, (u8*)&voltage_multiplier);
+    zcl_setAttrVal(ELECTRICITY_METER_EP1, ZCL_CLUSTER_MS_ELECTRICAL_MEASUREMENT, ZCL_ATTRID_AC_VOLTAGE_DIVISOR, (u8*)&voltage_divisor);
+    zcl_setAttrVal(ELECTRICITY_METER_EP1, ZCL_CLUSTER_MS_ELECTRICAL_MEASUREMENT, ZCL_ATTRID_AC_CURRENT_MULTIPLIER, (u8*)&current_multiplier);
+    zcl_setAttrVal(ELECTRICITY_METER_EP1, ZCL_CLUSTER_MS_ELECTRICAL_MEASUREMENT, ZCL_ATTRID_AC_CURRENT_DIVISOR, (u8*)&current_divisor);
+    zcl_setAttrVal(ELECTRICITY_METER_EP1, ZCL_CLUSTER_MS_ELECTRICAL_MEASUREMENT, ZCL_ATTRID_AC_POWER_MULTIPLIER, (u8*)&power_multiplier);
+    zcl_setAttrVal(ELECTRICITY_METER_EP1, ZCL_CLUSTER_MS_ELECTRICAL_MEASUREMENT, ZCL_ATTRID_AC_POWER_DIVISOR, (u8*)&power_divisor);
 
     app_uart_init();
 
