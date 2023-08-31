@@ -267,25 +267,6 @@ static void get_net_params_data() {
     if (send_command(&request_pkt)) {
         if (response_meter(cmd_net_params) == PKT_OK) {
             pkt_net_params_t *pkt_net_params = (pkt_net_params_t*)&response_pkt;
-            u32 power = 0;
-            power += from_bcd_to_dec(pkt_net_params->power[0]) * 10000;
-            power += from_bcd_to_dec(pkt_net_params->power[1]) * 100;
-            power += from_bcd_to_dec(pkt_net_params->power[2]);
-
-            while (power > 0xffff) power /= 10;
-
-            u16 pwr = power & 0xffff;
-
-            zcl_getAttrVal(ELECTRICITY_METER_EP1, ZCL_CLUSTER_MS_ELECTRICAL_MEASUREMENT, ZCL_ATTRID_APPARENT_POWER, &attr_len, (u8*)&attr_data);
-            u16 last_pwr = fromPtoInteger(attr_len, attr_data);
-
-            if (pwr != last_pwr) {
-                zcl_setAttrVal(ELECTRICITY_METER_EP1, ZCL_CLUSTER_MS_ELECTRICAL_MEASUREMENT, ZCL_ATTRID_APPARENT_POWER, (u8*)&pwr);
-            }
-
-#if UART_PRINTF_MODE
-            printf("power:   %d\r\n", pwr);
-#endif
 
             u16 volts = 0;
             u8 *volts_bcd = (u8*)&pkt_net_params->volts;
@@ -308,6 +289,8 @@ static void get_net_params_data() {
             amps += from_bcd_to_dec(amps_bcd[0]) * 100;
             amps += from_bcd_to_dec(amps_bcd[1]);
 
+            //amps = 1050;
+
             zcl_getAttrVal(ELECTRICITY_METER_EP1, ZCL_CLUSTER_MS_ELECTRICAL_MEASUREMENT, ZCL_ATTRID_LINE_CURRENT, &attr_len, (u8*)&attr_data);
             u16 last_amps = fromPtoInteger(attr_len, attr_data);
 
@@ -317,6 +300,30 @@ static void get_net_params_data() {
 #if UART_PRINTF_MODE
             printf("amps:    %d\r\n", amps);
 #endif
+
+            u32 power = 0;
+            power += from_bcd_to_dec(pkt_net_params->power[0]) * 10000;
+            power += from_bcd_to_dec(pkt_net_params->power[1]) * 100;
+            power += from_bcd_to_dec(pkt_net_params->power[2]);
+
+            while (power > 0xffff) power /= 10;
+
+            u16 pwr = power & 0xffff;
+
+            pwr = 3012;
+
+            zcl_getAttrVal(ELECTRICITY_METER_EP1, ZCL_CLUSTER_MS_ELECTRICAL_MEASUREMENT, ZCL_ATTRID_APPARENT_POWER, &attr_len, (u8*)&attr_data);
+            u16 last_pwr = fromPtoInteger(attr_len, attr_data);
+
+            if (pwr != last_pwr) {
+                zcl_setAttrVal(ELECTRICITY_METER_EP1, ZCL_CLUSTER_MS_ELECTRICAL_MEASUREMENT, ZCL_ATTRID_APPARENT_POWER, (u8*)&pwr);
+            }
+
+#if UART_PRINTF_MODE
+            printf("power:   %d\r\n", pwr);
+#endif
+
+
         }
     }
 }
@@ -361,7 +368,7 @@ static void get_resbat_data() {
     }
 }
 
-void get_date_release_data_mercury206() {
+static void get_date_release_data_mercury206() {
 
 #if UART_PRINTF_MODE
     printf("Start command to receive date of release\r\n");
@@ -382,6 +389,7 @@ void get_date_release_data_mercury206() {
 
             if (release_day < 10) {
                 dr[dr_len++] = '0';
+                dr[dr_len++] = 0x30 + release_day;
             } else {
                 dr[dr_len++] = 0x30 + release_day/10;
                 dr[dr_len++] = 0x30 + release_day%10;
@@ -390,20 +398,23 @@ void get_date_release_data_mercury206() {
 
             if (release_month < 10) {
                 dr[dr_len++] = '0';
+                dr[dr_len++] = 0x30 + release_month;
             } else {
                 dr[dr_len++] = 0x30 + release_month/10;
                 dr[dr_len++] = 0x30 + release_month%10;
             }
             dr[dr_len++] = '.';
-            dr[dr_len++] = '2';
-            dr[dr_len++] = '0';
 
-            if (release_year < 10) {
-                dr[dr_len++] = '0';
-            } else {
-                dr[dr_len++] = 0x30 + release_year/10;
-                dr[dr_len++] = 0x30 + release_year%10;
-            }
+            u8 year_str[8] = {0};
+
+            u16 year = 2000 + release_year;
+
+            itoa(year, year_str);
+
+            dr[dr_len++] = year_str[0];
+            dr[dr_len++] = year_str[1];
+            dr[dr_len++] = year_str[2];
+            dr[dr_len++] = year_str[3];
 
             if (set_zcl_str(dr, date_release, DATA_MAX_LEN+1)) {
                 zcl_setAttrVal(ELECTRICITY_METER_EP1, ZCL_CLUSTER_SE_METERING, ZCL_ATTRID_CUSTOM_DATE_RELEASE, (u8*)&date_release);
@@ -416,7 +427,7 @@ void get_date_release_data_mercury206() {
 }
 
 
-void get_serial_number_data_mercury206() {
+static void get_serial_number_data_mercury206() {
 
 #if UART_PRINTF_MODE
     printf("Start command to receive serial number\r\n");
@@ -445,7 +456,7 @@ void get_serial_number_data_mercury206() {
     }
 }
 
-u8 get_timeout_data() {
+static u8 get_timeout_data() {
 
     set_command(cmd_timeout);
 
