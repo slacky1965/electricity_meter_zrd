@@ -58,7 +58,7 @@ static void electricityMeter_zclWriteReqCmd(u16 clusterId, zclWriteCmd_t *pWrite
 static void electricityMeter_zclWriteRspCmd(zclWriteRspCmd_t *pWriteRspCmd);
 #endif
 #ifdef ZCL_REPORT
-static void electricityMeter_zclCfgReportCmd(zclCfgReportCmd_t *pCfgReportCmd);
+static void electricityMeter_zclCfgReportCmd(u8 endPoint, u16 clusterId, zclCfgReportCmd_t *pCfgReportCmd);
 static void electricityMeter_zclCfgReportRspCmd(zclCfgReportRspCmd_t *pCfgReportRspCmd);
 static void electricityMeter_zclReportCmd(zclReportCmd_t *pReportCmd);
 #endif
@@ -95,6 +95,9 @@ void electricityMeter_zclProcessIncomingMsg(zclIncoming_t *pInHdlrMsg)
 {
 //	printf("electricityMeter_zclProcessIncomingMsg\n");
 
+    u16 cluster = pInHdlrMsg->msg->indInfo.cluster_id;
+    u8 endPoint = pInHdlrMsg->msg->indInfo.dst_ep;
+
 	switch(pInHdlrMsg->hdr.cmd)
 	{
 #ifdef ZCL_READ
@@ -112,7 +115,7 @@ void electricityMeter_zclProcessIncomingMsg(zclIncoming_t *pInHdlrMsg)
 #endif
 #ifdef ZCL_REPORT
 		case ZCL_CMD_CONFIG_REPORT:
-			electricityMeter_zclCfgReportCmd(pInHdlrMsg->attrCmd);
+			electricityMeter_zclCfgReportCmd(endPoint, cluster, pInHdlrMsg->attrCmd);
 			break;
 		case ZCL_CMD_CONFIG_REPORT_RSP:
 			electricityMeter_zclCfgReportRspCmd(pInHdlrMsg->attrCmd);
@@ -270,10 +273,24 @@ static void electricityMeter_zclDfltRspCmd(zclDefaultRspCmd_t *pDftRspCmd)
  *
  * @return  None
  */
-static void electricityMeter_zclCfgReportCmd(zclCfgReportCmd_t *pCfgReportCmd)
+static void electricityMeter_zclCfgReportCmd(u8 endPoint, u16 clusterId, zclCfgReportCmd_t *pCfgReportCmd)
 {
-//    printf("electricityMeter_zclCfgReportCmd\n");
-
+    printf("electricityMeter_zclCfgReportCmd\r\n");
+    for(u8 i = 0; i < pCfgReportCmd->numAttr; i++) {
+        for (u8 ii = 0; ii < ZCL_REPORTING_TABLE_NUM; ii++) {
+            if (app_reporting[ii].pEntry->used) {
+                if (app_reporting[ii].pEntry->endPoint == endPoint && app_reporting[ii].pEntry->attrID == pCfgReportCmd->attrList[i].attrID) {
+                    if (app_reporting[ii].timerReportMinEvt) {
+                        TL_ZB_TIMER_CANCEL(&app_reporting[ii].timerReportMinEvt);
+                    }
+                    if (app_reporting[ii].timerReportMaxEvt) {
+                        TL_ZB_TIMER_CANCEL(&app_reporting[ii].timerReportMaxEvt);
+                    }
+                    return;
+                }
+            }
+        }
+    }
 }
 
 /*********************************************************************
