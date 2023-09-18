@@ -86,6 +86,13 @@ extern "C" {
 #define UART_TX_GPIO            UART_TX_PD7
 #define UART_RX_GPIO            UART_RX_PA0
 
+/************************* Configure Temperature ***********************************/
+#define GPIO_TEMP                   GPIO_PC3
+#define PC3_FUNC                    AS_GPIO
+//#define PC3_OUTPUT_ENABLE           1
+//#define PC3_INPUT_ENABLE            1
+#define PULL_WAKEUP_SRC_PC3         PM_PIN_PULLUP_1M //PM_PIN_PULLUP_10K
+
 //KEY
 #define	BUTTON 					    GPIO_PD6
 #define PD6_FUNC					AS_GPIO
@@ -113,7 +120,7 @@ extern "C" {
 #define PA3_OUTPUT_ENABLE		1
 #define PA3_INPUT_ENABLE		0
 
-#define	PM_WAKEUP_LEVEL		  	PM_WAKEUP_LEVEL_LOW
+//#define	PM_WAKEUP_LEVEL		  	PM_WAKEUP_LEVEL_LOW
 
 // UART
 #if ZBHCI_UART

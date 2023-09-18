@@ -32,8 +32,7 @@
 #include "bdb.h"
 #include "ota.h"
 
-#include "app_ui.h"
-#include "electricityMeter.h"
+#include "app_main.h"
 
 /**********************************************************************
  * LOCAL CONSTANTS
@@ -64,9 +63,9 @@ bdb_appCb_t g_zbBdbCb = {
 };
 
 #ifdef ZCL_OTA
-ota_callBack_t electricityMeter_otaCb =
+ota_callBack_t app_otaCb =
 {
-	electricityMeter_otaProcessMsgHandler,
+        app_otaProcessMsgHandler,
 };
 #endif
 
@@ -95,14 +94,14 @@ static s32 heartTimerCb(void *arg){
 }
 #endif
 
-s32 electricityMeter_bdbNetworkSteerStart(void *arg){
+s32 app_bdbNetworkSteerStart(void *arg){
 	bdb_networkSteerStart();
 
 	return -1;
 }
 
 #if FIND_AND_BIND_SUPPORT
-s32 electricityMeter_bdbFindAndBindStart(void *arg){
+s32 app_bdbFindAndBindStart(void *arg){
 	bdb_findAndBindStart(BDB_COMMISSIONING_ROLE_TARGET);
 
 	return -1;
@@ -145,7 +144,7 @@ void zb_bdbInitCb(u8 status, u8 joinedNetwork){
 			do{
 				jitter = zb_random() % 0x0fff;
 			}while(jitter == 0);
-			TL_ZB_TIMER_SCHEDULE(electricityMeter_bdbNetworkSteerStart, NULL, jitter);
+			TL_ZB_TIMER_SCHEDULE(app_bdbNetworkSteerStart, NULL, jitter);
 #endif
 		}
 	}else{
@@ -189,7 +188,7 @@ void zb_bdbCommissioningCb(u8 status, void *arg){
 #if FIND_AND_BIND_SUPPORT
 			if(!gLightCtx.bdbFindBindFlg){
 				gLightCtx.bdbFindBindFlg = TRUE;
-				TL_ZB_TIMER_SCHEDULE(electricityMeter_bdbFindAndBindStart, NULL, 1000);
+				TL_ZB_TIMER_SCHEDULE(app_bdbFindAndBindStart, NULL, 1000);
 			}
 #endif
 			break;
@@ -206,7 +205,7 @@ void zb_bdbCommissioningCb(u8 status, void *arg){
 				do{
 					jitter = zb_random() % 0x2710;
 				}while(jitter < 5000);
-				TL_ZB_TIMER_SCHEDULE(electricityMeter_bdbNetworkSteerStart, NULL, jitter);
+				TL_ZB_TIMER_SCHEDULE(app_bdbNetworkSteerStart, NULL, jitter);
 			}
 			break;
 		case BDB_COMMISSION_STA_FORMATION_FAILURE:
@@ -234,17 +233,17 @@ void zb_bdbCommissioningCb(u8 status, void *arg){
 }
 
 
-extern void electricityMeter_zclIdentifyCmdHandler(u8 endpoint, u16 srcAddr, u16 identifyTime);
+extern void app_zclIdentifyCmdHandler(u8 endpoint, u16 srcAddr, u16 identifyTime);
 void zb_bdbIdentifyCb(u8 endpoint, u16 srcAddr, u16 identifyTime){
 #if FIND_AND_BIND_SUPPORT
-	electricityMeter_zclIdentifyCmdHandler(endpoint, srcAddr, identifyTime);
+	app_zclIdentifyCmdHandler(endpoint, srcAddr, identifyTime);
 #endif
 }
 
 
 
 #ifdef ZCL_OTA
-void electricityMeter_otaProcessMsgHandler(u8 evt, u8 status)
+void app_otaProcessMsgHandler(u8 evt, u8 status)
 {
 	if(evt == OTA_EVT_START){
 		if(status == ZCL_STA_SUCCESS){
@@ -262,14 +261,14 @@ void electricityMeter_otaProcessMsgHandler(u8 evt, u8 status)
 }
 #endif
 
-s32 electricityMeter_softReset(void *arg){
+s32 app_softReset(void *arg){
 	SYSTEM_RESET();
 
 	return -1;
 }
 
 /*********************************************************************
- * @fn      electricityMeter_leaveCnfHandler
+ * @fn      app_leaveCnfHandler
  *
  * @brief   Handler for ZDO Leave Confirm message.
  *
@@ -277,18 +276,18 @@ s32 electricityMeter_softReset(void *arg){
  *
  * @return  None
  */
-void electricityMeter_leaveCnfHandler(nlme_leave_cnf_t *pLeaveCnf)
+void app_leaveCnfHandler(nlme_leave_cnf_t *pLeaveCnf)
 {
     if(pLeaveCnf->status == SUCCESS){
     	light_blink_start(3, 200, 200);
 
     	//waiting blink over
-    	TL_ZB_TIMER_SCHEDULE(electricityMeter_softReset, NULL, 2 * 1000);
+    	TL_ZB_TIMER_SCHEDULE(app_softReset, NULL, 2 * 1000);
     }
 }
 
 /*********************************************************************
- * @fn      electricityMeter_leaveIndHandler
+ * @fn      app_leaveIndHandler
  *
  * @brief   Handler for ZDO leave indication message.
  *
@@ -296,11 +295,11 @@ void electricityMeter_leaveCnfHandler(nlme_leave_cnf_t *pLeaveCnf)
  *
  * @return  None
  */
-void electricityMeter_leaveIndHandler(nlme_leave_ind_t *pLeaveInd)
+void app_leaveIndHandler(nlme_leave_ind_t *pLeaveInd)
 {
 
 }
 
-bool electricityMeter_nwkUpdateIndicateHandler(nwkCmd_nwkUpdate_t *pNwkUpdate){
+bool app_nwkUpdateIndicateHandler(nwkCmd_nwkUpdate_t *pNwkUpdate){
 	return FAILURE;
 }

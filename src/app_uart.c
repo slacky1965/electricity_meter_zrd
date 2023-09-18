@@ -1,7 +1,7 @@
 #include "tl_common.h"
 
 #include "app_uart.h"
-#include "config.h"
+#include "app_dev_config.h"
 #include "device.h"
 
 uart_data_t rec_buff = {0,  {0, } };
@@ -75,7 +75,7 @@ void app_uart_init() {
     flush_buff_uart();
     drv_uart_pin_set(UART_TX_PD7, UART_RX_PA0);
 
-    switch (em_config.device_model) {
+    switch (dev_config.device_model) {
         case DEVICE_KASKAD_11:
             baudrate = 2400;
             break;

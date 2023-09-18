@@ -1,12 +1,8 @@
 #include "tl_common.h"
 #include "zb_api.h"
 #include "zcl_include.h"
-//#include "gp.h"
-//#include "app_uart.h"
 
-#include "config.h"
-#include "app_ui.h"
-#include "electricityMeter.h"
+#include "app_dev_config.h"
 
 #define ID_CONFIG   0x0FED141A
 #define TOP_MASK    0xFFFFFFFF
@@ -15,7 +11,7 @@ static u8  default_config = false;
 static u32 config_addr_start = 0;
 static u32 config_addr_end = 0;
 
-em_config_t em_config;
+dev_config_t dev_config;
 
 u8 mcuBootAddrGet(void);
 
@@ -78,20 +74,19 @@ static void clear_user_data(u32 flash_addr) {
 }
 
 static void init_default_config() {
-    memset(&em_config, 0, sizeof(em_config_t));
-    em_config.id = ID_CONFIG;
-    em_config.top = 0;
-    em_config.new_ota = 0;
-    em_config.flash_addr_start = config_addr_start;
-    em_config.flash_addr_end = config_addr_end;
-    em_config.measurement_period = DEFAULT_MEASUREMENT_PERIOD;
+    memset(&dev_config, 0, sizeof(dev_config_t));
+    dev_config.id = ID_CONFIG;
+    dev_config.top = 0;
+    dev_config.new_ota = 0;
+    dev_config.flash_addr_start = config_addr_start;
+    dev_config.flash_addr_end = config_addr_end;
     default_config = true;
     write_config();
 }
 
 static void write_restore_config() {
-    em_config.crc = checksum((u8*)&(em_config), sizeof(em_config_t));
-    nv_flashWriteNew(1, NV_MODULE_APP,  NV_ITEM_APP_USER_CFG, sizeof(em_config_t), (u8*)&em_config);
+    dev_config.crc = checksum((u8*)&(dev_config), sizeof(dev_config_t));
+    nv_flashWriteNew(1, NV_MODULE_APP,  NV_ITEM_APP_USER_CFG, sizeof(dev_config_t), (u8*)&dev_config);
 
 #if UART_PRINTF_MODE && DEBUG_LEVEL
     printf("Save restored config to nv_ram in module NV_MODULE_APP (%d) item NV_ITEM_APP_USER_CFG (%d)\r\n",
@@ -101,7 +96,7 @@ static void write_restore_config() {
 }
 
 void init_config(u8 print) {
-    em_config_t config_curr, config_next, config_restore;
+    dev_config_t config_curr, config_next, config_restore;
     u8 find_config = false;
     nv_sts_t st = NV_SUCC;
 
@@ -111,9 +106,9 @@ void init_config(u8 print) {
 #error "NV_ENABLE must be enable in "stack_cfg.h" file!"
 #endif
 
-    st = nv_flashReadNew(1, NV_MODULE_APP,  NV_ITEM_APP_USER_CFG, sizeof(em_config_t), (u8*)&config_restore);
+    st = nv_flashReadNew(1, NV_MODULE_APP,  NV_ITEM_APP_USER_CFG, sizeof(dev_config_t), (u8*)&config_restore);
 
-    u16 crc = checksum((u8*)&config_restore, sizeof(em_config_t));
+    u16 crc = checksum((u8*)&config_restore, sizeof(dev_config_t));
 
     if (st != NV_SUCC || config_restore.id != ID_CONFIG || crc != config_restore.crc) {
 #if UART_PRINTF_MODE
@@ -129,7 +124,7 @@ void init_config(u8 print) {
         config_restore.new_ota = false;
         config_restore.flash_addr_start = config_addr_start;
         config_restore.flash_addr_end = config_addr_end;
-        memcpy(&em_config, &config_restore, sizeof(em_config_t));
+        memcpy(&dev_config, &config_restore, sizeof(dev_config_t));
         default_config = true;
         write_config();
         return;
@@ -137,7 +132,7 @@ void init_config(u8 print) {
 
     u32 flash_addr = config_addr_start;
 
-    flash_read_page(flash_addr, sizeof(em_config_t), (u8*)&config_curr);
+    flash_read_page(flash_addr, sizeof(dev_config_t), (u8*)&config_curr);
 
     if (config_curr.id != ID_CONFIG) {
 #if UART_PRINTF_MODE
@@ -151,11 +146,11 @@ void init_config(u8 print) {
     flash_addr += FLASH_PAGE_SIZE;
 
     while(flash_addr < config_addr_end) {
-        flash_read_page(flash_addr, sizeof(em_config_t), (u8*)&config_next);
-        crc = checksum((u8*)&config_next, sizeof(em_config_t));
+        flash_read_page(flash_addr, sizeof(dev_config_t), (u8*)&config_next);
+        crc = checksum((u8*)&config_next, sizeof(dev_config_t));
         if (config_next.id == ID_CONFIG && crc == config_next.crc) {
             if ((config_curr.top + 1) == config_next.top || (config_curr.top == TOP_MASK && config_next.top == 0)) {
-                memcpy(&config_curr, &config_next, sizeof(em_config_t));
+                memcpy(&config_curr, &config_next, sizeof(dev_config_t));
                 flash_addr += FLASH_PAGE_SIZE;
                 continue;
             }
@@ -167,10 +162,10 @@ void init_config(u8 print) {
     }
 
     if (find_config) {
-        memcpy(&em_config, &config_curr, sizeof(em_config_t));
-        em_config.flash_addr_start = flash_addr-FLASH_PAGE_SIZE;
+        memcpy(&dev_config, &config_curr, sizeof(dev_config_t));
+        dev_config.flash_addr_start = flash_addr-FLASH_PAGE_SIZE;
 #if UART_PRINTF_MODE
-        printf("Read config from flash address - 0x%x\r\n", em_config.flash_addr_start);
+        printf("Read config from flash address - 0x%x\r\n", dev_config.flash_addr_start);
 #endif /* UART_PRINTF_MODE */
     } else {
 #if UART_PRINTF_MODE
@@ -184,27 +179,27 @@ void init_config(u8 print) {
 void write_config() {
     if (default_config) {
         write_restore_config();
-        flash_erase(em_config.flash_addr_start);
-        flash_write(em_config.flash_addr_start, sizeof(em_config_t), (u8*)&(em_config));
+        flash_erase(dev_config.flash_addr_start);
+        flash_write(dev_config.flash_addr_start, sizeof(dev_config_t), (u8*)&(dev_config));
         default_config = false;
 #if UART_PRINTF_MODE && DEBUG_LEVEL
-        printf("Save config to flash address - 0x%x\r\n", em_config.flash_addr_start);
+        printf("Save config to flash address - 0x%x\r\n", dev_config.flash_addr_start);
 #endif /* UART_PRINTF_MODE */
     } else {
-        if (!em_config.new_ota) {
-            em_config.flash_addr_start += FLASH_PAGE_SIZE;
-            if (em_config.flash_addr_start == config_addr_end) {
-                em_config.flash_addr_start = config_addr_start;
+        if (!dev_config.new_ota) {
+            dev_config.flash_addr_start += FLASH_PAGE_SIZE;
+            if (dev_config.flash_addr_start == config_addr_end) {
+                dev_config.flash_addr_start = config_addr_start;
             }
-            if (em_config.flash_addr_start % FLASH_SECTOR_SIZE == 0) {
-                flash_erase(em_config.flash_addr_start);
+            if (dev_config.flash_addr_start % FLASH_SECTOR_SIZE == 0) {
+                flash_erase(dev_config.flash_addr_start);
             }
-            em_config.top++;
-            em_config.top &= TOP_MASK;
-            em_config.crc = checksum((u8*)&(em_config), sizeof(em_config_t));
-            flash_write(em_config.flash_addr_start, sizeof(em_config_t), (u8*)&(em_config));
+            dev_config.top++;
+            dev_config.top &= TOP_MASK;
+            dev_config.crc = checksum((u8*)&(dev_config), sizeof(dev_config_t));
+            flash_write(dev_config.flash_addr_start, sizeof(dev_config_t), (u8*)&(dev_config));
 #if UART_PRINTF_MODE && DEBUG_LEVEL
-            printf("Save config to flash address - 0x%x\r\n", em_config.flash_addr_start);
+            printf("Save config to flash address - 0x%x\r\n", dev_config.flash_addr_start);
 #endif /* UART_PRINTF_MODE */
         } else {
             write_restore_config();

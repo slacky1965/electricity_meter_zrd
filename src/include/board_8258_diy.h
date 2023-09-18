@@ -2,34 +2,31 @@
 #define SRC_INCLUDE_BOARD_8258_DIY_H_
 
 /************************* Configure KEY GPIO ***************************************/
-#define BUTTON                  GPIO_PB6
-#define PB6_INPUT_ENABLE        ON
-#define PB6_DATA_OUT            OFF
-#define PB6_OUTPUT_ENABLE       OFF
-#define PB6_FUNC                AS_GPIO
+#define BUTTON                  GPIO_PB5
+#define PB5_INPUT_ENABLE        ON
+#define PB5_DATA_OUT            OFF
+#define PB5_OUTPUT_ENABLE       OFF
+#define PB5_FUNC                AS_GPIO
 #define PULL_WAKEUP_SRC_PB6     PM_PIN_PULLUP_1M
 
-#define PM_WAKEUP_LEVEL         PM_WAKEUP_LEVEL_LOW // only for KEY
+#define BUTTON_2W               GPIO_PB2
+#define PB2_FUNC                AS_GPIO
+#define PB2_OUTPUT_ENABLE       OFF
+#define PB2_INPUT_ENABLE        ON
+#define PULL_WAKEUP_SRC_PB2     PM_PIN_PULLDOWN_100K
 
-/************************* Configure counters ***************************************/
-#define LITERS_PER_PULSE        10              /* How many liters per one pulse */
-#define COUNTERS_OVERFLOW       100000000       /* counters overflow             */
 
-/************************* Configure HOT GPIO ***************************************/
-#define HOT_GPIO                GPIO_PB7
-#define PB7_INPUT_ENABLE        ON
-#define PB7_DATA_OUT            OFF
-#define PB7_OUTPUT_ENABLE       OFF
-#define PB7_FUNC                AS_GPIO
-#define PULL_WAKEUP_SRC_PB7     PM_PIN_PULLUP_1M
+/**************************** Configure LED ******************************************/
 
-/************************* Configure COLD GPIO **************************************/
-#define COLD_GPIO               GPIO_PB4
-#define PB4_INPUT_ENABLE        ON
-#define PB4_DATA_OUT            OFF
-#define PB4_OUTPUT_ENABLE       OFF
-#define PB4_FUNC                AS_GPIO
-#define PULL_WAKEUP_SRC_PB4     PM_PIN_PULLUP_1M
+#define LED_STATUS              GPIO_PD3
+#define PD3_FUNC                AS_GPIO
+#define PD3_OUTPUT_ENABLE       ON
+#define PD3_INPUT_ENABLE        OFF
+
+#define LED_POWER               GPIO_PD5    // PD4
+#define PD5_FUNC                AS_GPIO
+#define PD5_OUTPUT_ENABLE       ON
+#define PD5_INPUT_ENABLE        OFF
 
 /**************************** Configure UART ***************************************
 *    UART_TX_PA2 = GPIO_PA2,
@@ -46,17 +43,29 @@
 *    UART_RX_PD6 = GPIO_PD6,
 */
 
+/**************************** UART for optoport ***********************************/
+#define UART_BAUD_RATE          9600
+#define UART_TX_GPIO            UART_TX_PD7
+#define UART_RX_GPIO            UART_RX_PA0
+
 #if UART_PRINTF_MODE
-#define DEBUG_INFO_TX_PIN       UART_TX_PD7//print
+//#define DEBUG_INFO_TX_PIN       UART_TX_PB1//print
+//#define BAUDRATE                115200
+//#define PB1_DATA_OUT            ON
+//#define PB1_OUTPUT_ENABLE       ON
+//#define PB1_INPUT_ENABLE        OFF
+//#define PULL_WAKEUP_SRC_PB1     PM_PIN_PULLUP_1M
+//#define PB1_FUNC                AS_GPIO
+
+#define DEBUG_INFO_TX_PIN       GPIO_PA4//print
 #define BAUDRATE                115200
+#define PA4_DATA_OUT            ON
+#define PA4_OUTPUT_ENABLE       ON
+#define PA4_INPUT_ENABLE        OFF
+#define PULL_WAKEUP_SRC_PA4     PM_PIN_PULLUP_1M
+#define PA4_FUNC                AS_GPIO
+
 #endif /* UART_PRINTF_MODE */
-
-/**************************** Configure LED ******************************************/
-
-#define LED1                        GPIO_PB1
-#define PB1_FUNC                    AS_GPIO
-#define PB1_OUTPUT_ENABLE           ON
-#define PB1_INPUT_ENABLE            OFF
 
 
 /************************* For 512K Flash only ***************************************/

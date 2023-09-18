@@ -26,7 +26,7 @@
 #include "../tl_common.h"
 #include "ev.h"
 
-sys_exception_cb_t g_sysExceptCallbak = NULL;
+sys_exception_cb_t g_sysExceptCallback = NULL;
 
 
 volatile u16 T_evtExcept[4] = {0};
@@ -34,10 +34,10 @@ u8 sys_exceptionPost(u16 line, u8 evt)
 {
 	T_evtExcept[0] = line;
 	T_evtExcept[1] = evt;
-
+	
 	/* TODO: some information stored in NV */
-	if(g_sysExceptCallbak){
-		g_sysExceptCallbak();
+	if(g_sysExceptCallback){
+		g_sysExceptCallback();
 	}
 
 	return 0;
@@ -57,13 +57,14 @@ void sys_stackStatusCheck(void)
 	}
 
 	if(stackOverflown){
+		printf("stackOverflown\r\n");
 		ZB_EXCEPTION_POST(SYS_EXCEPTTION_COMMON_STACK_OVERFLOWN);
 	}
 }
 
 void sys_exceptHandlerRegister(sys_exception_cb_t cb)
 {
-	g_sysExceptCallbak = cb;
+	g_sysExceptCallback = cb;
 }
 
 void ev_main(void)

@@ -66,14 +66,14 @@
     #define ZCL_BASIC_SW_BUILD_ID       {7,'v',(APP_RELEASE>>4)+0x30,'.',(APP_RELEASE&0xf)+0x30,'.',(APP_BUILD>>4)+0x30,(APP_BUILD&0xf)+0x30}
 #endif
 
-#define IMAGE_TYPE_ELECTRICITY_METER        (0x06 | (IMAGE_TYPE_BOOT_FLAG << 7))
+#define IMAGE_TYPE_APP              (0x07 | (IMAGE_TYPE_BOOT_FLAG << 7))
 
 /*********************************************************************************************
  * During OTA upgrade, the upgraded device will check the rules of the following three fields.
  * Refer to ZCL OTA specification for details.
  */
 #define MANUFACTURER_CODE_TELINK    0x1141//Telink ID
-#define	IMAGE_TYPE					((CHIP_TYPE << 8) | IMAGE_TYPE_ELECTRICITY_METER)
+#define	IMAGE_TYPE					((CHIP_TYPE << 8) | IMAGE_TYPE_APP)
 #define	FILE_VERSION				((APP_RELEASE << 24) | (APP_BUILD << 16) | (STACK_RELEASE << 8) | STACK_BUILD)
 
 /* Pre-compiled link configuration. */

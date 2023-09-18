@@ -1,6 +1,28 @@
 #include "tl_common.h"
+#include "zb_api.h"
+#include "zcl_include.h"
+#include "gp.h"
 
-#include "app_utility.h"
+s32 delayedMcuResetCb(void *arg) {
+
+    //printf("mcu reset\r\n");
+    zb_resetDevice();
+    return -1;
+}
+
+s32 delayedFactoryResetCb(void *arg) {
+
+    //printf("factory reset\r\n");
+    zb_factoryReset();
+//    zb_resetDevice();
+    return -1;
+}
+
+s32 delayedFullResetCb(void *arg) {
+
+    //printf("full reset\r\n");
+    return -1;
+}
 
 /* Function return size of string and convert signed  *
  * integer to ascii value and store them in array of  *

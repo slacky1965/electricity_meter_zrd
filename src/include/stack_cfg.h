@@ -25,12 +25,16 @@
 
 #pragma once
 
+/**
+ *  @brief Definition for timer event
+ */
+#define TIMER_EVENT_NUM                         (48)
 
 /**
  *  @brief  Working channel
  *          Valid value: 11 ~ 26
  */
-#define DEFAULT_CHANNEL                         11
+#define DEFAULT_CHANNEL                         20
 
 /**
  *  @brief  NVRAM
@@ -50,13 +54,13 @@
  *  @brief  ZCL: MAX number of cluster list, in cluster number add  + out cluster number
  *
  */
-#define	ZCL_CLUSTER_NUM_MAX						12
+#define	ZCL_CLUSTER_NUM_MAX						16
 
 /**
  *  @brief  ZCL: maximum number for zcl reporting table
  *
  */
-#define ZCL_REPORTING_TABLE_NUM					24
+#define ZCL_REPORTING_TABLE_NUM				    32
 
 /**
  *  @brief  ZCL: maximum number for zcl scene table
@@ -73,7 +77,7 @@
 /**
  *  @brief  APS: MAX number of binding table size
  */
-#define APS_BINDING_TABLE_NUM                 	24
+#define APS_BINDING_TABLE_NUM                 	32
 
 
 /**********************************************************************

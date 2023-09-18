@@ -41,9 +41,6 @@ extern "C" {
 #define REPORTING_MIN       60              /* 1 min            */
 #define REPORTING_MAX       300             /* 5 min            */
 
-///* for polling */
-//#define LONG_POLL           REPORTING_MIN
-
 /**********************************************************************
  * Product Information
  * max 24 symbols
@@ -60,9 +57,8 @@ extern "C" {
 
 /* Debug mode config */
 #define	UART_PRINTF_MODE				ON
+#define DEBUG_LEVEL                     OFF
 #define USB_PRINTF_MODE         		OFF
-#define DEBUG_LEVEL                     ON
-#define UART_DEBUG                      OFF
 
 /* PM */
 #define PM_ENABLE						OFF
@@ -100,7 +96,7 @@ extern "C" {
 #if (CHIP_TYPE == TLSR_8258_1M)
     #define FLASH_CAP_SIZE_1M           1
 #endif
-    #define BOARD                       BOARD_8258_DONGLE //BOARD_8258_DIY //BOARD_TB_04 //BOARD_8258_EVK //
+    #define BOARD                       BOARD_8258_DONGLE //BOARD_TB_04 //BOARD_8258_EVK //BOARD_8258_DIY //BOARD_8258_EVK_V1P2
     #define CLOCK_SYS_CLOCK_HZ          48000000
     /************************* For 512K Flash only ***************************************/
     /* Flash map:
@@ -118,7 +114,6 @@ extern "C" {
     #define END_USER_DATA1              (BEGIN_USER_DATA1 + USER_DATA_SIZE)
     #define BEGIN_USER_DATA2            0x40000
     #define END_USER_DATA2              (BEGIN_USER_DATA2 + USER_DATA_SIZE)
-//    #define GEN_USER_CFG_DATA           END_USER_DATA2
     #define NV_ITEM_APP_USER_CFG        (NV_ITEM_APP_GP_TRANS_TABLE + 1)    // see sdk/proj/drivers/drv_nv.h
 #elif defined(MCU_CORE_8278)
     #define FLASH_CAP_SIZE_1M           1
@@ -194,13 +189,13 @@ extern "C" {
 /**********************************************************************
  * ZCL cluster support setting
  */
-//#define ZCL_ON_OFF_SUPPORT                          OFF
-//#define ZCL_LEVEL_CTRL_SUPPORT                      OFF
-//#define ZCL_GROUP_SUPPORT                           OFF
-//#define ZCL_SCENE_SUPPORT                           OFF
+#define ZCL_ON_OFF_SUPPORT                          OFF
+#define ZCL_LEVEL_CTRL_SUPPORT                      OFF
+#define ZCL_GROUP_SUPPORT                           OFF
+#define ZCL_SCENE_SUPPORT                           OFF
 #define ZCL_OTA_SUPPORT                             ON
 #define ZCL_GP_SUPPORT                              ON
-//#define ZCL_WWAH_SUPPORT                            OFF
+#define ZCL_WWAH_SUPPORT                            OFF
 #if TOUCHLINK_SUPPORT
 #define ZCL_ZLL_COMMISSIONING_SUPPORT               ON
 #endif

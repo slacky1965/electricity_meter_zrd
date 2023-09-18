@@ -6,19 +6,39 @@ OUT_DIR += \
  
 OBJS += \
 $(OUT_PATH)/$(SRC_PATH)/common/main.o \
+$(OUT_PATH)/$(SRC_PATH)/zb_appCb.o \
+$(OUT_PATH)/$(SRC_PATH)/zcl_appCb.o \
+$(OUT_PATH)/$(SRC_PATH)/app_endpoint_cfg.o \
+$(OUT_PATH)/$(SRC_PATH)/app_uart.o \
+$(OUT_PATH)/$(SRC_PATH)/app_temperature.o \
+$(OUT_PATH)/$(SRC_PATH)/app_dev_config.o \
+$(OUT_PATH)/$(SRC_PATH)/app_reporting.o \
+$(OUT_PATH)/$(SRC_PATH)/app_utility.o \
+$(OUT_PATH)/$(SRC_PATH)/app_led.o \
+$(OUT_PATH)/$(SRC_PATH)/app_button.o \
 $(OUT_PATH)/$(SRC_PATH)/devices/device.o \
 $(OUT_PATH)/$(SRC_PATH)/devices/kaskad_1_mt.o \
 $(OUT_PATH)/$(SRC_PATH)/devices/kaskad_11.o \
 $(OUT_PATH)/$(SRC_PATH)/devices/mercury_206.o \
 $(OUT_PATH)/$(SRC_PATH)/devices/energomera_ce102m.o \
-$(OUT_PATH)/$(SRC_PATH)/config.o \
-$(OUT_PATH)/$(SRC_PATH)/app_ui.o \
-$(OUT_PATH)/$(SRC_PATH)/app_uart.o \
-$(OUT_PATH)/$(SRC_PATH)/app_utility.o \
-$(OUT_PATH)/$(SRC_PATH)/electricityMeterEpCfg.o \
-$(OUT_PATH)/$(SRC_PATH)/zcl_electricityMeterCb.o \
-$(OUT_PATH)/$(SRC_PATH)/zb_appCb.o \
-$(OUT_PATH)/$(SRC_PATH)/electricityMeter.o
+$(OUT_PATH)/$(SRC_PATH)/app_main.o
+
+
+
+
+#$(OUT_PATH)/$(SRC_PATH)/devices/device.o \
+#$(OUT_PATH)/$(SRC_PATH)/devices/kaskad_1_mt.o \
+#$(OUT_PATH)/$(SRC_PATH)/devices/kaskad_11.o \
+#$(OUT_PATH)/$(SRC_PATH)/devices/mercury_206.o \
+#$(OUT_PATH)/$(SRC_PATH)/devices/energomera_ce102m.o \
+#$(OUT_PATH)/$(SRC_PATH)/config.o \
+#$(OUT_PATH)/$(SRC_PATH)/app_ui.o \
+#$(OUT_PATH)/$(SRC_PATH)/app_uart.o \
+#$(OUT_PATH)/$(SRC_PATH)/app_utility.o \
+#$(OUT_PATH)/$(SRC_PATH)/electricityMeterEpCfg.o \
+#$(OUT_PATH)/$(SRC_PATH)/zcl_electricityMeterCb.o \
+#$(OUT_PATH)/$(SRC_PATH)/zb_appCb.o \
+#$(OUT_PATH)/$(SRC_PATH)/electricityMeter.o
 
 
 #$(OUT_PATH)/$(SRC_PATH)/app_ui.o \

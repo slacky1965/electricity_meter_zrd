@@ -1,5 +1,5 @@
-#ifndef SRC_INCLUDE_CONFIG_H_
-#define SRC_INCLUDE_CONFIG_H_
+#ifndef SRC_INCLUDE_APP_DEV_CONFIG_H_
+#define SRC_INCLUDE_APP_DEV_CONFIG_H_
 
 /* must be no more than FLASH_PAGE_SIZE (256) bytes */
 typedef struct __attribute__((packed)) {
@@ -19,13 +19,12 @@ typedef struct __attribute__((packed)) {
     u16 current_multiplier;
     u16 current_divisor;
     u16 crc;
-} em_config_t;
+} dev_config_t;
 
-extern em_config_t em_config;
+extern dev_config_t dev_config;
 
 void init_config(u8 print);
 void write_config();
 
 
-
-#endif /* SRC_INCLUDE_CONFIG_H_ */
+#endif /* SRC_INCLUDE_APP_DEV_CONFIG_H_ */

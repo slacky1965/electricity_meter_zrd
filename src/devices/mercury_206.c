@@ -1,13 +1,12 @@
 #include "tl_common.h"
 #include "zcl_include.h"
 
-#include "config.h"
+#include "app_dev_config.h"
 #include "device.h"
 #include "mercury_206.h"
 #include "app_uart.h"
-#include "app_ui.h"
 #include "se_custom_attr.h"
-#include "electricityMeter.h"
+#include "app_endpoint_cfg.h"
 
 static package_t request_pkt;
 static package_t response_pkt;
@@ -139,7 +138,7 @@ static pkt_error_t response_meter(u8 command) {
             u16 crc_pkt = ((u8*)&response_pkt)[load_size-2] & 0xff;
             crc_pkt |= (((u8*)&response_pkt)[load_size-1] << 8) & 0xff00;
             if (crc == crc_pkt) {
-                if (reverse32(response_pkt.address) == em_config.device_address) {
+                if (reverse32(response_pkt.address) == dev_config.device_address) {
                     if (response_pkt.cmd == command) {
                         pkt_error_no = PKT_OK;
                     } else {
@@ -168,7 +167,7 @@ static void set_command(u8 cmd) {
 
     memset(&request_pkt, 0, sizeof(package_t));
 
-    request_pkt.address = reverse32(em_config.device_address);
+    request_pkt.address = reverse32(dev_config.device_address);
     request_pkt.cmd = cmd;
     request_pkt.pkt_len = 5;
     u16 crc = checksum((u8*)&request_pkt, request_pkt.pkt_len);
@@ -206,11 +205,11 @@ static void get_tariffs_data() {
             u64 tariff = tariff_from_bcd(pkt_tariffs->tariff_1) & 0xffffffffffff;
             u64 last_tariff;
 
-            zcl_getAttrVal(ELECTRICITY_METER_EP1, ZCL_CLUSTER_SE_METERING, ZCL_ATTRID_CURRENT_TIER_1_SUMMATION_DELIVERD, &attr_len, (u8*)&attr_data);
+            zcl_getAttrVal(APP_ENDPOINT_1, ZCL_CLUSTER_SE_METERING, ZCL_ATTRID_CURRENT_TIER_1_SUMMATION_DELIVERD, &attr_len, (u8*)&attr_data);
             last_tariff = fromPtoInteger(attr_len, attr_data);
 
             if (tariff > last_tariff) {
-                zcl_setAttrVal(ELECTRICITY_METER_EP1, ZCL_CLUSTER_SE_METERING, ZCL_ATTRID_CURRENT_TIER_1_SUMMATION_DELIVERD, (u8*)&tariff);
+                zcl_setAttrVal(APP_ENDPOINT_1, ZCL_CLUSTER_SE_METERING, ZCL_ATTRID_CURRENT_TIER_1_SUMMATION_DELIVERD, (u8*)&tariff);
             }
 #if UART_PRINTF_MODE
             printf("tariff1: %d\r\n", tariff);
@@ -218,11 +217,11 @@ static void get_tariffs_data() {
 
             tariff = tariff_from_bcd(pkt_tariffs->tariff_2) & 0xffffffffffff;
 
-            zcl_getAttrVal(ELECTRICITY_METER_EP1, ZCL_CLUSTER_SE_METERING, ZCL_ATTRID_CURRENT_TIER_2_SUMMATION_DELIVERD, &attr_len, (u8*)&attr_data);
+            zcl_getAttrVal(APP_ENDPOINT_1, ZCL_CLUSTER_SE_METERING, ZCL_ATTRID_CURRENT_TIER_2_SUMMATION_DELIVERD, &attr_len, (u8*)&attr_data);
             last_tariff = fromPtoInteger(attr_len, attr_data);
 
             if (tariff > last_tariff) {
-                zcl_setAttrVal(ELECTRICITY_METER_EP1, ZCL_CLUSTER_SE_METERING, ZCL_ATTRID_CURRENT_TIER_2_SUMMATION_DELIVERD, (u8*)&tariff);
+                zcl_setAttrVal(APP_ENDPOINT_1, ZCL_CLUSTER_SE_METERING, ZCL_ATTRID_CURRENT_TIER_2_SUMMATION_DELIVERD, (u8*)&tariff);
             }
 
 #if UART_PRINTF_MODE
@@ -231,11 +230,11 @@ static void get_tariffs_data() {
 
             tariff = tariff_from_bcd(pkt_tariffs->tariff_3) & 0xffffffffffff;
 
-            zcl_getAttrVal(ELECTRICITY_METER_EP1, ZCL_CLUSTER_SE_METERING, ZCL_ATTRID_CURRENT_TIER_3_SUMMATION_DELIVERD, &attr_len, (u8*)&attr_data);
+            zcl_getAttrVal(APP_ENDPOINT_1, ZCL_CLUSTER_SE_METERING, ZCL_ATTRID_CURRENT_TIER_3_SUMMATION_DELIVERD, &attr_len, (u8*)&attr_data);
             last_tariff = fromPtoInteger(attr_len, attr_data);
 
             if (tariff > last_tariff) {
-                zcl_setAttrVal(ELECTRICITY_METER_EP1, ZCL_CLUSTER_SE_METERING, ZCL_ATTRID_CURRENT_TIER_3_SUMMATION_DELIVERD, (u8*)&tariff);
+                zcl_setAttrVal(APP_ENDPOINT_1, ZCL_CLUSTER_SE_METERING, ZCL_ATTRID_CURRENT_TIER_3_SUMMATION_DELIVERD, (u8*)&tariff);
             }
 #if UART_PRINTF_MODE
             printf("tariff3: %d\r\n", tariff);
@@ -243,11 +242,11 @@ static void get_tariffs_data() {
 
             tariff = tariff_from_bcd(pkt_tariffs->tariff_4) & 0xffffffffffff;
 
-            zcl_getAttrVal(ELECTRICITY_METER_EP1, ZCL_CLUSTER_SE_METERING, ZCL_ATTRID_CURRENT_TIER_4_SUMMATION_DELIVERD, &attr_len, (u8*)&attr_data);
+            zcl_getAttrVal(APP_ENDPOINT_1, ZCL_CLUSTER_SE_METERING, ZCL_ATTRID_CURRENT_TIER_4_SUMMATION_DELIVERD, &attr_len, (u8*)&attr_data);
             last_tariff = fromPtoInteger(attr_len, attr_data);
 
             if (tariff > last_tariff) {
-                zcl_setAttrVal(ELECTRICITY_METER_EP1, ZCL_CLUSTER_SE_METERING, ZCL_ATTRID_CURRENT_TIER_4_SUMMATION_DELIVERD, (u8*)&tariff);
+                zcl_setAttrVal(APP_ENDPOINT_1, ZCL_CLUSTER_SE_METERING, ZCL_ATTRID_CURRENT_TIER_4_SUMMATION_DELIVERD, (u8*)&tariff);
             }
 #if UART_PRINTF_MODE
             printf("tariff4: %d\r\n", tariff);
@@ -273,11 +272,11 @@ static void get_net_params_data() {
             volts += from_bcd_to_dec(volts_bcd[0]) * 100;
             volts += from_bcd_to_dec(volts_bcd[1]);
 
-            zcl_getAttrVal(ELECTRICITY_METER_EP1, ZCL_CLUSTER_MS_ELECTRICAL_MEASUREMENT, ZCL_ATTRID_RMS_VOLTAGE, &attr_len, (u8*)&attr_data);
+            zcl_getAttrVal(APP_ENDPOINT_1, ZCL_CLUSTER_MS_ELECTRICAL_MEASUREMENT, ZCL_ATTRID_RMS_VOLTAGE, &attr_len, (u8*)&attr_data);
             u16 last_volts = fromPtoInteger(attr_len, attr_data);
 
             if (volts != last_volts) {
-                zcl_setAttrVal(ELECTRICITY_METER_EP1, ZCL_CLUSTER_MS_ELECTRICAL_MEASUREMENT, ZCL_ATTRID_RMS_VOLTAGE, (u8*)&volts);
+                zcl_setAttrVal(APP_ENDPOINT_1, ZCL_CLUSTER_MS_ELECTRICAL_MEASUREMENT, ZCL_ATTRID_RMS_VOLTAGE, (u8*)&volts);
             }
 
 #if UART_PRINTF_MODE
@@ -291,11 +290,11 @@ static void get_net_params_data() {
 
             //amps = 1050;
 
-            zcl_getAttrVal(ELECTRICITY_METER_EP1, ZCL_CLUSTER_MS_ELECTRICAL_MEASUREMENT, ZCL_ATTRID_LINE_CURRENT, &attr_len, (u8*)&attr_data);
+            zcl_getAttrVal(APP_ENDPOINT_1, ZCL_CLUSTER_MS_ELECTRICAL_MEASUREMENT, ZCL_ATTRID_LINE_CURRENT, &attr_len, (u8*)&attr_data);
             u16 last_amps = fromPtoInteger(attr_len, attr_data);
 
             if (amps != last_amps) {
-                zcl_setAttrVal(ELECTRICITY_METER_EP1, ZCL_CLUSTER_MS_ELECTRICAL_MEASUREMENT, ZCL_ATTRID_LINE_CURRENT, (u8*)&amps);
+                zcl_setAttrVal(APP_ENDPOINT_1, ZCL_CLUSTER_MS_ELECTRICAL_MEASUREMENT, ZCL_ATTRID_LINE_CURRENT, (u8*)&amps);
             }
 #if UART_PRINTF_MODE
             printf("amps:    %d\r\n", amps);
@@ -310,13 +309,13 @@ static void get_net_params_data() {
 
             u16 pwr = power & 0xffff;
 
-            pwr = 3012;
+            //pwr = 3012;
 
-            zcl_getAttrVal(ELECTRICITY_METER_EP1, ZCL_CLUSTER_MS_ELECTRICAL_MEASUREMENT, ZCL_ATTRID_APPARENT_POWER, &attr_len, (u8*)&attr_data);
+            zcl_getAttrVal(APP_ENDPOINT_1, ZCL_CLUSTER_MS_ELECTRICAL_MEASUREMENT, ZCL_ATTRID_APPARENT_POWER, &attr_len, (u8*)&attr_data);
             u16 last_pwr = fromPtoInteger(attr_len, attr_data);
 
             if (pwr != last_pwr) {
-                zcl_setAttrVal(ELECTRICITY_METER_EP1, ZCL_CLUSTER_MS_ELECTRICAL_MEASUREMENT, ZCL_ATTRID_APPARENT_POWER, (u8*)&pwr);
+                zcl_setAttrVal(APP_ENDPOINT_1, ZCL_CLUSTER_MS_ELECTRICAL_MEASUREMENT, ZCL_ATTRID_APPARENT_POWER, (u8*)&pwr);
             }
 
 #if UART_PRINTF_MODE
@@ -353,11 +352,11 @@ static void get_resbat_data() {
                 battery_level++;
             }
 
-            zcl_getAttrVal(ELECTRICITY_METER_EP1, ZCL_CLUSTER_SE_METERING, ZCL_ATTRID_REMAINING_BATTERY_LIFE, &attr_len, (u8*)&attr_data);
+            zcl_getAttrVal(APP_ENDPOINT_1, ZCL_CLUSTER_SE_METERING, ZCL_ATTRID_REMAINING_BATTERY_LIFE, &attr_len, (u8*)&attr_data);
             u8 last_bl = fromPtoInteger(attr_len, attr_data);
 
             if (battery_level != last_bl) {
-                zcl_setAttrVal(ELECTRICITY_METER_EP1, ZCL_CLUSTER_SE_METERING, ZCL_ATTRID_REMAINING_BATTERY_LIFE, (u8*)&battery_level);
+                zcl_setAttrVal(APP_ENDPOINT_1, ZCL_CLUSTER_SE_METERING, ZCL_ATTRID_REMAINING_BATTERY_LIFE, (u8*)&battery_level);
             }
 
 #if UART_PRINTF_MODE
@@ -417,7 +416,7 @@ static void get_date_release_data_mercury206() {
             dr[dr_len++] = year_str[3];
 
             if (set_zcl_str(dr, date_release, DATA_MAX_LEN+1)) {
-                zcl_setAttrVal(ELECTRICITY_METER_EP1, ZCL_CLUSTER_SE_METERING, ZCL_ATTRID_CUSTOM_DATE_RELEASE, (u8*)&date_release);
+                zcl_setAttrVal(APP_ENDPOINT_1, ZCL_CLUSTER_SE_METERING, ZCL_ATTRID_CUSTOM_DATE_RELEASE, (u8*)&date_release);
 #if UART_PRINTF_MODE
                 printf("Date of release: %s\r\n", date_release+1);
 #endif
@@ -447,7 +446,7 @@ static void get_serial_number_data_mercury206() {
             itoa(addr, sn);
 
             if (set_zcl_str(sn, serial_number, SE_ATTR_SN_SIZE)) {
-                zcl_setAttrVal(ELECTRICITY_METER_EP1, ZCL_CLUSTER_SE_METERING, ZCL_ATTRID_METER_SERIAL_NUMBER, (u8*)&serial_number);
+                zcl_setAttrVal(APP_ENDPOINT_1, ZCL_CLUSTER_SE_METERING, ZCL_ATTRID_METER_SERIAL_NUMBER, (u8*)&serial_number);
 #if UART_PRINTF_MODE
                 printf("Serial Number: %s\r\n", serial_number+1);
 #endif

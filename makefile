@@ -19,7 +19,6 @@ LIBS := -lzb_router -ldrivers_8258 -lsoft-fp
 
 DEVICE_TYPE = -DROUTER=1
 MCU_TYPE = -DMCU_CORE_8258=1
-#-D__PROJECT_TL_CONTACT_SENSOR__=1 
 BOOT_FLAG = -DMCU_CORE_8258 -DMCU_STARTUP_8258
 
 SDK_PATH := ./tl_zigbee_sdk
@@ -29,8 +28,6 @@ MAKE_INCLUDES := ./make
 TOOLS_PATH := ./tools
 VERSION_RELEASE := V$(shell awk -F " " '/APP_RELEASE/ {gsub("0x",""); printf "%.1f", $$3/10.0; exit}' $(SRC_PATH)/include/version_cfg.h)
 VERSION_BUILD := $(shell awk -F " " '/APP_BUILD/ {gsub("0x",""); printf "%02d", $$3; exit}' ./src/include/version_cfg.h)
-
- 
 
 TL_Check = $(TOOLS_PATH)/tl_check_fw.py
 
@@ -42,6 +39,7 @@ INCLUDE_PATHS := \
 -I$(SDK_PATH)/zigbee/zbapi \
 -I$(SDK_PATH)/zigbee/bdb/includes \
 -I$(SDK_PATH)/zigbee/gp \
+-I$(SDK_PATH)/zigbee/zdo \
 -I$(SDK_PATH)/zigbee/zcl \
 -I$(SDK_PATH)/zigbee/ota \
 -I$(SDK_PATH)/zbhci \
@@ -49,7 +47,9 @@ INCLUDE_PATHS := \
 -I$(SRC_PATH)/include \
 -I$(SRC_PATH)/devices/include \
 -I$(SRC_PATH)/common \
--I./common 
+-I./common
+
+ 
  
 LS_FLAGS := $(SDK_PATH)/platform/boot/8258/boot_8258.link
 
@@ -88,6 +88,7 @@ RM := rm -rf
 # All of the sources participating in the build are defined here
 -include $(MAKE_INCLUDES)/zdo.mk
 -include $(MAKE_INCLUDES)/zcl.mk
+-include $(MAKE_INCLUDES)/wwah.mk
 -include $(MAKE_INCLUDES)/ss.mk
 -include $(MAKE_INCLUDES)/ota.mk
 -include $(MAKE_INCLUDES)/mac.mk
