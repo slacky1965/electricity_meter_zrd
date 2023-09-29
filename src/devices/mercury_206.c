@@ -1,6 +1,12 @@
 #include "tl_common.h"
 #include "zcl_include.h"
 
+#ifndef METER_MODEL
+#define METER_MODEL MERCURY_206
+#endif
+
+#if (METER_MODEL == MERCURY_206)
+
 #include "app_dev_config.h"
 #include "device.h"
 #include "mercury_206.h"
@@ -64,37 +70,36 @@ static u8 send_command(package_t *pkt) {
 
     size_t len;
 
+//    app_uart_rx_off();
+    flush_buff_uart();
+
     /* three attempts to write to uart */
     for (u8 attempt = 0; attempt < 3; attempt++) {
         len = write_bytes_to_uart((u8*)pkt, pkt->pkt_len);
         if (len == pkt->pkt_len) {
-#if UART_PRINTF_MODE && UART_DEBUG
-            printf("send bytes: %u\r\n", len);
-#endif
             break;
         } else {
             len = 0;
         }
-#if UART_PRINTF_MODE && UART_DEBUG
+#if UART_PRINTF_MODE && DEBUG_PACKAGE
         printf("Attempt to send data to uart: %u\r\n", attempt+1);
 #endif
         sleep_ms(250);
     }
 
+
+    sleep_ms(200);
+//    app_uart_rx_off();
+
+#if UART_PRINTF_MODE && DEBUG_PACKAGE
     if (len == 0) {
-#if UART_PRINTF_MODE && UART_DEBUG
-        printf("Can't send a request pkt\r\n");
-#endif
+        u8 head[] = "write to uart error";
+        print_package(head, (u8*)pkt, pkt->pkt_len);
     } else {
-        sleep_ms(200);
-#if UART_PRINTF_MODE && UART_DEBUG
-        printf("request pkt: 0x");
-        for (int i = 0; i < len; i++) {
-            printf("%02x", ((u8*)pkt)[i]);
-        }
-        printf("\r\n");
-#endif
+        u8 head[] = "write to uart";
+        print_package(head, (u8*)pkt, len);
     }
+#endif
 
     return len;
 }
@@ -107,30 +112,24 @@ static pkt_error_t response_meter(u8 command) {
 
     memset(buff, 0, sizeof(package_t));
 
-    for (u8 attempt = 0; attempt < 3; attempt ++) {
+    /* trying to read for 1 seconds */
+    for(u8 i = 0; i < 100; i++ ) {
         load_size = 0;
-        while(available_buff_uart() && load_size < PKT_BUFF_MAX_LEN) {
-            buff[load_size++] = read_byte_from_buff_uart();
-            load_len++;
+        if (available_buff_uart()) {
+            while(available_buff_uart() && load_size < PKT_BUFF_MAX_LEN) {
+                buff[load_size++] = read_byte_from_buff_uart();
+                load_len++;
+            }
+
+            if (load_size > 6) break;
         }
-
-        if (load_size > 6) break;
-
-        sleep_ms(250);
+        sleep_ms(10);
     }
 
-#if UART_PRINTF_MODE && UART_DEBUG
-    printf("read bytes: %u\r\n", load_len);
-#endif
-
-
     if (load_size) {
-#if UART_PRINTF_MODE && UART_DEBUG
-        printf("response pkt: 0x");
-        for (int i = 0; i < load_size; i++) {
-            printf("%02x", buff[i]);
-        }
-        printf("\r\n");
+#if UART_PRINTF_MODE && DEBUG_PACKAGE
+        u8 head[] = "read from uart";
+        print_package(head, buff, load_size);
 #endif
         if (load_size > 6) {
             response_pkt.pkt_len = load_size;
@@ -153,8 +152,12 @@ static pkt_error_t response_meter(u8 command) {
         } else {
             pkt_error_no = PKT_ERR_RESPONSE;
         }
+    } else {
+#if UART_PRINTF_MODE && DEBUG_PACKAGE
+        u8 head[] = "read from uart error";
+        print_package(head, buff, load_size);
+#endif
     }
-
 
 #if UART_PRINTF_MODE
     if (pkt_error_no != PKT_OK) print_error(pkt_error_no);
@@ -192,8 +195,8 @@ static u32 tariff_from_bcd(u32 tariff_bcd) {
 
 static void get_tariffs_data() {
 
-#if UART_PRINTF_MODE
-    printf("Start command to receive tariffs\r\n");
+#if UART_PRINTF_MODE && (DEBUG_DEVICE_DATA || DEBUG_PACKAGE)
+    printf("\r\nCommand get tariffs\r\n");
 #endif
 
     set_command(cmd_tariffs_data);
@@ -211,7 +214,7 @@ static void get_tariffs_data() {
             if (tariff > last_tariff) {
                 zcl_setAttrVal(APP_ENDPOINT_1, ZCL_CLUSTER_SE_METERING, ZCL_ATTRID_CURRENT_TIER_1_SUMMATION_DELIVERD, (u8*)&tariff);
             }
-#if UART_PRINTF_MODE
+#if UART_PRINTF_MODE && DEBUG_DEVICE_DATA
             printf("tariff1: %d\r\n", tariff);
 #endif
 
@@ -224,7 +227,7 @@ static void get_tariffs_data() {
                 zcl_setAttrVal(APP_ENDPOINT_1, ZCL_CLUSTER_SE_METERING, ZCL_ATTRID_CURRENT_TIER_2_SUMMATION_DELIVERD, (u8*)&tariff);
             }
 
-#if UART_PRINTF_MODE
+#if UART_PRINTF_MODE && DEBUG_DEVICE_DATA
             printf("tariff2: %d\r\n", tariff);
 #endif
 
@@ -236,7 +239,7 @@ static void get_tariffs_data() {
             if (tariff > last_tariff) {
                 zcl_setAttrVal(APP_ENDPOINT_1, ZCL_CLUSTER_SE_METERING, ZCL_ATTRID_CURRENT_TIER_3_SUMMATION_DELIVERD, (u8*)&tariff);
             }
-#if UART_PRINTF_MODE
+#if UART_PRINTF_MODE && DEBUG_DEVICE_DATA
             printf("tariff3: %d\r\n", tariff);
 #endif
 
@@ -248,7 +251,7 @@ static void get_tariffs_data() {
             if (tariff > last_tariff) {
                 zcl_setAttrVal(APP_ENDPOINT_1, ZCL_CLUSTER_SE_METERING, ZCL_ATTRID_CURRENT_TIER_4_SUMMATION_DELIVERD, (u8*)&tariff);
             }
-#if UART_PRINTF_MODE
+#if UART_PRINTF_MODE && DEBUG_DEVICE_DATA
             printf("tariff4: %d\r\n", tariff);
 #endif
         }
@@ -257,8 +260,8 @@ static void get_tariffs_data() {
 
 static void get_net_params_data() {
 
-#if UART_PRINTF_MODE
-    printf("Start command to receive net parameters (power, voltage, current)\r\n");
+#if UART_PRINTF_MODE && (DEBUG_DEVICE_DATA || DEBUG_PACKAGE)
+    printf("\r\nCommand get net parameters (power, voltage, current)\r\n");
 #endif
 
     set_command(cmd_net_params);
@@ -279,7 +282,7 @@ static void get_net_params_data() {
                 zcl_setAttrVal(APP_ENDPOINT_1, ZCL_CLUSTER_MS_ELECTRICAL_MEASUREMENT, ZCL_ATTRID_RMS_VOLTAGE, (u8*)&volts);
             }
 
-#if UART_PRINTF_MODE
+#if UART_PRINTF_MODE && DEBUG_DEVICE_DATA
             printf("voltage: %d\r\n", volts);
 #endif
 
@@ -296,8 +299,8 @@ static void get_net_params_data() {
             if (amps != last_amps) {
                 zcl_setAttrVal(APP_ENDPOINT_1, ZCL_CLUSTER_MS_ELECTRICAL_MEASUREMENT, ZCL_ATTRID_LINE_CURRENT, (u8*)&amps);
             }
-#if UART_PRINTF_MODE
-            printf("amps:    %d\r\n", amps);
+#if UART_PRINTF_MODE && DEBUG_DEVICE_DATA
+            printf("amps: %d\r\n", amps);
 #endif
 
             u32 power = 0;
@@ -318,8 +321,8 @@ static void get_net_params_data() {
                 zcl_setAttrVal(APP_ENDPOINT_1, ZCL_CLUSTER_MS_ELECTRICAL_MEASUREMENT, ZCL_ATTRID_APPARENT_POWER, (u8*)&pwr);
             }
 
-#if UART_PRINTF_MODE
-            printf("power:   %d\r\n", pwr);
+#if UART_PRINTF_MODE && DEBUG_DEVICE_DATA
+            printf("power: %d\r\n", pwr);
 #endif
 
 
@@ -330,7 +333,7 @@ static void get_net_params_data() {
 static void get_resbat_data() {
 
 #if UART_PRINTF_MODE
-    printf("Start command to receive running time (to get battery life)\r\n");
+    printf("\r\nCommand get resource of battery\r\n");
 #endif
 
     u8 lifetime = RESOURCE_BATTERY, worktime;
@@ -359,7 +362,7 @@ static void get_resbat_data() {
                 zcl_setAttrVal(APP_ENDPOINT_1, ZCL_CLUSTER_SE_METERING, ZCL_ATTRID_REMAINING_BATTERY_LIFE, (u8*)&battery_level);
             }
 
-#if UART_PRINTF_MODE
+#if UART_PRINTF_MODE && DEBUG_DEVICE_DATA
             printf("Resource battery: %d.%d\r\n", (worktime*100)/lifetime, ((worktime*100)%lifetime)*100/lifetime);
 #endif
 
@@ -367,10 +370,10 @@ static void get_resbat_data() {
     }
 }
 
-static void get_date_release_data_mercury206() {
+static void get_date_release_data() {
 
-#if UART_PRINTF_MODE
-    printf("Start command to receive date of release\r\n");
+#if UART_PRINTF_MODE && (DEBUG_DEVICE_DATA || DEBUG_PACKAGE)
+    printf("\r\nCommand get date release\r\n");
 #endif
 
     set_command(cmd_date_release);
@@ -417,8 +420,8 @@ static void get_date_release_data_mercury206() {
 
             if (set_zcl_str(dr, date_release, DATA_MAX_LEN+1)) {
                 zcl_setAttrVal(APP_ENDPOINT_1, ZCL_CLUSTER_SE_METERING, ZCL_ATTRID_CUSTOM_DATE_RELEASE, (u8*)&date_release);
-#if UART_PRINTF_MODE
-                printf("Date of release: %s\r\n", date_release+1);
+#if UART_PRINTF_MODE && DEBUG_DEVICE_DATA
+        printf("Date of release: %s, len: %d\r\n", date_release+1, *date_release);
 #endif
             }
         }
@@ -426,10 +429,10 @@ static void get_date_release_data_mercury206() {
 }
 
 
-static void get_serial_number_data_mercury206() {
+static void get_serial_number_data() {
 
-#if UART_PRINTF_MODE
-    printf("Start command to receive serial number\r\n");
+#if UART_PRINTF_MODE && (DEBUG_DEVICE_DATA || DEBUG_PACKAGE)
+    printf("\r\nCommand get serial number\r\n");
 #endif
 
     set_command(cmd_serial_number);
@@ -447,8 +450,8 @@ static void get_serial_number_data_mercury206() {
 
             if (set_zcl_str(sn, serial_number, SE_ATTR_SN_SIZE)) {
                 zcl_setAttrVal(APP_ENDPOINT_1, ZCL_CLUSTER_SE_METERING, ZCL_ATTRID_METER_SERIAL_NUMBER, (u8*)&serial_number);
-#if UART_PRINTF_MODE
-                printf("Serial Number: %s\r\n", serial_number+1);
+#if UART_PRINTF_MODE && DEBUG_DEVICE_DATA
+            printf("Serial Number: %s, len: %d\r\n", serial_number+1, *serial_number);
 #endif
             }
         }
@@ -456,6 +459,10 @@ static void get_serial_number_data_mercury206() {
 }
 
 static u8 get_timeout_data() {
+
+#if UART_PRINTF_MODE && (DEBUG_DEVICE_DATA || DEBUG_PACKAGE)
+    printf("\r\nCommand ping of device\r\n");
+#endif
 
     set_command(cmd_timeout);
 
@@ -468,36 +475,31 @@ static u8 get_timeout_data() {
     return false;
 }
 
-u8 measure_meter_mercury206() {
-
-    u8 ret = false;
+u8 _measure_meter() {
 
     get_timeout_data();     /* does not respond to the first command after a pause. fake command */
-    sleep_ms(500);
 
-    if (get_timeout_data()) {
+    u8 ret = get_timeout_data();
+
+    if (ret) {
         if (new_start) {
-            get_serial_number_data_mercury206();
-            get_date_release_data_mercury206();
+            get_serial_number_data();
+            get_date_release_data();
             new_start = false;
         }
         get_net_params_data();
         get_tariffs_data();
         get_resbat_data();
 
-        fault_measure_counter = 0;
-        ret = true;
+        fault_measure_flag = false;
     } else {
-        fault_measure_counter++;
-
-        if (fault_measure_counter == 10) {
-#if UART_PRINTF_MODE
-            printf("Fault get data from device. Restart!!!\r\n");
-#endif
-            zb_resetDevice();
+        fault_measure_flag = true;
+        if (!timerFaultMeasurementEvt) {
+            timerFaultMeasurementEvt = TL_ZB_TIMER_SCHEDULE(fault_measure_meterCb, NULL, TIMEOUT_10MIN);
         }
     }
 
     return ret;
 }
 
+#endif

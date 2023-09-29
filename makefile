@@ -1,6 +1,11 @@
 # Set Project Name
 PROJECT_NAME := electricity_meter_zrd
 
+METER_MODEL ?= KASKAD_1_MT
+#METER_MODEL ?= KASKAD_11_C1
+#METER_MODEL ?= MERCURY_206
+#METER_MODEL ?= ENERGOMERA_CE102M
+
 # Set the serial port number for downloading the firmware
 DOWNLOAD_PORT := COM3
 
@@ -29,6 +34,7 @@ TOOLS_PATH := ./tools
 VERSION_RELEASE := V$(shell awk -F " " '/APP_RELEASE/ {gsub("0x",""); printf "%.1f", $$3/10.0; exit}' $(SRC_PATH)/include/version_cfg.h)
 VERSION_BUILD := $(shell awk -F " " '/APP_BUILD/ {gsub("0x",""); printf "%02d", $$3; exit}' ./src/include/version_cfg.h)
 
+
 TL_Check = $(TOOLS_PATH)/tl_check_fw.py
 
 INCLUDE_PATHS := \
@@ -50,7 +56,6 @@ INCLUDE_PATHS := \
 -I./common
 
  
- 
 LS_FLAGS := $(SDK_PATH)/platform/boot/8258/boot_8258.link
 
 GCC_FLAGS := \
@@ -68,7 +73,7 @@ GCC_FLAGS := \
 GCC_FLAGS += \
 $(DEVICE_TYPE) \
 $(MCU_TYPE) \
--D__PROJECT_TL_DIMMABLE_LIGHT__=1
+-DMETER_MODEL=$(METER_MODEL)
 
 OBJ_SRCS := 
 S_SRCS := 
@@ -108,6 +113,7 @@ RM := rm -rf
 LST_FILE := $(OUT_PATH)/$(PROJECT_NAME).lst
 BIN_FILE := $(OUT_PATH)/$(PROJECT_NAME).bin
 ELF_FILE := $(OUT_PATH)/$(PROJECT_NAME).elf
+FIRMWARE_FILE := $(shell echo $(METER_MODEL)_$(VERSION_RELEASE).$(VERSION_BUILD).bin | tr [:upper:] [:lower:])
 
 SIZEDUMMY += \
 sizedummy \
@@ -150,8 +156,10 @@ $(BIN_FILE): $(ELF_FILE)
 	@python3 $(TL_Check) $(BIN_FILE)
 	@echo 'Finished building: $@'
 	@echo ' '
-	@cp $(BIN_FILE) $(PROJECT_NAME)_$(VERSION_RELEASE).$(VERSION_BUILD).bin
+	cp $(BIN_FILE) $(FIRMWARE_FILE)
 
+
+#	@cp $(BIN_FILE) $(PROJECT_NAME)_$(VERSION_RELEASE).$(VERSION_BUILD).bin
 
 sizedummy: $(ELF_FILE)
 	@echo 'Invoking: Print Size'
@@ -161,7 +169,7 @@ sizedummy: $(ELF_FILE)
 
 # Other Targets
 clean:
-	-$(RM) $(FLASH_IMAGE) $(ELFS) $(OBJS) $(SIZEDUMMY) $(LST_FILE) $(ELF_FILE) $(PROJECT_NAME)_$(VERSION_RELEASE).$(VERSION_BUILD).bin
+	-$(RM) $(FLASH_IMAGE) $(ELFS) $(OBJS) $(SIZEDUMMY) $(LST_FILE) $(ELF_FILE) *.bin
 	-@echo ' '
 
 clean-project:

@@ -82,9 +82,10 @@ extern "C" {
 *******************************************************************************************************/
 
 /**************************** Configure UART ***************************************/
-#define UART_BAUD_RATE          9600
-#define UART_TX_GPIO            UART_TX_PD7
-#define UART_RX_GPIO            UART_RX_PA0
+#define BAUDRATE_UART           9600
+#define GPIO_UART_TX            UART_TX_PD7
+#define GPIO_UART_RX            UART_RX_PA0
+
 
 /************************* Configure Temperature ***********************************/
 #define GPIO_TEMP                   GPIO_PC3

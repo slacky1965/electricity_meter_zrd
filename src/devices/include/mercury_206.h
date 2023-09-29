@@ -1,6 +1,8 @@
 #ifndef SRC_INCLUDE_MERCURY_206_H_
 #define SRC_INCLUDE_MERCURY_206_H_
 
+//#if (METER_MODEL == MERCURY_206)
+
 typedef enum _command_t {
     cmd_serial_number   = 0x2f,
     cmd_tariffs_data    = 0x27,
@@ -66,5 +68,6 @@ typedef struct __attribute__((packed)) _pkt_running_time_t {
     u16 crc;
 } pkt_running_time_t;
 
+//#endif
 
 #endif /* SRC_INCLUDE_MERCURY_206_H_ */

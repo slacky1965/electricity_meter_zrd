@@ -1,6 +1,8 @@
 #ifndef SRC_INCLUDE_KASKAD_11_H_
 #define SRC_INCLUDE_KASKAD_11_H_
 
+//#if (METER_MODEL == KASKAD_11_C1)
+
 typedef enum _command_t {
     cmd_open_channel    = 0x02,
     cmd_close_channel   = 0x03,
@@ -121,5 +123,6 @@ typedef struct __attribute__((packed)) _pkt_datetime_t {
     u8  crc;
 } pkt_datetime_t;
 
+//#endif
 
 #endif /* SRC_INCLUDE_KASKAD_11_H_ */

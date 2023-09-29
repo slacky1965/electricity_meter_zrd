@@ -1,6 +1,12 @@
 #include "tl_common.h"
 #include "zcl_include.h"
 
+#ifndef METER_MODEL
+#define METER_MODEL ENERGOMERA_CE102M
+#endif
+
+#if (METER_MODEL == ENERGOMERA_CE102M)
+
 #include "se_custom_attr.h"
 #include "app_uart.h"
 #include "app_endpoint_cfg.h"
@@ -152,11 +158,14 @@ static u8 *str_from_brackets(u8 *p_str) {
     return str;
 }
 
-
 static size_t send_command(command_t command) {
 
     size_t len, size = sizeof_str(command_array[command]);
     u8 ch;
+
+//    app_uart_rx_off();
+    flush_buff_uart();
+
 
     for(u8 i = 0; i < size; i++) {
         ch = command_array[command][i];
@@ -170,87 +179,61 @@ static size_t send_command(command_t command) {
     for (u8 attempt = 0; attempt < 3; attempt++) {
         len = write_bytes_to_uart(package_buff, size);
         if (len == size) {
-#if UART_PRINTF_MODE && UART_DEBUG
-            printf("send bytes: %d\r\n", len);
-#endif
             break;
         } else {
             len = 0;
         }
-#if UART_PRINTF_MODE && UART_DEBUG
+#if UART_PRINTF_MODE && DEBUG_PACKAGE
         printf("Attempt to send data to uart: %d\r\n", attempt+1);
 #endif
         sleep_ms(250);
     }
 
+
+    sleep_ms(200);
+//    app_uart_rx_on();
+
+#if UART_PRINTF_MODE && DEBUG_PACKAGE
     if (len == 0) {
-#if UART_PRINTF_MODE && UART_DEBUG
-        printf("Can't send a request pkt\r\n");
-#endif
+        u8 head[] = "write to uart error";
+        print_package(head, package_buff, size);
     } else {
-#if UART_PRINTF_MODE && UART_DEBUG
-        u8 ch;
-        printf("request pkt: 0x");
-        for (int i = 0; i < len; i++) {
-            ch = ((u8*)&package_buff)[i];
-            if (ch < 0x10) {
-                printf("0%x", ch);
-            } else {
-                printf("%x", ch);
-            }
-//            printf("%02x", ((u8*)&package_buff)[i]);
-        }
-        printf("\r\n");
-#endif
-        sleep_ms(200);
+        u8 head[] = "write to uart";
+        print_package(head, package_buff, len);
     }
+#endif
 
     return len;
 }
 
 static pkt_error_t response_meter(command_t command) {
 
-    u8 load_size;
+    size_t load_size;
     pkt_error_no = PKT_ERR_TIMEOUT;
 
-    for (u8 attempt = 0; attempt < 3; attempt ++) {
+    /* trying to read for 1 seconds */
+    for(u8 i = 0; i < 100; i++ ) {
         load_size = 0;
-        while (available_buff_uart() && load_size < PKT_BUFF_MAX_LEN) {
-            package_buff[load_size++] = read_byte_from_buff_uart() & 0x7f;
-            if (!available_buff_uart()) {
-                attempt = 3;
-                pkt_error_no = PKT_OK;
-                package_buff[load_size] = 0;
-                break;
+        if (available_buff_uart()) {
+            while (available_buff_uart() && load_size < PKT_BUFF_MAX_LEN) {
+                package_buff[load_size++] = read_byte_from_buff_uart() & 0x7f;
+                if (!available_buff_uart()) {
+                    i = 100;
+                    pkt_error_no = PKT_OK;
+                    package_buff[load_size] = 0;
+                    break;
+                }
             }
         }
-        if (attempt < 3) sleep_ms(250);
+        sleep_ms(10);
     }
 
-#if UART_PRINTF_MODE && UART_DEBUG
-    printf("read bytes: %d\r\n", load_size);
+    if (load_size) {
+#if UART_PRINTF_MODE && DEBUG_PACKAGE
+        u8 head[] = "read from uart";
+        print_package(head, package_buff, load_size);
 #endif
 
-    if (load_size) {
-#if UART_PRINTF_MODE && UART_DEBUG
-        u8 ch;
-        printf("response pkt: 0x");
-        for (int i = 0; i < load_size; i++) {
-            ch = package_buff[i];
-            if (ch < 0x10) {
-                printf("0%x", ch);
-            } else {
-                printf("%x", ch);
-            }
-//            printf("%02x", package_buff[i]);
-        }
-        printf(" ");
-        for (int i = 0; i < load_size; i++) {
-            if (package_buff[i] < 0x20) printf(".");
-            else printf("%c", package_buff[i]);
-        }
-        printf("\r\n");
-#endif
         if (command == cmd_open_channel) {
             if (package_buff[0] == 0x2f) {
                 pkt_error_no = PKT_OK;
@@ -293,9 +276,14 @@ static pkt_error_t response_meter(command_t command) {
                 pkt_error_no = PKT_ERR_CRC;
             }
         }
+    } else {
+#if UART_PRINTF_MODE && DEBUG_PACKAGE
+        u8 head[] = "read from uart error";
+        print_package(head, package_buff, load_size);
+#endif
     }
 
-#if UART_PRINTF_MODE
+#if UART_PRINTF_MODE && (DEBUG_DEVICE_DATA || DEBUG_PACKAGE)
     if (pkt_error_no != PKT_OK) print_error(pkt_error_no);
 #endif
 
@@ -304,7 +292,9 @@ static pkt_error_t response_meter(command_t command) {
 
 static u8 open_session() {
 
-    flush_buff_uart();
+#if UART_PRINTF_MODE && (DEBUG_DEVICE_DATA || DEBUG_PACKAGE)
+    printf("\r\nCommand open of channel\r\n");
+#endif
 
     if (send_command(cmd_open_channel)) {
         if (response_meter(cmd_open_channel) == PKT_OK) {
@@ -317,10 +307,18 @@ static u8 open_session() {
 
 static void close_session() {
 
+#if UART_PRINTF_MODE && (DEBUG_DEVICE_DATA || DEBUG_PACKAGE)
+    printf("\r\nCommand close of channel\r\n");
+#endif
+
     send_command(cmd_close_channel);
 }
 
 static u8 ack_start() {
+
+#if UART_PRINTF_MODE && (DEBUG_DEVICE_DATA || DEBUG_PACKAGE)
+    printf("\r\nCommand start confirmation\r\n");
+#endif
 
     if (send_command(cmd_ack_start)) {
         if (response_meter(cmd_ack_start) == PKT_OK) {
@@ -332,6 +330,10 @@ static u8 ack_start() {
 }
 
 static void get_stat_data() {
+
+#if UART_PRINTF_MODE && (DEBUG_DEVICE_DATA || DEBUG_PACKAGE)
+    printf("\r\nCommand get status\r\n");
+#endif
 
     if (send_command(cmd_stat_data)) {
         if (response_meter(cmd_stat_data) == PKT_OK) {
@@ -355,7 +357,7 @@ static void get_stat_data() {
                 v |= (*(stat_str++)) & 0x0f;
                 val |= v & 0xff;
 
-#if UART_PRINTF_MODE
+#if UART_PRINTF_MODE && DEBUG_DEVICE_DATA
                 printf("status: 0x");
                 if (val <= 0xf) {
                     printf("0000000");
@@ -390,6 +392,10 @@ static void get_stat_data() {
 
 static void get_tariffs_data() {
 
+#if UART_PRINTF_MODE && (DEBUG_DEVICE_DATA || DEBUG_PACKAGE)
+    printf("\r\nCommand get tariffs\r\n");
+#endif
+
 //    u8 buff[] = ".ET0PE(1234.10)..(1234.10)..(5678.20)..(9111.30)..(1013.40)..(0.00)...G";
 //    static u32 count = 0;
 
@@ -421,7 +427,7 @@ static void get_tariffs_data() {
                     if (tariff > last_tariff) {
                         zcl_setAttrVal(APP_ENDPOINT_1, ZCL_CLUSTER_SE_METERING, ZCL_ATTRID_CURRENT_TIER_1_SUMMATION_DELIVERD, (u8*)&tariff);
                     }
-#if UART_PRINTF_MODE
+#if UART_PRINTF_MODE && DEBUG_DEVICE_DATA
                     printf("tariff1: %d\r\n", tariff);
 #endif
 
@@ -438,7 +444,7 @@ static void get_tariffs_data() {
                             zcl_setAttrVal(APP_ENDPOINT_1, ZCL_CLUSTER_SE_METERING, ZCL_ATTRID_CURRENT_TIER_2_SUMMATION_DELIVERD, (u8*)&tariff);
                         }
 
-#if UART_PRINTF_MODE
+#if UART_PRINTF_MODE && DEBUG_DEVICE_DATA
                         printf("tariff2: %d\r\n", tariff);
 #endif
 
@@ -454,7 +460,7 @@ static void get_tariffs_data() {
                             if (tariff > last_tariff) {
                                 zcl_setAttrVal(APP_ENDPOINT_1, ZCL_CLUSTER_SE_METERING, ZCL_ATTRID_CURRENT_TIER_3_SUMMATION_DELIVERD, (u8*)&tariff);
                             }
-#if UART_PRINTF_MODE
+#if UART_PRINTF_MODE && DEBUG_DEVICE_DATA
                             printf("tariff3: %d\r\n", tariff);
 #endif
                             tariff = number_from_brackets(&p_str) & 0xffffffffffff;
@@ -469,7 +475,7 @@ static void get_tariffs_data() {
                                 if (tariff > last_tariff) {
                                     zcl_setAttrVal(APP_ENDPOINT_1, ZCL_CLUSTER_SE_METERING, ZCL_ATTRID_CURRENT_TIER_4_SUMMATION_DELIVERD, (u8*)&tariff);
                                 }
-#if UART_PRINTF_MODE
+#if UART_PRINTF_MODE && DEBUG_DEVICE_DATA
                                 printf("tariff4: %d\r\n", tariff);
 #endif
                             }
@@ -482,6 +488,10 @@ static void get_tariffs_data() {
 }
 
 static void get_power_data() {
+
+#if UART_PRINTF_MODE && (DEBUG_DEVICE_DATA || DEBUG_PACKAGE)
+    printf("\r\nCommand get power\r\n");
+#endif
 
 //    u8 buff[] = "POWEP(30.000000)\0";
 
@@ -523,7 +533,7 @@ static void get_power_data() {
                     zcl_setAttrVal(APP_ENDPOINT_1, ZCL_CLUSTER_MS_ELECTRICAL_MEASUREMENT, ZCL_ATTRID_APPARENT_POWER, (u8*)&pwr);
                 }
 
-#if UART_PRINTF_MODE
+#if UART_PRINTF_MODE && DEBUG_DEVICE_DATA
                 printf("power: %d\r\n", power);
 #endif
             }
@@ -532,6 +542,10 @@ static void get_power_data() {
 }
 
 static void get_voltage_data() {
+
+#if UART_PRINTF_MODE && (DEBUG_DEVICE_DATA || DEBUG_PACKAGE)
+    printf("\r\nCommand get voltage\r\n");
+#endif
 
     if (send_command(cmd_volts_data)) {
         if (response_meter(cmd_volts_data) == PKT_OK) {
@@ -549,7 +563,7 @@ static void get_voltage_data() {
                 if (volts != last_volts) {
                     zcl_setAttrVal(APP_ENDPOINT_1, ZCL_CLUSTER_MS_ELECTRICAL_MEASUREMENT, ZCL_ATTRID_RMS_VOLTAGE, (u8*)&volts);
                 }
-#if UART_PRINTF_MODE
+#if UART_PRINTF_MODE && DEBUG_DEVICE_DATA
                 printf("voltage: %d\r\n", volts);
 #endif
             }
@@ -558,6 +572,10 @@ static void get_voltage_data() {
 }
 
 static void get_amps_data() {
+
+#if UART_PRINTF_MODE && (DEBUG_DEVICE_DATA || DEBUG_PACKAGE)
+    printf("\r\nCommand get current\r\n");
+#endif
 
 //    static u16 count = 0;
 //    u8 buff[] = "CURRE(9.472)\0";
@@ -581,7 +599,7 @@ static void get_amps_data() {
                 if (amps != last_amps) {
                     zcl_setAttrVal(APP_ENDPOINT_1, ZCL_CLUSTER_MS_ELECTRICAL_MEASUREMENT, ZCL_ATTRID_LINE_CURRENT, (u8*)&amps);
                 }
-#if UART_PRINTF_MODE
+#if UART_PRINTF_MODE && DEBUG_DEVICE_DATA
                 printf("amps: %d\r\n", amps);
 #endif
             }
@@ -594,6 +612,10 @@ static void get_serial_number_data() {
 
     u8 *sn, *p_str;
 
+#if UART_PRINTF_MODE && (DEBUG_DEVICE_DATA || DEBUG_PACKAGE)
+    printf("\r\nCommand get serial number\r\n");
+#endif
+
     if (send_command(cmd_serial_number)) {
         if (response_meter(cmd_serial_number) == PKT_OK) {
             p_str = package_buff;
@@ -602,7 +624,7 @@ static void get_serial_number_data() {
                 u8 serial_number[SE_ATTR_SN_SIZE] = {0};
                 if (set_zcl_str(sn, serial_number, SE_ATTR_SN_SIZE)) {
                     zcl_setAttrVal(APP_ENDPOINT_1, ZCL_CLUSTER_SE_METERING, ZCL_ATTRID_METER_SERIAL_NUMBER, (u8*)&serial_number);
-#if UART_PRINTF_MODE
+#if UART_PRINTF_MODE && DEBUG_DEVICE_DATA
                     printf("Serial Number: %s, len: %d\r\n", serial_number+1, *serial_number);
 #endif
                 }
@@ -616,20 +638,25 @@ static void get_date_release_data() {
     u8 dr[] = "Not supported";
     u8 date_release[DATA_MAX_LEN+2] = {0};
 
+#if UART_PRINTF_MODE && (DEBUG_DEVICE_DATA || DEBUG_PACKAGE)
+    printf("\r\nCommand get date release\r\n");
+#endif
+
     if (set_zcl_str(dr, date_release, DATA_MAX_LEN+1)) {
         zcl_setAttrVal(APP_ENDPOINT_1, ZCL_CLUSTER_SE_METERING, ZCL_ATTRID_CUSTOM_DATE_RELEASE, (u8*)&date_release);
-#if UART_PRINTF_MODE
-        printf("Date of release: %s\r\n", date_release+1);
+#if UART_PRINTF_MODE && DEBUG_DEVICE_DATA
+        printf("Date of release: %s, len: %d\r\n", date_release+1, *date_release);
 #endif
     }
 }
 
-u8 measure_meter_energomera_ce102m() {
+u8 _measure_meter() {
 
-    u8 ret = false;
+    u8 ret = open_session();
 
-    if (open_session()) {
-        if (ack_start()) {
+    if (ret) {
+        ret = ack_start();
+        if (ret) {
             get_stat_data();
             if (new_start) {
                 get_serial_number_data();
@@ -641,22 +668,22 @@ u8 measure_meter_energomera_ce102m() {
             get_voltage_data();
             get_amps_data();
 
-            fault_measure_counter = 0;
-            ret = true;
+            fault_measure_flag = false;
         } else {
-            fault_measure_counter++;
+            fault_measure_flag = true;
+            if (!timerFaultMeasurementEvt) {
+                timerFaultMeasurementEvt = TL_ZB_TIMER_SCHEDULE(fault_measure_meterCb, NULL, /*TIMEOUT_30SEC*/TIMEOUT_10MIN);
+            }
         }
         close_session();
     } else {
-        fault_measure_counter++;
-    }
-
-    if (fault_measure_counter == 10) {
-#if UART_PRINTF_MODE
-        printf("Fault get data from device. Restart!!!\r\n");
-#endif
-        zb_resetDevice();
+        fault_measure_flag = true;
+        if (!timerFaultMeasurementEvt) {
+            timerFaultMeasurementEvt = TL_ZB_TIMER_SCHEDULE(fault_measure_meterCb, NULL, /*TIMEOUT_30SEC*/TIMEOUT_10MIN);
+        }
     }
 
     return ret;
 }
+
+#endif

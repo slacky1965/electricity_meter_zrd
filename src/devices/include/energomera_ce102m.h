@@ -38,5 +38,4 @@ typedef struct __attribute__((packed)) _ce102m_status_t {
     u32 reserve6                   :3;     /* 29-31    */
 } ce102m_status_t;
 
-
 #endif /* SRC_INCLUDE_ENERGOMERA_CE102M_H_ */
