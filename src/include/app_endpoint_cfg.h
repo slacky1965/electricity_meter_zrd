@@ -54,6 +54,7 @@ typedef struct {
     u8  device_type;
     u8  device_model;
     u32 device_address;
+    u8  device_name[1+DEVICE_NAME_LEN];
     u8  measurement_period;
     u32 current;
     u32 current_multiplier;
