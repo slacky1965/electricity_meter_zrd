@@ -125,13 +125,11 @@ void user_app_init(void)
     wwah_init(WWAH_TYPE_SERVER, (af_simple_descriptor_t *)&app_simpleDesc);
 #endif
 
-    app_uart_init();
+//    app_uart_init(); uart initialize from function set_device_model()
     init_config(true);
     init_button();
 
-//    adc_temp_init();
     ds18b20_init();
-//    OneWireInit();
 
     /* start timer for flash status led */
     g_appCtx.timerLedStatusEvt = TL_ZB_TIMER_SCHEDULE(flashLedStatusCb, NULL, TIMEOUT_5SEC);
@@ -141,14 +139,10 @@ void user_app_init(void)
 
     /* start timer for control internal temperature */
     getTemperatureCb(NULL);
-    TL_ZB_TIMER_SCHEDULE(getTemperatureCb, NULL, TIMEOUT_1SEC);
+    TL_ZB_TIMER_SCHEDULE(getTemperatureCb, NULL, TIMEOUT_5SEC);
 
     /* set device model */
     set_device_model(dev_config.device_model);
-
-    /* start timer get data from device */
-    g_appCtx.timerMeasurementEvt = TL_ZB_TIMER_SCHEDULE(measure_meterCb, NULL, TIMEOUT_5SEC);
-
 }
 
 void app_task(void) {
@@ -237,10 +231,12 @@ void user_init(bool isRetention)
     bdb_defaultReportingCfg(APP_ENDPOINT_1, HA_PROFILE_ID, ZCL_CLUSTER_SE_METERING, ZCL_ATTRID_DIVISOR,
             0, 60, (u8 *)&reportableChange);
 
-    /* Serial Number and Data Release */
+    /* Serial Number, Data Release and Model Name */
     bdb_defaultReportingCfg(APP_ENDPOINT_1, HA_PROFILE_ID, ZCL_CLUSTER_SE_METERING, ZCL_ATTRID_METER_SERIAL_NUMBER,
             0, 300, (u8 *)&reportableChange);
     bdb_defaultReportingCfg(APP_ENDPOINT_1, HA_PROFILE_ID, ZCL_CLUSTER_SE_METERING, ZCL_ATTRID_CUSTOM_DATE_RELEASE,
+            0, 300, (u8 *)&reportableChange);
+    bdb_defaultReportingCfg(APP_ENDPOINT_1, HA_PROFILE_ID, ZCL_CLUSTER_SE_METERING, ZCL_ATTRID_CUSTOM_DEVICE_MODEL,
             0, 300, (u8 *)&reportableChange);
 
     /* Voltage and divisor, multiplier */
