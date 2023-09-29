@@ -143,6 +143,10 @@ s32 getTemperatureCb(void *arg) {
 
     s16 temperature = ds18b20_get_temp();
 
+#if UART_PRINTF_MODE && DEBUG_TEMPERATURE
+    printf("Temperature: %d\r\n", temperature);
+#endif
+
     zcl_setAttrVal(APP_ENDPOINT_1, ZCL_CLUSTER_GEN_DEVICE_TEMP_CONFIG, ZCL_ATTRID_DEV_TEMP_CURR_TEMP, (u8*)&temperature);
 
     return 0;

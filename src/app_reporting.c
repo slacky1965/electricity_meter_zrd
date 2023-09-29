@@ -56,7 +56,7 @@ static s32 app_reportMinAttrTimerCb(void *arg) {
     if (pEntry->minInterval == pEntry->maxInterval) {
         reportAttr(pEntry);
         app_reporting->time_posted = clock_time();
-#if UART_PRINTF_MODE && DEBUG_LEVEL
+#if UART_PRINTF_MODE && DEBUG_REPORTING
         printf("Report Min_Interval has been sent. endPoint: %d, clusterID: 0x%x, attrID: 0x%x, minInterval: %d, maxInterval: %d\r\n",
                 pEntry->endPoint, pEntry->clusterID, pEntry->attrID, pEntry->minInterval, pEntry->maxInterval);
 #endif
@@ -74,7 +74,7 @@ static s32 app_reportMinAttrTimerCb(void *arg) {
 
         reportAttr(pEntry);
         app_reporting->time_posted = clock_time();
-#if UART_PRINTF_MODE && DEBUG_LEVEL
+#if UART_PRINTF_MODE && DEBUG_REPORTING
         printf("Report Min_Interval has been sent. endPoint: %d, clusterID: 0x%x, attrID: 0x%x, minInterval: %d, maxInterval: %d\r\n",
                 pEntry->endPoint, pEntry->clusterID, pEntry->attrID, pEntry->minInterval, pEntry->maxInterval);
 #endif
@@ -91,7 +91,7 @@ static s32 app_reportMaxAttrTimerCb(void *arg) {
         if (app_reporting->timerReportMinEvt) {
             TL_ZB_TIMER_CANCEL(&app_reporting->timerReportMinEvt);
         }
-#if UART_PRINTF_MODE && DEBUG_LEVEL
+#if UART_PRINTF_MODE && DEBUG_REPORTING
         printf("Report Max_Interval has been sent. endPoint: %d, clusterID: 0x%x, attrID: 0x%x, minInterval: %d, maxInterval: %d\r\n",
                 pEntry->endPoint, pEntry->clusterID, pEntry->attrID, pEntry->minInterval, pEntry->maxInterval);
 #endif
@@ -115,7 +115,7 @@ void app_reportAttrTimerStart() {
                 if(zb_bindingTblSearched(pEntry->clusterID, pEntry->endPoint)) {
                     if (!app_reporting[i].timerReportMinEvt) {
                         if (pEntry->minInterval && pEntry->maxInterval && pEntry->minInterval <= pEntry->maxInterval) {
-#if UART_PRINTF_MODE && DEBUG_LEVEL
+#if UART_PRINTF_MODE && DEBUG_REPORTING
                             printf("Start minTimer. endPoint: %d, clusterID: 0x%x, attrID: 0x%x, min: %d, max: %d\r\n", pEntry->endPoint, pEntry->clusterID, pEntry->attrID, pEntry->minInterval, pEntry->maxInterval);
 #endif
                             app_reporting[i].timerReportMinEvt = TL_ZB_TIMER_SCHEDULE(app_reportMinAttrTimerCb, &app_reporting[i], pEntry->minInterval*1000);
@@ -125,7 +125,7 @@ void app_reportAttrTimerStart() {
                         if (pEntry->maxInterval) {
                             if (pEntry->minInterval < pEntry->maxInterval) {
                                 if (pEntry->maxInterval != pEntry->minInterval && pEntry->maxInterval > pEntry->minInterval) {
-#if UART_PRINTF_MODE && DEBUG_LEVEL
+#if UART_PRINTF_MODE && DEBUG_REPORTING
                                     printf("Start maxTimer. endPoint: %d, clusterID: 0x%x, attrID: 0x%x, min: %d, max: %d\r\n", pEntry->endPoint, pEntry->clusterID, pEntry->attrID, pEntry->minInterval, pEntry->maxInterval);
 #endif
                                     app_reporting[i].timerReportMaxEvt = TL_ZB_TIMER_SCHEDULE(app_reportMaxAttrTimerCb, &app_reporting[i], pEntry->maxInterval*1000);
@@ -171,7 +171,7 @@ void app_reportNoMinLimit(void)
                         reportAttr(pEntry);
 
                         app_reporting[i].time_posted = clock_time();
-#if UART_PRINTF_MODE && DEBUG_LEVEL
+#if UART_PRINTF_MODE && DEBUG_REPORTING
                         printf("Report No_Min_Limit has been sent. endPoint: %d, clusterID: 0x%x, attrID: 0x%x, minInterval: %d, maxInterval: %d\r\n",
                                 pEntry->endPoint, pEntry->clusterID, pEntry->attrID, pEntry->minInterval, pEntry->maxInterval);
 #endif
@@ -179,7 +179,7 @@ void app_reportNoMinLimit(void)
                             TL_ZB_TIMER_CANCEL(&app_reporting[i].timerReportMaxEvt);
                         }
                         app_reporting[i].timerReportMaxEvt = TL_ZB_TIMER_SCHEDULE(app_reportMaxAttrTimerCb, &app_reporting[i], pEntry->maxInterval*1000);
-#if UART_PRINTF_MODE && DEBUG_LEVEL
+#if UART_PRINTF_MODE && DEBUG_REPORTING
                         printf("Start maxTimer. endPoint: %d, clusterID: 0x%x, attrID: 0x%x, min: %d, max: %d\r\n", pEntry->endPoint, pEntry->clusterID, pEntry->attrID, pEntry->minInterval, pEntry->maxInterval);
 #endif
                     }
