@@ -70,10 +70,10 @@ static void app_uartRecvCb() {
 
 void app_uart_init() {
 
-    u32 baudrate = 9600;
+    u32 baudrate = BAUDRATE_UART;
 
     flush_buff_uart();
-    drv_uart_pin_set(UART_TX_PD7, UART_RX_PA0);
+    drv_uart_pin_set(GPIO_UART_TX, GPIO_UART_RX);
 
     switch (dev_config.device_model) {
         case DEVICE_KASKAD_11:
@@ -91,8 +91,13 @@ size_t write_bytes_to_uart(u8 *data, size_t len) {
 
     if (len > UART_DATA_LEN) len = UART_DATA_LEN;
 
-    if (drv_uart_tx_start(data, len)) {
-        return len;
-    }
+    if (drv_uart_tx_start(data, len)) return len;
+
     return 0;
 }
+
+void app_uart_rx_off() {
+
+    drv_gpio_input_en(GPIO_UART_RX, false);
+}
+

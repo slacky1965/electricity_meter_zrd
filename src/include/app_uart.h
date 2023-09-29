@@ -5,6 +5,9 @@
 #define UART_BUFF_SIZE 512              /* size ring buffer  */
 #define UART_BUFF_MASK UART_BUFF_SIZE-1 /* mask ring buffer  */
 
+#define app_uart_rx_on  app_uart_init
+
+
 typedef struct {
     u32 dma_len;        // dma len must be 4 byte
     u8  data[UART_DATA_LEN];
@@ -16,7 +19,6 @@ u8 read_byte_from_buff_uart();
 u8 available_buff_uart();
 size_t get_queue_len_buff_uart();
 void flush_buff_uart();
-
-
+void app_uart_rx_off();
 
 #endif /* SRC_INCLUDE_APP_UART_H_ */
