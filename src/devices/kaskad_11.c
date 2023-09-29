@@ -555,9 +555,9 @@ static void get_serial_number_data() {
 
 u8 _measure_meter() {
 
-    u8 ret = false;
+    u8 ret = open_channel();
 
-    if (open_channel()) {
+    if (ret) {
 
         if (new_start) {
             get_serial_number_data();
@@ -580,16 +580,12 @@ u8 _measure_meter() {
             ret = true;
         }
         close_channel();
-        fault_measure_counter = 0;
+        fault_measure_flag = false;
     } else {
-        fault_measure_counter++;
-    }
-
-    if (fault_measure_counter == 10) {
-#if UART_PRINTF_MODE
-        printf("Fault get data from device. Restart!!!\r\n");
-#endif
-        zb_resetDevice();
+        fault_measure_flag = true;
+        if (!timerFaultMeasurementEvt) {
+            timerFaultMeasurementEvt = TL_ZB_TIMER_SCHEDULE(fault_measure_meterCb, NULL, TIMEOUT_10MIN);
+        }
     }
 
     return ret;
