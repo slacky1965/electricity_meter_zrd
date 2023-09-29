@@ -164,9 +164,10 @@ zcl_seAttr_t g_zcl_seAttrs = {
     .summation_formatting = 0,
     .battery_percentage = 100,
     .serial_number = {8,'1','1','1','1','1','1','1','1'},
-    .date_release = {10,'1','4','.','1','0','.','1','9','6','5'},
+    .date_release = {10,'x','x','.','x','x','.','x','x','x','x'},
     .device_model = 0,           // Electric Metering
     .device_address = 0,
+    .device_name = {9,'N','o',' ','D','e','v','i','c','e'},
     .measurement_period = DEFAULT_MEASUREMENT_PERIOD,
 };
 
@@ -186,6 +187,7 @@ const zclAttrInfo_t se_attrTbl[] = {
     {ZCL_ATTRID_CUSTOM_DEVICE_ADDRESS,              ZCL_DATA_TYPE_UINT32,       ACCESS_CONTROL_READ | ACCESS_CONTROL_WRITE,         (u8*)&g_zcl_seAttrs.device_address},
     {ZCL_ATTRID_CUSTOM_MEASUREMENT_PERIOD,          ZCL_DATA_TYPE_UINT8,        ACCESS_CONTROL_READ | ACCESS_CONTROL_WRITE,         (u8*)&g_zcl_seAttrs.measurement_period},
     {ZCL_ATTRID_CUSTOM_DATE_RELEASE,                ZCL_DATA_TYPE_OCTET_STR,    ACCESS_CONTROL_READ | ACCESS_CONTROL_REPORTABLE,    (u8*)&g_zcl_seAttrs.date_release},
+    {ZCL_ATTRID_CUSTOM_DEVICE_MODEL,                ZCL_DATA_TYPE_OCTET_STR,    ACCESS_CONTROL_READ | ACCESS_CONTROL_REPORTABLE,    (u8*)&g_zcl_seAttrs.device_name},
 
     { ZCL_ATTRID_GLOBAL_CLUSTER_REVISION,           ZCL_DATA_TYPE_UINT16,       ACCESS_CONTROL_READ,                                (u8*)&zcl_attr_global_clusterRevision},
 };
