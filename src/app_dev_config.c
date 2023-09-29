@@ -43,13 +43,13 @@ static void get_user_data_addr(u8 print) {
         config_addr_start = BEGIN_USER_DATA1;
         config_addr_end = END_USER_DATA1;
 #if UART_PRINTF_MODE
-        if (print) printf("OTA mode enabled. MCU boot from address: 0x%x\r\n", BEGIN_USER_DATA2);
+        if (print) printf("\r\nOTA mode enabled. MCU boot from address: 0x%x\r\n", BEGIN_USER_DATA2);
 #endif /* UART_PRINTF_MODE */
     } else {
         config_addr_start = BEGIN_USER_DATA2;
         config_addr_end = END_USER_DATA2;
 #if UART_PRINTF_MODE
-        if (print) printf("OTA mode enabled. MCU boot from address: 0x%x\r\n", BEGIN_USER_DATA1);
+        if (print) printf("\r\nOTA mode enabled. MCU boot from address: 0x%x\r\n", BEGIN_USER_DATA1);
 #endif /* UART_PRINTF_MODE */
     }
 #else
@@ -57,7 +57,7 @@ static void get_user_data_addr(u8 print) {
     config_addr_end = END_USER_DATA2;
 
 #if UART_PRINTF_MODE
-    if (print) printf("OTA mode desabled. MCU boot from address: 0x%x\r\n", BEGIN_USER_DATA1);
+    if (print) printf("\r\nOTA mode desabled. MCU boot from address: 0x%x\r\n", BEGIN_USER_DATA1);
 #endif /* UART_PRINTF_MODE */
 
 #endif
