@@ -156,7 +156,9 @@ $(BIN_FILE): $(ELF_FILE)
 	@python3 $(TL_Check) $(BIN_FILE)
 	@echo 'Finished building: $@'
 	@echo ' '
-	cp $(BIN_FILE) $(FIRMWARE_FILE)
+	@cp $(BIN_FILE) $(FIRMWARE_FILE)
+	@echo 'Copy $(BIN_FILE) to $(FIRMWARE_FILE)'
+	@echo ' '
 
 
 #	@cp $(BIN_FILE) $(PROJECT_NAME)_$(VERSION_RELEASE).$(VERSION_BUILD).bin

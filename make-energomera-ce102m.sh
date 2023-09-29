@@ -1,0 +1,3 @@
+#!/bin/bash
+ 
+make METER_MODEL=ENERGOMERA_CE102M
