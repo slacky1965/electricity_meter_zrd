@@ -243,74 +243,86 @@ void zb_bdbIdentifyCb(u8 endpoint, u16 srcAddr, u16 identifyTime){
 
 
 #ifdef ZCL_OTA
-//void app_otaProcessMsgHandler(u8 evt, u8 status)
-//{
-//	if(evt == OTA_EVT_START){
-//		if(status == ZCL_STA_SUCCESS){
-//
-//		}else{
-//
-//		}
-//	}else if(evt == OTA_EVT_COMPLETE){
-//		if(status == ZCL_STA_SUCCESS){
-//			ota_mcuReboot();
-//		}else{
-//			ota_queryStart(OTA_PERIODIC_QUERY_INTERVAL);
-//		}
-//	}
-//}
-
-extern ota_clientInfo_t otaClientInfo;
-
 void app_otaProcessMsgHandler(u8 evt, u8 status) {
-    printf("app_otaProcessMsgHandler: status = %x\r\n", status);
-    if (evt == OTA_EVT_START) {
-        if (status == ZCL_STA_SUCCESS) {
 
+	if(evt == OTA_EVT_START){
+		if(status == ZCL_STA_SUCCESS){
 #if UART_PRINTF_MODE && DEBUG_OTA
             printf("OTA update start.\r\n");
 #endif /* UART_PRINTF_MODE */
 
-            dev_config.new_ota = true;
+//            dev_config.new_ota = true;
             write_config();
 
-        } else {
+		}else{
 
-        }
-    } else if (evt == OTA_EVT_COMPLETE) {
-
-        if (status == ZCL_STA_SUCCESS) {
-
+		}
+	}else if(evt == OTA_EVT_COMPLETE){
+		if(status == ZCL_STA_SUCCESS){
 #if UART_PRINTF_MODE && DEBUG_OTA
             printf("OTA update successful.\r\n");
 #endif /* UART_PRINTF_MODE */
-
-            ota_mcuReboot();
-
-        } else {
-
+			ota_mcuReboot();
+		}else{
 #if UART_PRINTF_MODE && DEBUG_OTA
-            printf("OTA update failure. Try again.\r\n");
+            printf("OTA update failure.\r\n");
 #endif /* UART_PRINTF_MODE */
-
-            /* reset update OTA */
-            nv_resetModule(NV_MODULE_OTA);
-
-            memset((u8*) &otaClientInfo, 0, sizeof(otaClientInfo));
-            otaClientInfo.clientOtaFlg = OTA_FLAG_INIT_DONE;
-            otaClientInfo.crcValue = 0xffffffff;
-
-            zcl_attr_imageTypeID = 0xffff;
-            zcl_attr_fileOffset = 0xffffffff;
-            zcl_attr_downloadFileVer = 0xffffffff;
-
-            /* restore config */
-            init_config(false);
-
-            ota_queryStart(OTA_PERIODIC_QUERY_INTERVAL);
-        }
-    }
+			ota_queryStart(OTA_PERIODIC_QUERY_INTERVAL);
+		}
+	}
 }
+
+//extern ota_clientInfo_t otaClientInfo;
+//
+//void app_otaProcessMsgHandler(u8 evt, u8 status) {
+//    printf("app_otaProcessMsgHandler: status = %x\r\n", status);
+//    if (evt == OTA_EVT_START) {
+//        if (status == ZCL_STA_SUCCESS) {
+//
+//#if UART_PRINTF_MODE && DEBUG_OTA
+//            printf("OTA update start.\r\n");
+//#endif /* UART_PRINTF_MODE */
+//
+//            dev_config.new_ota = true;
+//            write_config();
+//
+//        } else {
+//
+//        }
+//    } else if (evt == OTA_EVT_COMPLETE) {
+//
+//        if (status == ZCL_STA_SUCCESS) {
+//
+//#if UART_PRINTF_MODE && DEBUG_OTA
+//            printf("OTA update successful.\r\n");
+//#endif /* UART_PRINTF_MODE */
+//
+//            ota_mcuReboot();
+//
+//        } else {
+//
+//#if UART_PRINTF_MODE && DEBUG_OTA
+//            printf("OTA update failure. Try again.\r\n");
+//#endif /* UART_PRINTF_MODE */
+//
+//            /* reset update OTA */
+//            nv_resetModule(NV_MODULE_OTA);
+//
+//            memset((u8*) &otaClientInfo, 0, sizeof(otaClientInfo));
+//            otaClientInfo.clientOtaFlg = OTA_FLAG_INIT_DONE;
+//            otaClientInfo.crcValue = 0xffffffff;
+//
+//            zcl_attr_imageTypeID = 0xffff;
+//            zcl_attr_fileOffset = 0xffffffff;
+//            zcl_attr_downloadFileVer = 0xffffffff;
+//
+//            /* restore config */
+//            init_config(false);
+//
+//            ota_queryStart(OTA_PERIODIC_QUERY_INTERVAL);
+//        }
+//    }
+//}
 
 #endif
 

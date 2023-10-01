@@ -34,15 +34,11 @@ extern "C" {
     #define MCU_CORE_8258       1
 #endif
 
-#define KASKAD_1_MT             1
-#define KASKAD_11_C1            2
-#define MERCURY_206             3
-#define ENERGOMERA_CE102M       4
-#define ENERGOMERA_CE102        5
-
-//#ifndef METER_MODEL
-//    #define METER_MODEL         KASKAD_1_MT
-//#endif
+//#define KASKAD_1_MT             1
+//#define KASKAD_11_C1            2
+//#define MERCURY_206             3
+//#define ENERGOMERA_CE102M       4
+//#define ENERGOMERA_CE102        5
 
 #define ON                      1
 #define OFF                     0
@@ -67,6 +63,7 @@ extern "C" {
 
 /* Debug mode config */
 #define	UART_PRINTF_MODE				ON
+#define DEBUG_CONFIG                    ON
 #define DEBUG_DEVICE_DATA               ON
 #define DEBUG_PACKAGE                   ON
 #define DEBUG_REPORTING                 OFF
@@ -108,22 +105,37 @@ extern "C" {
 #endif
     #define CLOCK_SYS_CLOCK_HZ          32000000
 #elif defined(MCU_CORE_8258)
+#define FIRMWARE_ADDRESS                0x8000
 #if (CHIP_TYPE == TLSR_8258_1M)
     #define FLASH_CAP_SIZE_1M           1
+    /********************* For 512K Flash only (bootloader mode) ********************************/
+    /* Flash map:
+        0x00000  bootloader
+        0x08000  Firmware
+        0x77000  OTA Image
+        0xE6000  NV
+        0xFC000  U_Cfg_Info
+        0xFE000  F_Cfg_Info
+        0xFF000  MAC address
+        0x100000 End Flash
+     */
+    #define OTA_ADDRESS                 0x77000
 #endif
     #define BOARD                       BOARD_8258_DONGLE //BOARD_TB_04 //BOARD_8258_EVK //BOARD_8258_DIY //BOARD_8258_EVK_V1P2
     #define CLOCK_SYS_CLOCK_HZ          48000000
-    /************************* For 512K Flash only ***************************************/
+    /********************* For 512K Flash only (bootloader mode) ********************************/
     /* Flash map:
-        0x00000 Old Firmware bin
-        0x34000 NV_1
-        0x40000 OTA New bin storage Area
+        0x00000 bootloader
+        0x08000 Firmware
+        0x39000 OTA Image
+        0x6A000 NV_1
         0x76000 MAC address
-        0x77000 C_Cfg_Info
+        0x77000 F_Cfg_Info
         0x78000 U_Cfg_Info
         0x7A000 NV_2
         0x80000 End Flash
      */
+    #define OTA_ADDRESS                 0x39000
     #define USER_DATA_SIZE              0x34000
     #define BEGIN_USER_DATA1            0x00000
     #define END_USER_DATA1              (BEGIN_USER_DATA1 + USER_DATA_SIZE)
@@ -208,7 +220,7 @@ extern "C" {
 #define ZCL_LEVEL_CTRL_SUPPORT                      OFF
 #define ZCL_GROUP_SUPPORT                           OFF
 #define ZCL_SCENE_SUPPORT                           OFF
-#define ZCL_OTA_SUPPORT                             ON
+#define ZCL_OTA_SUPPORT                             OFF
 #define ZCL_GP_SUPPORT                              ON
 #define ZCL_WWAH_SUPPORT                            OFF
 #if TOUCHLINK_SUPPORT

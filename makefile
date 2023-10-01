@@ -1,15 +1,17 @@
 # Set Project Name
 PROJECT_NAME := electricity_meter_zrd
 
-METER_MODEL ?= KASKAD_1_MT
-#METER_MODEL ?= KASKAD_11_C1
-#METER_MODEL ?= MERCURY_206
-#METER_MODEL ?= ENERGOMERA_CE102M
-
 # Set the serial port number for downloading the firmware
 DOWNLOAD_PORT := COM3
 
-COMPILE_PREFIX = C:/TelinkSDK/opt/tc32/bin/tc32
+COMPILE_OS = $(shell uname -o)
+LINUX_OS = GNU/Linux
+
+ifeq ($(COMPILE_OS),$(LINUX_OS))	
+	COMPILE_PREFIX = /opt/tc32/bin/tc32
+else
+	COMPILE_PREFIX = C:/TelinkSDK/opt/tc32/bin/tc32
+endif
 
 AS      = $(COMPILE_PREFIX)-elf-as
 CC      = $(COMPILE_PREFIX)-elf-gcc
@@ -29,6 +31,7 @@ BOOT_FLAG = -DMCU_CORE_8258 -DMCU_STARTUP_8258
 SDK_PATH := ./tl_zigbee_sdk
 SRC_PATH := ./src
 OUT_PATH := ./out
+OTA_PATH := ./zigbee2mqtt/OTA
 MAKE_INCLUDES := ./make
 TOOLS_PATH := ./tools
 VERSION_RELEASE := V$(shell awk -F " " '/APP_RELEASE/ {gsub("0x",""); printf "%.1f", $$3/10.0; exit}' $(SRC_PATH)/include/version_cfg.h)
@@ -36,6 +39,7 @@ VERSION_BUILD := $(shell awk -F " " '/APP_BUILD/ {gsub("0x",""); printf "%02d", 
 
 
 TL_Check = $(TOOLS_PATH)/tl_check_fw.py
+TL_OTA_TOOL = ./zigbee_ota_tool_v2.2.exe
 
 INCLUDE_PATHS := \
 -I$(SDK_PATH)/platform \
@@ -72,8 +76,7 @@ GCC_FLAGS := \
 
 GCC_FLAGS += \
 $(DEVICE_TYPE) \
-$(MCU_TYPE) \
--DMETER_MODEL=$(METER_MODEL)
+$(MCU_TYPE)
 
 OBJ_SRCS := 
 S_SRCS := 
@@ -113,7 +116,9 @@ RM := rm -rf
 LST_FILE := $(OUT_PATH)/$(PROJECT_NAME).lst
 BIN_FILE := $(OUT_PATH)/$(PROJECT_NAME).bin
 ELF_FILE := $(OUT_PATH)/$(PROJECT_NAME).elf
-FIRMWARE_FILE := $(shell echo $(METER_MODEL)_$(VERSION_RELEASE).$(VERSION_BUILD).bin | tr [:upper:] [:lower:])
+LOWER_NAME := $(shell echo $(PROJECT_NAME) | tr [:upper:] [:lower:])
+FIRMWARE_FILE := $(LOWER_NAME)_$(VERSION_RELEASE).$(VERSION_BUILD).bin
+BOOTLOADER := $(TOOLS_PATH)/bootloader/bootloader_8258_512k.bin
 
 SIZEDUMMY += \
 sizedummy \
@@ -123,13 +128,13 @@ sizedummy \
 all: pre-build main-build
 
 flash: $(BIN_FILE)
-	@python3 $(TOOLS_PATH)/TlsrPgm.py -b921600 -p$(DOWNLOAD_PORT) -t50 -a2550 -m -w we 0 $(BIN_FILE)
-#	@python3 $(TOOLS_PATH)/TlsrComProg.py -p$(DOWNLOAD_PORT) -f $(TOOLS_PATH)/floader.bin we 0 $(BIN_FILE)
+	@python3 $(TOOLS_PATH)/TlsrPgm.py -b921600 -p$(DOWNLOAD_PORT) -t50 -a2550 -m -w we 0x8000 $(BIN_FILE)
 	
 erase-flash:
 	@python3 $(TOOLS_PATH)/TlsrPgm.py -b921600 -p$(DOWNLOAD_PORT) -t50 -a2550 ea
-#	@python3 $(TOOLS_PATH)/TlsrComProg.py -p$(DOWNLOAD_PORT) -f $(TOOLS_PATH)/floader.bin ea
 
+flash-bootloader:
+	@python3 $(TOOLS_PATH)/TlsrPgm.py -b921600 -p$(DOWNLOAD_PORT) -t50 -a2550 -m -w we 0 $(BOOTLOADER)
 reset:
 	@python3 $(TOOLS_PATH)/TlsrPgm.py -p$(DOWNLOAD_PORT) -t50 -a2550 -m -w i
 
@@ -161,8 +166,6 @@ $(BIN_FILE): $(ELF_FILE)
 	@echo ' '
 
 
-#	@cp $(BIN_FILE) $(PROJECT_NAME)_$(VERSION_RELEASE).$(VERSION_BUILD).bin
-
 sizedummy: $(ELF_FILE)
 	@echo 'Invoking: Print Size'
 	@$(SIZE) -t $(ELF_FILE)
@@ -183,7 +186,7 @@ clean-project:
 	
 pre-build:
 	mkdir -p $(foreach s,$(OUT_DIR),$(OUT_PATH)$(s))
-#	-" $(SDK_PATH)/tools/tl_link_load.sh" " $(SDK_PATH)/platform/boot/8258/boot_8258.link" "C:\TelinkSDK\SDK\tl_zigbee_sdk\build\tlsr_tc32/boot.link"
+	mkdir -p $(OTA_PATH); 
 	-@echo ' '
 
 post-build:

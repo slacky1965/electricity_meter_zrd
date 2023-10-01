@@ -41,8 +41,8 @@
 		#define CHIP_TYPE					TLSR_B91
 #endif
 
-#define APP_RELEASE                         0x10        //app release 1.3
-#define APP_BUILD                           0x01        //app build 01, full version - v1.3.01
+#define APP_RELEASE                         0x10        //app release 1.0
+#define APP_BUILD                           0x03        //app build 01, full version - v1.3.01
 #define STACK_RELEASE						0x30        //stack release 3.0
 #define STACK_BUILD							0x01        //stack build 01
 #define HW_VERSION                          0x01
@@ -74,9 +74,10 @@
  */
 #define MANUFACTURER_CODE_TELINK    0x1141//Telink ID
 #define	IMAGE_TYPE					((CHIP_TYPE << 8) | IMAGE_TYPE_APP)
-#define	FILE_VERSION				((APP_RELEASE << 24) | (APP_BUILD << 16) | (STACK_RELEASE << 8) | STACK_BUILD)
+#define FILE_VERSION                ((APP_RELEASE << 24) | (APP_BUILD << 16) | (STACK_RELEASE << 8) | STACK_BUILD)
 
 /* Pre-compiled link configuration. */
 #define IS_BOOT_LOADER_IMAGE				0
 #define RESV_FOR_APP_RAM_CODE_SIZE			0
 #define IMAGE_OFFSET						APP_IMAGE_ADDR
+

@@ -23,6 +23,8 @@ $(OUT_PATH)/$(SRC_PATH)/devices/mercury_206.o \
 $(OUT_PATH)/$(SRC_PATH)/devices/energomera_ce102m.o \
 $(OUT_PATH)/$(SRC_PATH)/app_main.o
 
+
+
 # Each subdirectory must supply rules for building sources it contributes
 $(OUT_PATH)/$(SRC_PATH)/%.o: $(SRC_PATH)/%.c 
 	@echo 'Building file: $<'
