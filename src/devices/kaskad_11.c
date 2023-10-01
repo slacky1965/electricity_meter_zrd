@@ -553,7 +553,7 @@ static void get_serial_number_data() {
     }
 }
 
-u8 _measure_meter() {
+u8 measure_meter_kaskad_11() {
 
     u8 ret = open_channel();
 

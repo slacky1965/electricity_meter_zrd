@@ -613,7 +613,7 @@ void pkt_test(command_t command) {
     }
 }
 
-u8 _measure_meter() {
+u8 measure_meter_kaskad_1_mt() {
 
     u8 ret = ping_start_data();        /* ping to device       */
 

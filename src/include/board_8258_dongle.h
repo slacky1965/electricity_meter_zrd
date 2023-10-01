@@ -121,6 +121,10 @@ extern "C" {
 #define PA3_OUTPUT_ENABLE		1
 #define PA3_INPUT_ENABLE		0
 
+//#define LED_POWER                   LED_R
+#define LED_PERMIT                  LED_STATUS
+
+
 //#define	PM_WAKEUP_LEVEL		  	PM_WAKEUP_LEVEL_LOW
 
 // UART

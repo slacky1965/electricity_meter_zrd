@@ -475,7 +475,7 @@ static u8 get_timeout_data() {
     return false;
 }
 
-u8 _measure_meter() {
+u8 measure_meter_mercury_206() {
 
     get_timeout_data();     /* does not respond to the first command after a pause. fake command */
 

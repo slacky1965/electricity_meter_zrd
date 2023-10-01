@@ -43,13 +43,9 @@ u8 set_device_model(device_model_t model) {
     u8 dr[] = "xx.xx.xxxx";
     u8 date_release[DATA_MAX_LEN+2] = {0};
 
-
-
-    measure_meter = _measure_meter;
-
     switch (model) {
         case DEVICE_KASKAD_1_MT: {
-#if (METER_MODEL == KASKAD_1_MT)
+            measure_meter = measure_meter_kaskad_1_mt;
             energy_divisor = 100;
             voltage_divisor = 100;
             current_divisor = 1000;
@@ -57,60 +53,31 @@ u8 set_device_model(device_model_t model) {
             if (set_zcl_str(device_model[DEVICE_KASKAD_1_MT], name, DEVICE_NAME_LEN)) {
                 zcl_setAttrVal(APP_ENDPOINT_1, ZCL_CLUSTER_SE_METERING, ZCL_ATTRID_CUSTOM_DEVICE_MODEL, (u8*)&name);
             }
-#else
-            measure_meter = NULL;
-            u8 ns[] = "Firmware not include KASKADE-1-MT";
-            if (set_zcl_str(ns, name, DEVICE_NAME_LEN)) {
-                zcl_setAttrVal(APP_ENDPOINT_1, ZCL_CLUSTER_SE_METERING, ZCL_ATTRID_CUSTOM_DEVICE_MODEL, (u8*)&name);
-            }
-#endif
             break;
         }
         case DEVICE_KASKAD_11: {
-#if (METER_MODEL == KASKAD_11_C1)
-//                measure_meter = measure_meter_kaskad11;
+//                measure_meter = measure_meter_kaskad_11;
             measure_meter = NULL;
             if (set_zcl_str(device_model[DEVICE_KASKAD_11], name, DEVICE_NAME_LEN)) {
                 zcl_setAttrVal(APP_ENDPOINT_1, ZCL_CLUSTER_SE_METERING, ZCL_ATTRID_CUSTOM_DEVICE_MODEL, (u8*)&name);
             }
-#else
-            measure_meter = NULL;
-            u8 ns[] = "Firmware not include KASKADE-11-C1";
-            if (set_zcl_str(ns, name, DEVICE_NAME_LEN)) {
-                zcl_setAttrVal(APP_ENDPOINT_1, ZCL_CLUSTER_SE_METERING, ZCL_ATTRID_CUSTOM_DEVICE_MODEL, (u8*)&name);
-            }
-#endif
             break;
         }
         case DEVICE_MERCURY_206: {
-#if (METER_MODEL == MERCURY_206)
+            measure_meter = measure_meter_mercury_206;
             energy_divisor = 100;
             voltage_divisor = 10;
             current_divisor = 100;
             if (set_zcl_str(device_model[DEVICE_MERCURY_206], name, DEVICE_NAME_LEN)) {
                 zcl_setAttrVal(APP_ENDPOINT_1, ZCL_CLUSTER_SE_METERING, ZCL_ATTRID_CUSTOM_DEVICE_MODEL, (u8*)&name);
             }
-#else
-            measure_meter = NULL;
-            u8 ns[] = "Firmware not include MERCURY-206";
-            if (set_zcl_str(ns, name, DEVICE_NAME_LEN)) {
-                zcl_setAttrVal(APP_ENDPOINT_1, ZCL_CLUSTER_SE_METERING, ZCL_ATTRID_CUSTOM_DEVICE_MODEL, (u8*)&name);
-            }
-#endif
             break;
         }
         case DEVICE_ENERGOMERA_CE102M: {
-#if (METER_MODEL == ENERGOMERA_CE102M)
+            measure_meter = measure_meter_energomera_ce102m;
             if (set_zcl_str(device_model[DEVICE_ENERGOMERA_CE102M], name, DEVICE_NAME_LEN)) {
                 zcl_setAttrVal(APP_ENDPOINT_1, ZCL_CLUSTER_SE_METERING, ZCL_ATTRID_CUSTOM_DEVICE_MODEL, (u8*)&name);
             }
-#else
-            measure_meter = NULL;
-            u8 ns[] = "Firmware not include ENERGOMERA-CE102M";
-            if (set_zcl_str(ns, name, DEVICE_NAME_LEN)) {
-                zcl_setAttrVal(APP_ENDPOINT_1, ZCL_CLUSTER_SE_METERING, ZCL_ATTRID_CUSTOM_DEVICE_MODEL, (u8*)&name);
-            }
-#endif
             break;
         }
         default:
@@ -180,7 +147,7 @@ s32 measure_meterCb(void *arg) {
 
 s32 fault_measure_meterCb(void *arg) {
 
-    if (fault_measure_flag && !dev_config.new_ota) {
+    if (fault_measure_flag) {
 #if UART_PRINTF_MODE
         printf("Fault get data from device. Restart!!!\r\n");
 #endif

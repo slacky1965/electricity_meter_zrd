@@ -10,11 +10,11 @@
 s32 flashLedStatusCb(void *arg) {
     if (zb_isDeviceJoinedNwk() && device_online) {
         light_blink_stop();
-        if (dev_config.new_ota) {
-            light_blink_start(2, 30, 250);
-        } else {
+//        if (dev_config.new_ota) {
+//            light_blink_start(2, 30, 250);
+//        } else {
             light_blink_start(1, 30, 30);
-        }
+//        }
     } else {
         light_blink_start(3, 30, 250);
     }

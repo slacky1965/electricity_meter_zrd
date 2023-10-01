@@ -53,7 +53,11 @@ void print_package(u8 *head, u8 *buff, size_t len);
 u8 set_device_model(device_model_t model);
 
 s32 measure_meterCb(void *arg);
-u8 _measure_meter();
 s32 fault_measure_meterCb(void *arg);
+u8 measure_meter_kaskad_1_mt();
+u8 measure_meter_kaskad_11();
+u8 measure_meter_mercury_206();
+u8 measure_meter_energomera_ce102m();
+
 
 #endif /* SRC_INCLUDE_DEVICE_H_ */
