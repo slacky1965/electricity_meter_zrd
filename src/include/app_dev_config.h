@@ -4,10 +4,6 @@
 /* must be no more than FLASH_PAGE_SIZE (256) bytes */
 typedef struct __attribute__((packed)) {
     u32 id;                     /* ID - ID_CONFIG                   */
-    u8  new_ota;                /* new ota flag                     */
-    u32 top;                    /* 0x0 .. 0xFFFFFFFF                */
-    u32 flash_addr_start;       /* flash page address start         */
-    u32 flash_addr_end;         /* flash page address end           */
     u16 measurement_period;     /* measurement period in sec.       */
     u8  device_model;           /* manufacturer of electric meters  */
     u32 device_address;         /* see address on dislpay ID-20109  */
