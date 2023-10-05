@@ -1,7 +1,7 @@
 /********************************************************************************************************
- * @file    factory_reset.h
+ * @file    bootloader.h
  *
- * @brief   This is the header file for factory_reset
+ * @brief   This is the header file for bootloader
  *
  * @author  Zigbee Group
  * @date    2021
@@ -23,10 +23,11 @@
  *
  *******************************************************************************************************/
 
-#ifndef FACTORY_RESET_H
-#define FACTORY_RESET_H
+#ifndef _BOOTLOADER_H_
+#define _BOOTLOADER_H_
 
-void factoryRst_init(void);
-void factoryRst_handler(void);
 
-#endif	/* FACTORY_RESET_H */
+void bootloader_init(bool isBoot);
+void bootloader_loop(void);
+
+#endif	/* _BOOTLOADER_H_ */

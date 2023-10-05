@@ -1,7 +1,7 @@
 /********************************************************************************************************
- * @file    factory_reset.h
+ * @file    main.c
  *
- * @brief   This is the header file for factory_reset
+ * @brief   This is the source file for main
  *
  * @author  Zigbee Group
  * @date    2021
@@ -23,10 +23,40 @@
  *
  *******************************************************************************************************/
 
-#ifndef FACTORY_RESET_H
-#define FACTORY_RESET_H
+#include "tl_common.h"
+#include "bootloader.h"
 
-void factoryRst_init(void);
-void factoryRst_handler(void);
 
-#endif	/* FACTORY_RESET_H */
+int main(void){
+	startup_state_e state = drv_platform_init();
+
+	u8 isRetention = (state == SYSTEM_DEEP_RETENTION) ? 1 : 0;
+	u8 isBoot = (state == SYSTEM_BOOT) ? 1 : 0;
+
+	if(!isRetention){
+		ev_buf_init();
+		ev_timer_init();
+	}
+
+	bootloader_init(isBoot);
+
+#if VOLTAGE_DETECT_ENABLE
+    u32 tick = clock_time();
+#endif
+
+	while(1){
+#if VOLTAGE_DETECT_ENABLE
+		if(clock_time_exceed(tick, 200 * 1000)){
+			voltage_detect(0);
+			tick = clock_time();
+		}
+#endif
+
+		ev_main();
+
+		bootloader_loop();
+	}
+
+	return 0;
+}
+
