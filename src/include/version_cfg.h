@@ -48,25 +48,25 @@
 #define HW_VERSION                          0x01
 
 #ifndef ZCL_BASIC_MFG_NAME
-    #define ZCL_BASIC_MFG_NAME     {6,'T','E','L','I','N','K'}
+    #define ZCL_BASIC_MFG_NAME      {6,'T','E','L','I','N','K'}
 #endif
 #ifndef ZCL_BASIC_MODEL_ID
-    #define ZCL_BASIC_MODEL_ID     {8,'T','L','S','R','8','2','6','x'}
+    #define ZCL_BASIC_MODEL_ID      {8,'T','L','S','R','8','2','6','x'}
 #endif
 #ifndef ZCL_BASIC_DATE_CODE
-    #define ZCL_BASIC_DATE_CODE    {8,'2','0','2','3','0','7','1','4'}
+    #define ZCL_BASIC_DATE_CODE     {8,'2','0','2','3','0','7','1','4'}
 #endif
 #ifndef ZCL_BASIC_LOC_DESC
-    #define ZCL_BASIC_LOC_DESC     {7,'U','N','K','N','O','W','N'}
+    #define ZCL_BASIC_LOC_DESC      {7,'U','N','K','N','O','W','N'}
 #endif
 #ifndef ZCL_BASIC_BUILD_ID
-    #define ZCL_BASIC_BUILD_ID     {10,'0','1','2','2','0','5','2','0','1','7'}
+    #define ZCL_BASIC_BUILD_ID      {10,'0','1','2','2','0','5','2','0','1','7'}
 #endif
 #ifndef ZCL_BASIC_SW_BUILD_ID //max 16 chars v1.3.02
-    #define ZCL_BASIC_SW_BUILD_ID       {7,'v',(APP_RELEASE>>4)+0x30,'.',(APP_RELEASE&0xf)+0x30,'.',(APP_BUILD>>4)+0x30,(APP_BUILD&0xf)+0x30}
+    #define ZCL_BASIC_SW_BUILD_ID   {7,'v',(APP_RELEASE>>4)+0x30,'.',(APP_RELEASE&0xf)+0x30,'.',(APP_BUILD>>4)+0x30,(APP_BUILD&0xf)+0x30}
 #endif
 
-#define IMAGE_TYPE_APP              (0x07 | (IMAGE_TYPE_BOOT_FLAG << 7))
+#define IMAGE_TYPE_APP          (0x07 | (IMAGE_TYPE_BOOT_FLAG << 7))
 
 /*********************************************************************************************
  * During OTA upgrade, the upgraded device will check the rules of the following three fields.
@@ -76,8 +76,8 @@
 #define	IMAGE_TYPE					((CHIP_TYPE << 8) | IMAGE_TYPE_APP)
 #define FILE_VERSION                ((APP_RELEASE << 24) | (APP_BUILD << 16) | (STACK_RELEASE << 8) | STACK_BUILD)
 
+
 /* Pre-compiled link configuration. */
 #define IS_BOOT_LOADER_IMAGE				0
 #define RESV_FOR_APP_RAM_CODE_SIZE			0
 #define IMAGE_OFFSET						APP_IMAGE_ADDR
-

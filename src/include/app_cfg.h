@@ -135,12 +135,12 @@ extern "C" {
         0x7A000 NV_2
         0x80000 End Flash
      */
-    #define OTA_ADDRESS                 0x39000
-    #define USER_DATA_SIZE              0x34000
-    #define BEGIN_USER_DATA1            0x00000
-    #define END_USER_DATA1              (BEGIN_USER_DATA1 + USER_DATA_SIZE)
-    #define BEGIN_USER_DATA2            0x40000
-    #define END_USER_DATA2              (BEGIN_USER_DATA2 + USER_DATA_SIZE)
+//    #define OTA_ADDRESS                 0x39000
+//    #define USER_DATA_SIZE              0x34000
+//    #define BEGIN_USER_DATA1            0x00000
+//    #define END_USER_DATA1              (BEGIN_USER_DATA1 + USER_DATA_SIZE)
+//    #define BEGIN_USER_DATA2            0x40000
+//    #define END_USER_DATA2              (BEGIN_USER_DATA2 + USER_DATA_SIZE)
     #define NV_ITEM_APP_USER_CFG        (NV_ITEM_APP_GP_TRANS_TABLE + 1)    // see sdk/proj/drivers/drv_nv.h
 #elif defined(MCU_CORE_8278)
     #define FLASH_CAP_SIZE_1M           1
@@ -231,7 +231,9 @@ extern "C" {
 #define ZCL_ELECTRICAL_MEASUREMENT_SUPPORT          ON
 #define ZCL_DEV_TEMPERATURE_CFG_SUPPORT             ON
 
-
+#if (ZCL_OTA_SUPPORT == ON)
+#error Please set "ZCL_OTA_SUPPORT OFF" in app_cfg.h
+#endif
 
 /**********************************************************************
  * Stack configuration
