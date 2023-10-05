@@ -34,7 +34,7 @@ u8 sys_exceptionPost(u16 line, u8 evt)
 {
 	T_evtExcept[0] = line;
 	T_evtExcept[1] = evt;
-	
+
 	/* TODO: some information stored in NV */
 	if(g_sysExceptCallback){
 		g_sysExceptCallback();
@@ -57,7 +57,6 @@ void sys_stackStatusCheck(void)
 	}
 
 	if(stackOverflown){
-		printf("stackOverflown\r\n");
 		ZB_EXCEPTION_POST(SYS_EXCEPTTION_COMMON_STACK_OVERFLOWN);
 	}
 }
