@@ -281,7 +281,9 @@ static void app_zclCfgReportCmd(u8 endPoint, u16 clusterId, zclCfgReportCmd_t *p
         for (u8 ii = 0; ii < ZCL_REPORTING_TABLE_NUM; ii++) {
             if (app_reporting[ii].pEntry->used) {
                 if (app_reporting[ii].pEntry->endPoint == endPoint && app_reporting[ii].pEntry->attrID == pCfgReportCmd->attrList[i].attrID) {
+#if UART_PRINTF_MODE && DEBUG_REPORTING
                     printf("reportCfg: %d endPoint: 0x%x, attrId: 0x%x\r\n", ii, endPoint, pCfgReportCmd->attrList[i].attrID);
+#endif
                     if (app_reporting[ii].timerReportMinEvt) {
                         TL_ZB_TIMER_CANCEL(&app_reporting[ii].timerReportMinEvt);
                     }
