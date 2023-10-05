@@ -5,9 +5,7 @@ OUT_DIR += \
  
 OBJS += \
 $(OUT_PATH)/platform/boot/link_cfg.o \
-$(OUT_PATH)/platform/boot/8258/cstartup_8258.o 
-
-
+$(OUT_PATH)/platform/boot/8258/cstartup_8258.o
 
 # Each subdirectory must supply rules for building sources it contributes
 $(OUT_PATH)/platform/boot/%.o: $(SDK_PATH)/platform/boot/%.S

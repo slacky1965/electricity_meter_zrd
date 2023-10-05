@@ -10,7 +10,6 @@ OBJS += \
 $(OUT_PATH)/zbhci/zbhci.o \
 $(OUT_PATH)/zbhci/zbhciCmdProcess.o \
 $(OUT_PATH)/zbhci/zbhci_zclHandler.o \
-$(OUT_PATH)/zbhci/zbhciCmdProcess.o \
 $(OUT_PATH)/zbhci/zbhci_zclHandler.o \
 $(OUT_PATH)/zbhci/usbPrint/hci_usbPrint.o \
 $(OUT_PATH)/zbhci/usbHID/zbhci_usb_hid.o \
