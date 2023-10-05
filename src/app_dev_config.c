@@ -42,7 +42,7 @@ void init_config(u8 print) {
     nv_sts_t st = NV_SUCC;
 
 #if UART_PRINTF_MODE && DEBUG_CONFIG
-    printf("\r\nOTA mode disabled. MCU boot from address: 0x%x\r\n", FIRMWARE_ADDRESS);
+    printf("\r\nOTA mode disabled. MCU boot from address: 0x%x\r\n", APP_IMAGE_ADDR);
 #endif /* UART_PRINTF_MODE */
 
 #if !NV_ENABLE
