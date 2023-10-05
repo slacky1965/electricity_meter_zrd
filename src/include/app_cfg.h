@@ -105,10 +105,9 @@ extern "C" {
 #endif
     #define CLOCK_SYS_CLOCK_HZ          32000000
 #elif defined(MCU_CORE_8258)
-#define FIRMWARE_ADDRESS                0x8000
 #if (CHIP_TYPE == TLSR_8258_1M)
     #define FLASH_CAP_SIZE_1M           1
-    /********************* For 512K Flash only (bootloader mode) ********************************/
+    /********************** For 1M Flash only (bootloader mode) *********************************/
     /* Flash map:
         0x00000  bootloader
         0x08000  Firmware
