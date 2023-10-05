@@ -231,7 +231,7 @@ extern "C" {
 #define ZCL_DEV_TEMPERATURE_CFG_SUPPORT             ON
 
 #if (ZCL_OTA_SUPPORT == ON)
-#error Please set "ZCL_OTA_SUPPORT OFF" in app_cfg.h
+#error ZCL_OTA_SUPPORT must be disable in "app_cfg.h"
 #endif
 
 /**********************************************************************
