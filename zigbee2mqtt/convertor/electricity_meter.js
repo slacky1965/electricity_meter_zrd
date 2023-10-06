@@ -10,7 +10,7 @@ const { postfixWithEndpointName, precisionRound } = require('zigbee-herdsman-con
 const e = exposes.presets;
 const ea = exposes.access;
 
-const switchDeviceModel = ['No Device', 'KASKAD-1-MT', 'KASKAD-11-C1', 'MERCURY-206', 'ENERGOMERA-CE102M'];
+const switchDeviceModel = ['No Device', 'KASKAD-1-MT', 'KASKAD-11-C1', 'MERCURY-206', 'ENERGOMERA-CE102M', 'NEVA-MT124'];
 
 const tzLocal = {
   device_address_config: {

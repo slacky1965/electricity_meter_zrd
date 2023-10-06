@@ -68,21 +68,21 @@ static void app_uartRecvCb() {
     }
 }
 
-void app_uart_init() {
+void app_uart_init(u32 baudrate) {
 
-    u32 baudrate = BAUDRATE_UART;
+//    u32 baudrate = BAUDRATE_UART;
 
     flush_buff_uart();
     drv_uart_pin_set(GPIO_UART_TX, GPIO_UART_RX);
 
-    switch (dev_config.device_model) {
-        case DEVICE_KASKAD_11:
-            baudrate = 2400;
-            break;
-        default:
-            baudrate = 9600;
-            break;
-    }
+//    switch (dev_config.device_model) {
+//        case DEVICE_KASKAD_11:
+//            baudrate = 2400;
+//            break;
+//        default:
+//            baudrate = 9600;
+//            break;
+//    }
 
     drv_uart_init(baudrate, (u8*)&rec_buff, sizeof(uart_data_t), app_uartRecvCb);
 }

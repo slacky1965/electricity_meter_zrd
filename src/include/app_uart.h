@@ -13,7 +13,7 @@ typedef struct {
     u8  data[UART_DATA_LEN];
 } uart_data_t;
 
-void app_uart_init();
+void app_uart_init(u32 baudrate);
 size_t write_bytes_to_uart(u8 *data, size_t len);
 u8 read_byte_from_buff_uart();
 u8 available_buff_uart();

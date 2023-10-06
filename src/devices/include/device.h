@@ -21,6 +21,7 @@ typedef enum {
     DEVICE_KASKAD_11,
     DEVICE_MERCURY_206,
     DEVICE_ENERGOMERA_CE102M,
+    DEVICE_NEVA_MT124,
     DEVICE_MAX,
 } device_model_t;
 
@@ -58,6 +59,7 @@ u8 measure_meter_kaskad_1_mt();
 u8 measure_meter_kaskad_11();
 u8 measure_meter_mercury_206();
 u8 measure_meter_energomera_ce102m();
+u8 measure_meter_neva_mt124();
 
 
 #endif /* SRC_INCLUDE_DEVICE_H_ */

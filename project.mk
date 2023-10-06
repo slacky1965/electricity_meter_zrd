@@ -21,6 +21,7 @@ $(OUT_PATH)/$(SRC_PATH)/devices/kaskad_1_mt.o \
 $(OUT_PATH)/$(SRC_PATH)/devices/kaskad_11.o \
 $(OUT_PATH)/$(SRC_PATH)/devices/mercury_206.o \
 $(OUT_PATH)/$(SRC_PATH)/devices/energomera_ce102m.o \
+$(OUT_PATH)/$(SRC_PATH)/devices/neva_mt124.o \
 $(OUT_PATH)/$(SRC_PATH)/app_main.o
 
 

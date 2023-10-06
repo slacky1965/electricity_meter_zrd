@@ -34,12 +34,6 @@ extern "C" {
     #define MCU_CORE_8258       1
 #endif
 
-//#define KASKAD_1_MT             1
-//#define KASKAD_11_C1            2
-//#define MERCURY_206             3
-//#define ENERGOMERA_CE102M       4
-//#define ENERGOMERA_CE102        5
-
 #define ON                      1
 #define OFF                     0
 
@@ -63,12 +57,12 @@ extern "C" {
 
 /* Debug mode config */
 #define	UART_PRINTF_MODE				ON
-#define DEBUG_CONFIG                    ON
+#define DEBUG_CONFIG                    OFF
 #define DEBUG_DEVICE_DATA               ON
 #define DEBUG_PACKAGE                   ON
 #define DEBUG_REPORTING                 OFF
 #define DEBUG_TEMPERATURE               OFF
-#define DEBUG_OTA                       ON
+#define DEBUG_OTA                       OFF
 
 #define USB_PRINTF_MODE         		OFF
 
