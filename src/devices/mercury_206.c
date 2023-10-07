@@ -1,12 +1,6 @@
 #include "tl_common.h"
 #include "zcl_include.h"
 
-#ifndef METER_MODEL
-#define METER_MODEL MERCURY_206
-#endif
-
-#if (METER_MODEL == MERCURY_206)
-
 #include "app_dev_config.h"
 #include "device.h"
 #include "mercury_206.h"
@@ -502,4 +496,3 @@ u8 measure_meter_mercury_206() {
     return ret;
 }
 
-#endif

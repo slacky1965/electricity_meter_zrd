@@ -1,8 +1,6 @@
 #ifndef SRC_INCLUDE_KASKAD_1_MT_H_
 #define SRC_INCLUDE_KASKAD_1_MT_H_
 
-//#if (METER_MODEL == KASKAD_1_MT)
-
 typedef enum _command_t {
     cmd_open_channel         = 0x01,
     cmd_tariffs_data         = 0x05,
@@ -119,8 +117,5 @@ typedef struct __attribute__((packed)) _pkt_data31_t {
     u8  stop;
 } pkt_data31_t;
 
-//void measure_meter_kaskad1mt();
-
-//#endif
 
 #endif /* SRC_INCLUDE_KASKAD_1_MT_H_ */

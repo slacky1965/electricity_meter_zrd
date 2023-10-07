@@ -1,12 +1,6 @@
 #include "tl_common.h"
 #include "zcl_include.h"
 
-#ifndef METER_MODEL
-#define METER_MODEL KASKAD_11_C1
-#endif
-
-#if (METER_MODEL == KASKAD_11_C1)
-
 #include "device.h"
 #include "kaskad_11.h"
 #include "app_dev_config.h"
@@ -591,4 +585,3 @@ u8 measure_meter_kaskad_11() {
     return ret;
 }
 
-#endif

@@ -1,12 +1,6 @@
 #include "tl_common.h"
 #include "zcl_include.h"
 
-#ifndef METER_MODEL
-#define METER_MODEL KASKAD_1_MT
-#endif
-
-#if (METER_MODEL == KASKAD_1_MT)
-
 #include "se_custom_attr.h"
 #include "app_uart.h"
 #include "app_endpoint_cfg.h"
@@ -640,4 +634,3 @@ u8 measure_meter_kaskad_1_mt() {
     return ret;
 }
 
-#endif

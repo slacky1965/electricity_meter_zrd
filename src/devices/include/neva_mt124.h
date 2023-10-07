@@ -10,6 +10,4 @@ typedef enum _command_t {
     cmd_sensors_data
 } command_t;
 
-
-
 #endif /* SRC_DEVICES_INCLUDE_NEVA_MT124_H_ */

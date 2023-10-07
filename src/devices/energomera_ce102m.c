@@ -1,12 +1,6 @@
 #include "tl_common.h"
 #include "zcl_include.h"
 
-#ifndef METER_MODEL
-#define METER_MODEL ENERGOMERA_CE102M
-#endif
-
-#if (METER_MODEL == ENERGOMERA_CE102M)
-
 #include "se_custom_attr.h"
 #include "app_uart.h"
 #include "app_endpoint_cfg.h"
@@ -686,4 +680,3 @@ u8 measure_meter_energomera_ce102m() {
     return ret;
 }
 
-#endif
