@@ -217,7 +217,7 @@ void user_init(bool isRetention)
     bdb_defaultReportingCfg(APP_ENDPOINT_1, HA_PROFILE_ID, ZCL_CLUSTER_GEN_DEVICE_TEMP_CONFIG, ZCL_ATTRID_DEV_TEMP_CURR_TEMP,
             0, 30, (u8 *)&reportableChange);
 
-    /* 4 tariffs and divisor, multiplier */
+    /* 4 tariffs and divisor, multiplier, battery life */
     bdb_defaultReportingCfg(APP_ENDPOINT_1, HA_PROFILE_ID, ZCL_CLUSTER_SE_METERING, ZCL_ATTRID_CURRENT_TIER_1_SUMMATION_DELIVERD,
             0, 60, (u8 *)&reportableChange);
     bdb_defaultReportingCfg(APP_ENDPOINT_1, HA_PROFILE_ID, ZCL_CLUSTER_SE_METERING, ZCL_ATTRID_CURRENT_TIER_2_SUMMATION_DELIVERD,
@@ -230,6 +230,8 @@ void user_init(bool isRetention)
             0, 60, (u8 *)&reportableChange);
     bdb_defaultReportingCfg(APP_ENDPOINT_1, HA_PROFILE_ID, ZCL_CLUSTER_SE_METERING, ZCL_ATTRID_DIVISOR,
             0, 60, (u8 *)&reportableChange);
+    bdb_defaultReportingCfg(APP_ENDPOINT_1, HA_PROFILE_ID, ZCL_CLUSTER_SE_METERING, ZCL_ATTRID_REMAINING_BATTERY_LIFE,
+            300, 900, (u8 *)&reportableChange);
 
     /* Serial Number, Data Release and Model Name */
     bdb_defaultReportingCfg(APP_ENDPOINT_1, HA_PROFILE_ID, ZCL_CLUSTER_SE_METERING, ZCL_ATTRID_METER_SERIAL_NUMBER,
