@@ -97,8 +97,8 @@ extern "C" {
 //KEY
 #define	BUTTON 					    GPIO_PD6
 #define PD6_FUNC					AS_GPIO
-#define PD6_OUTPUT_ENABLE			0
-#define PD6_INPUT_ENABLE			1
+#define PD6_OUTPUT_ENABLE			OFF
+#define PD6_INPUT_ENABLE			ON
 #define	PULL_WAKEUP_SRC_PD6			PM_PIN_PULLUP_1M //PM_PIN_PULLUP_10K
 
 //#define BUTTON  BUTTON1
@@ -115,6 +115,7 @@ extern "C" {
 #define PA2_FUNC				AS_GPIO
 #define PA2_OUTPUT_ENABLE		1
 #define PA2_INPUT_ENABLE		0
+
 
 #define LED_POWER               GPIO_PA3
 #define PA3_FUNC				AS_GPIO
@@ -134,7 +135,7 @@ extern "C" {
 
 // DEBUG
 #if UART_PRINTF_MODE
-	#define	DEBUG_INFO_TX_PIN	    GPIO_PC6//print
+	#define	DEBUG_INFO_TX_PIN	    GPIO_PC6    //printf
     #define BAUDRATE                115200
 #endif
 /*******************************************************************************************************

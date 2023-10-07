@@ -1,32 +1,32 @@
-#ifndef SRC_INCLUDE_BOARD_8258_DIY_H_
-#define SRC_INCLUDE_BOARD_8258_DIY_H_
+#pragma once
+
+/* Enable C linkage for C++ Compilers: */
+#if defined(__cplusplus)
+extern "C" {
+#endif
 
 /************************* Configure KEY GPIO ***************************************/
-#define BUTTON                  GPIO_PB5
-#define PB5_INPUT_ENABLE        ON
-#define PB5_DATA_OUT            OFF
-#define PB5_OUTPUT_ENABLE       OFF
-#define PB5_FUNC                AS_GPIO
+#define BUTTON                  GPIO_PB6
+#define PB6_INPUT_ENABLE        ON
+#define PB6_DATA_OUT            OFF
+#define PB6_OUTPUT_ENABLE       OFF
+#define PB6_FUNC                AS_GPIO
 #define PULL_WAKEUP_SRC_PB6     PM_PIN_PULLUP_1M
-
-#define BUTTON_2W               GPIO_PB2
-#define PB2_FUNC                AS_GPIO
-#define PB2_OUTPUT_ENABLE       OFF
-#define PB2_INPUT_ENABLE        ON
-#define PULL_WAKEUP_SRC_PB2     PM_PIN_PULLDOWN_100K
-
 
 /**************************** Configure LED ******************************************/
 
-#define LED_STATUS              GPIO_PD3
-#define PD3_FUNC                AS_GPIO
-#define PD3_OUTPUT_ENABLE       ON
-#define PD3_INPUT_ENABLE        OFF
+#define LED_STATUS              GPIO_PC0
+#define PC0_FUNC                AS_GPIO
+#define PC0_OUTPUT_ENABLE       ON
+#define PC0_INPUT_ENABLE        OFF
 
-#define LED_POWER               GPIO_PD5    // PD4
-#define PD5_FUNC                AS_GPIO
-#define PD5_OUTPUT_ENABLE       ON
-#define PD5_INPUT_ENABLE        OFF
+#define LED_POWER               GPIO_PA1
+#define PA1_FUNC                AS_GPIO
+#define PA1_OUTPUT_ENABLE       ON
+#define PA1_INPUT_ENABLE        OFF
+
+#define LED_PERMIT              LED_STATUS
+
 
 /**************************** Configure UART ***************************************
 *    UART_TX_PA2 = GPIO_PA2,
@@ -44,48 +44,21 @@
 */
 
 /**************************** UART for optoport ***********************************/
-#define UART_BAUD_RATE          9600
-#define UART_TX_GPIO            UART_TX_PD7
-#define UART_RX_GPIO            UART_RX_PA0
+#define BAUDRATE_UART           9600
+#define GPIO_UART_TX            UART_TX_PD7
+#define GPIO_UART_RX            UART_RX_PA0
 
 #if UART_PRINTF_MODE
-//#define DEBUG_INFO_TX_PIN       UART_TX_PB1//print
-//#define BAUDRATE                115200
-//#define PB1_DATA_OUT            ON
-//#define PB1_OUTPUT_ENABLE       ON
-//#define PB1_INPUT_ENABLE        OFF
-//#define PULL_WAKEUP_SRC_PB1     PM_PIN_PULLUP_1M
-//#define PB1_FUNC                AS_GPIO
-
-#define DEBUG_INFO_TX_PIN       GPIO_PA4//print
+#define DEBUG_INFO_TX_PIN       GPIO_PB1    //printf
 #define BAUDRATE                115200
-#define PA4_DATA_OUT            ON
-#define PA4_OUTPUT_ENABLE       ON
-#define PA4_INPUT_ENABLE        OFF
-#define PULL_WAKEUP_SRC_PA4     PM_PIN_PULLUP_1M
-#define PA4_FUNC                AS_GPIO
+#endif
 
-#endif /* UART_PRINTF_MODE */
+/************************* Configure Temperature ***********************************/
+#define GPIO_TEMP               GPIO_PC3
+#define PC3_FUNC                AS_GPIO
+#define PULL_WAKEUP_SRC_PC3     PM_PIN_PULLUP_1M
 
-
-/************************* For 512K Flash only ***************************************/
-/* Flash map:
-  0x00000 Old Firmware bin
-  0x34000 NV_1
-  0x40000 OTA New bin storage Area
-  0x76000 MAC address
-  0x77000 C_Cfg_Info
-  0x78000 U_Cfg_Info
-  0x7A000 NV_2
-  0x80000 End Flash
- */
-#define USER_DATA_SIZE          0x34000
-#define BEGIN_USER_DATA1        0x00000
-#define END_USER_DATA1          (BEGIN_USER_DATA1 + USER_DATA_SIZE)
-#define BEGIN_USER_DATA2        0x40000
-#define END_USER_DATA2          (BEGIN_USER_DATA2 + USER_DATA_SIZE)
-#define GEN_USER_CFG_DATA       END_USER_DATA2
-
-
-
-#endif /* SRC_INCLUDE_BOARD_8258_DIY_H_ */
+/* Disable C linkage for C++ Compilers: */
+#if defined(__cplusplus)
+}
+#endif
