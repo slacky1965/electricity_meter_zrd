@@ -65,6 +65,13 @@ const tzLocal = {
 	    convertSet: async (entity, key, value, meta) => {
 	        return null;
 	    },
+    key:['battery_life'],
+        convertGet: async (entity, key, meta) => {
+	        await entity.read('seMetering', ['remainingBattLife']);
+	    },
+	    convertSet: async (entity, key, value, meta) => {
+		    return null;
+	    },
     key:['serial_number'],
         convertGet: async (entity, key, meta) => {
 	        await entity.read('seMetering', ['meterSerialNumber']);
@@ -171,6 +178,18 @@ const fzLocal = {
         if (msg.data.hasOwnProperty('currentTier4SummDelivered')) {
             const data = msg.data['currentTier4SummDelivered'];
             result.Tariff4 = (parseInt(data[0]) << 32) + parseInt(data[1])/energy_divisor*energy_multiplier;
+		}
+        return result;
+    },
+  },
+  battery_life: {
+    cluster: 'seMetering',
+    type: ['attributeReport', 'readResponse'],
+    convert: (model, msg, publish, options, meta) => {
+        const result = {};
+        if (msg.data.hasOwnProperty('remainingBattLife')) {
+          const data = parseInt(msg.data['remainingBattLife']);
+          result.BatteryLife = data;
 		}
         return result;
     },
@@ -373,7 +392,7 @@ const definition = {
     vendor: 'DIY', // Vendor of the device (only used for documentation and startup logging)
     description: 'Electricity Meter', // Description of the device, copy from vendor site. (only used for documentation and startup logging)
     fromZigbee: [fzLocal.e_divisor, fzLocal.e_multiplier, fzLocal.tariff1, fzLocal.tariff2, fzLocal.tariff3, fzLocal.tariff4, 
-                 fzLocal.serial_number, fzLocal.date_release, fzLocal.model_name,
+                 fzLocal.serial_number, fzLocal.date_release, fzLocal.model_name, fzLocal.battery_life,
                  fzLocal.v_multiplier, fzLocal.v_divisor, fzLocal.voltage,
                  fzLocal.c_multiplier, fzLocal.c_divisor, fzLocal.current,
                  fzLocal.p_multiplier, fzLocal.p_divisor, fzLocal.power,
@@ -384,6 +403,7 @@ const definition = {
     },
     configure: async (device, coordinatorEndpoint, logger) => {
       const firstEndpoint = device.getEndpoint(1);
+      await firstEndpoint.read('seMetering', ['remainingBattLife']);
       await reporting.bind(firstEndpoint, coordinatorEndpoint, ['seMetering', 'haElectricalMeasurement', 'genDeviceTempCfg']);
       const payload_e_multiplier = [{attribute: {ID: 769, type: 0x22}, minimumReportInterval: 0, maximumReportInterval: 60, reportableChange: 0}];
       await firstEndpoint.configureReporting('seMetering', payload_e_multiplier);
@@ -397,6 +417,8 @@ const definition = {
       await firstEndpoint.configureReporting('seMetering', payload_tariff3);
       const payload_tariff4 = [{attribute: {ID: 0x0106, type: 0x25}, minimumReportInterval: 0, maximumReportInterval: 60, reportableChange: 0}];
       await firstEndpoint.configureReporting('seMetering', payload_tariff4);
+      const payload_battery_life = [{attribute: {ID: 0x0201, type: 0x20}, minimumReportInterval: 300, maximumReportInterval: 900, reportableChange: 0}];
+      await firstEndpoint.configureReporting('seMetering', payload_battery_life);
       const payload_serial_number = [{attribute: {ID: 0x0308, type: 0x41}, minimumReportInterval: 0, maximumReportInterval: 300, reportableChange: 0}];
       await firstEndpoint.configureReporting('seMetering', payload_serial_number);
       const payload_date_release = [{attribute: {ID: 0xf003, type: 0x41}, minimumReportInterval: 0, maximumReportInterval: 300, reportableChange: 0}];
@@ -434,6 +456,7 @@ const definition = {
       exposes.numeric('Voltage', ea.STATE_GET).withUnit('V').withDescription('Voltage'),
       exposes.numeric('Current', ea.STATE_GET).withUnit('A').withDescription('Current'),
       exposes.numeric('Power', ea.STATE_GET).withUnit('kW').withDescription('Power'),
+      exposes.numeric('BatteryLife', ea.STATE_GET).withUnit('%').withDescription('Battery Life'),
       exposes.numeric('Temperature', ea.STATE_GET).withUnit('°C').withDescription('Device temperature'),
       exposes.numeric('device_address_preset', ea.STATE_SET).withDescription('Device Address'),
       exposes.enum('device_model_preset', ea.STATE_SET, switchDeviceModel).withDescription('Device Model'),
