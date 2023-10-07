@@ -14,14 +14,19 @@ Not finished! In the process!
 4. Энергомера-СЕ102М
 5. Нева-МТ124
 
+Проверялось на этом.
 
 <img src="https://raw.githubusercontent.com/slacky1965/electricity_meter_zrd/main/doc/images/tlsr8258_dongle.jpg"/>
 
+Будет сделано на этом.
+
 <img src="https://raw.githubusercontent.com/slacky1965/electricity_meter_zrd/main/doc/images/E180-Z5812SP.jpg"/>
+
+Схема.
 
 <img src="https://raw.githubusercontent.com/slacky1965/electricity_meter_zrd/main/doc/images/Schematic_Electricity_Meter_zrd.jpg"/>
 
-Прототип
+Прототип.
 
 <img src="https://raw.githubusercontent.com/slacky1965/electricity_meter_zrd/main/doc/images/prototype.jpg"/>
 
