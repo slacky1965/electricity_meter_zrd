@@ -627,7 +627,7 @@ u8 measure_meter_kaskad_1_mt() {
     } else {
         fault_measure_flag = true;
         if (!timerFaultMeasurementEvt) {
-            timerFaultMeasurementEvt = TL_ZB_TIMER_SCHEDULE(fault_measure_meterCb, NULL, TIMEOUT_30SEC/*TIMEOUT_10MIN*/);
+            timerFaultMeasurementEvt = TL_ZB_TIMER_SCHEDULE(fault_measure_meterCb, NULL, /*TIMEOUT_30SEC*/TIMEOUT_10MIN);
         }
     }
 
