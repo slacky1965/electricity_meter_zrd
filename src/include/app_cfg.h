@@ -30,6 +30,8 @@
 extern "C" {
 #endif
 
+#include "app_types.h"
+
 #ifndef MCU_CORE_8258
     #define MCU_CORE_8258       1
 #endif

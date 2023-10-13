@@ -5,16 +5,16 @@
 #define LED_OFF                     0
 
 void led_init(void);
-void led_on(u32 pin);
-void led_off(u32 pin);
+void led_on(uint32_t pin);
+void led_off(uint32_t pin);
 
-void light_blink_start(u8 times, u16 ledOnTime, u16 ledOffTime);
+void light_blink_start(uint8_t times, uint16_t ledOnTime, uint16_t ledOffTime);
 void light_blink_stop(void);
 
 void light_init(void);
 void light_on(void);
 void light_off(void);
-s32 flashLedStatusCb(void *arg);
+int32_t flashLedStatusCb(void *arg);
 
 
 #endif /* SRC_INCLUDE_APP_LED_H_ */

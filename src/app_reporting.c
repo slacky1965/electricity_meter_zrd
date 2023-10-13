@@ -8,7 +8,7 @@
 #include "app_reporting.h"
 #include "app_main.h"
 
-#define BUILD_U48(b0, b1, b2, b3, b4, b5)   ( (u64)((((u64)(b5) & 0x0000000000ff) << 40) + (((u64)(b4) & 0x0000000000ff) << 32) + (((u64)(b3) & 0x0000000000ff) << 24) + (((u64)(b2) & 0x0000000000ff) << 16) + (((u64)(b1) & 0x0000000000ff) << 8) + ((u64)(b0) & 0x00000000FF)) )
+#define BUILD_U48(b0, b1, b2, b3, b4, b5)   ( (uint64_t)((((uint64_t)(b5) & 0x0000000000ff) << 40) + (((uint64_t)(b4) & 0x0000000000ff) << 32) + (((uint64_t)(b3) & 0x0000000000ff) << 24) + (((uint64_t)(b2) & 0x0000000000ff) << 16) + (((uint64_t)(b1) & 0x0000000000ff) << 8) + ((uint64_t)(b0) & 0x00000000FF)) )
 
 app_reporting_t app_reporting[ZCL_REPORTING_TABLE_NUM];
 
@@ -18,14 +18,14 @@ extern void reportAttr(reportCfgInfo_t *pEntry);
  * Custom reporting application
  */
 
-static u8 app_reportableChangeValueChk(u8 dataType, u8 *curValue, u8 *prevValue, u8 *reportableChange) {
-    u8 needReport = false;
+static uint8_t app_reportableChangeValueChk(uint8_t dataType, uint8_t *curValue, uint8_t *prevValue, uint8_t *reportableChange) {
+    uint8_t needReport = false;
 
     switch(dataType) {
         case ZCL_DATA_TYPE_UINT48: {
-            u64 P = BUILD_U48(prevValue[0], prevValue[1], prevValue[2], prevValue[3], prevValue[4], prevValue[5]);
-            u64 C = BUILD_U48(curValue[0], curValue[1], curValue[2], curValue[3], curValue[4], curValue[5]);
-            u64 R = BUILD_U48(reportableChange[0], reportableChange[1], reportableChange[2], reportableChange[3], reportableChange[4], reportableChange[5]);
+            uint64_t P = BUILD_U48(prevValue[0], prevValue[1], prevValue[2], prevValue[3], prevValue[4], prevValue[5]);
+            uint64_t C = BUILD_U48(curValue[0], curValue[1], curValue[2], curValue[3], curValue[4], curValue[5]);
+            uint64_t R = BUILD_U48(reportableChange[0], reportableChange[1], reportableChange[2], reportableChange[3], reportableChange[4], reportableChange[5]);
             if(P >= C){
                 needReport = ((P - C) > R) ? true : false;
             }else{
@@ -41,7 +41,7 @@ static u8 app_reportableChangeValueChk(u8 dataType, u8 *curValue, u8 *prevValue,
     return needReport;
 }
 
-static s32 app_reportMinAttrTimerCb(void *arg) {
+static int32_t app_reportMinAttrTimerCb(void *arg) {
     app_reporting_t *app_reporting = (app_reporting_t*)arg;
     reportCfgInfo_t *pEntry = app_reporting->pEntry;
 
@@ -63,7 +63,7 @@ static s32 app_reportMinAttrTimerCb(void *arg) {
         return 0;
     }
 
-    u8 len = zcl_getAttrSize(pAttrEntry->type, pAttrEntry->data);
+    uint8_t len = zcl_getAttrSize(pAttrEntry->type, pAttrEntry->data);
 
 
     len = (len>8) ? (8):(len);
@@ -83,7 +83,7 @@ static s32 app_reportMinAttrTimerCb(void *arg) {
     return 0;
 }
 
-static s32 app_reportMaxAttrTimerCb(void *arg) {
+static int32_t app_reportMaxAttrTimerCb(void *arg) {
     app_reporting_t *app_reporting = (app_reporting_t*)arg;
     reportCfgInfo_t *pEntry = app_reporting->pEntry;
 
@@ -102,10 +102,10 @@ static s32 app_reportMaxAttrTimerCb(void *arg) {
 }
 
 void app_reportAttrTimerStart() {
-    static u8 first = 1;
+    static uint8_t first = 1;
 
     if(zcl_reportingEntryActiveNumGet()) {
-        for(u8 i = 0; i < ZCL_REPORTING_TABLE_NUM; i++) {
+        for(uint8_t i = 0; i < ZCL_REPORTING_TABLE_NUM; i++) {
             reportCfgInfo_t *pEntry = &reportingTab.reportCfgInfo[i];
             app_reporting[i].pEntry = pEntry;
             if (first) {
@@ -146,9 +146,9 @@ void app_reportNoMinLimit(void)
 {
     if(zcl_reportingEntryActiveNumGet()){
         zclAttrInfo_t *pAttrEntry = NULL;
-        u16 len = 0;
+        uint16_t len = 0;
 
-        for(u8 i = 0; i < ZCL_REPORTING_TABLE_NUM; i++){
+        for(uint8_t i = 0; i < ZCL_REPORTING_TABLE_NUM; i++){
             reportCfgInfo_t *pEntry = &reportingTab.reportCfgInfo[i];
             if(pEntry->used && (pEntry->maxInterval != 0xFFFF) && (pEntry->minInterval == 0)){
                 //there is no minimum limit
@@ -193,7 +193,7 @@ void app_reporting_init() {
 
     TL_SETSTRUCTCONTENT(app_reporting, 0);
 
-    for (u8 i = 0; i < ZCL_REPORTING_TABLE_NUM; i++) {
+    for (uint8_t i = 0; i < ZCL_REPORTING_TABLE_NUM; i++) {
         reportCfgInfo_t *pEntry = &reportingTab.reportCfgInfo[i];
 //        printf("(%d) used: %s\r\n", i, pEntry->used?"true":"false");
         if (pEntry->used) {

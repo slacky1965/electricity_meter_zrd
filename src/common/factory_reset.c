@@ -31,7 +31,7 @@
 #define FACTORY_RESET_TIMEOUT					2	//second
 
 ev_timer_event_t *factoryRst_timerEvt = NULL;
-u8 factoryRst_powerCnt = 0;
+uint8_t factoryRst_powerCnt = 0;
 bool factoryRst_exist = FALSE;
 
 nv_sts_t factoryRst_powerCntSave(void){
@@ -54,7 +54,7 @@ nv_sts_t factoryRst_powerCntRestore(void){
 	return st;
 }
 
-static s32 factoryRst_timerCb(void *arg){
+static int32_t factoryRst_timerCb(void *arg){
 	if(factoryRst_powerCnt >= FACTORY_RESET_POWER_CNT_THRESHOLD){
 		/* here is just a mark, wait for device announce and then perform factory reset. */
 		factoryRst_exist = TRUE;

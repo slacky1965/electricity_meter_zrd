@@ -7,7 +7,7 @@
 #include "app_main.h"
 #include "app_dev_config.h"
 
-s32 flashLedStatusCb(void *arg) {
+int32_t flashLedStatusCb(void *arg) {
     if (zb_isDeviceJoinedNwk() && device_online) {
         light_blink_stop();
 //        if (dev_config.new_ota) {
@@ -22,11 +22,11 @@ s32 flashLedStatusCb(void *arg) {
     return 0;
 }
 
-void led_on(u32 pin){
+void led_on(uint32_t pin){
     drv_gpio_write(pin, LED_ON);
 }
 
-void led_off(u32 pin){
+void led_off(uint32_t pin){
     drv_gpio_write(pin, LED_OFF);
 }
 
@@ -52,9 +52,9 @@ void light_init(void)
 
 }
 
-s32 zclLightTimerCb(void *arg)
+int32_t zclLightTimerCb(void *arg)
 {
-    u32 interval = 0;
+    uint32_t interval = 0;
 
     if(g_appCtx.sta == g_appCtx.oriSta){
         g_appCtx.times--;
@@ -76,9 +76,9 @@ s32 zclLightTimerCb(void *arg)
     return interval;
 }
 
-void light_blink_start(u8 times, u16 ledOnTime, u16 ledOffTime)
+void light_blink_start(uint8_t times, uint16_t ledOnTime, uint16_t ledOffTime)
 {
-    u32 interval = 0;
+    uint32_t interval = 0;
     g_appCtx.times = times;
 
     if(!g_appCtx.timerLedEvt){

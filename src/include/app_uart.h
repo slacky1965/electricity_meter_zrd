@@ -9,14 +9,14 @@
 
 
 typedef struct {
-    u32 dma_len;        // dma len must be 4 byte
-    u8  data[UART_DATA_LEN];
+    uint32_t dma_len;        // dma len must be 4 byte
+    uint8_t  data[UART_DATA_LEN];
 } uart_data_t;
 
-void app_uart_init(u32 baudrate);
-size_t write_bytes_to_uart(u8 *data, size_t len);
-u8 read_byte_from_buff_uart();
-u8 available_buff_uart();
+void app_uart_init(uint32_t baudrate);
+size_t write_bytes_to_uart(uint8_t *data, size_t len);
+uint8_t read_byte_from_buff_uart();
+uint8_t available_buff_uart();
 size_t get_queue_len_buff_uart();
 void flush_buff_uart();
 void app_uart_rx_off();

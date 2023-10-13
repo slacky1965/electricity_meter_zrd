@@ -3,23 +3,23 @@
 
 /* must be no more than FLASH_PAGE_SIZE (256) bytes */
 typedef struct __attribute__((packed)) {
-    u32 id;                     /* ID - ID_CONFIG                   */
-    u16 measurement_period;     /* measurement period in sec.       */
-    u8  device_model;           /* manufacturer of electric meters  */
-    u32 device_address;         /* see address on dislpay ID-20109  */
-    u32 tariff_multiplier;
-    u32 tariff_devisor;
-    u8  summation_formatting;
-    u16 voltage_multiplier;
-    u16 voltage_divisor;
-    u16 current_multiplier;
-    u16 current_divisor;
-    u16 crc;
+    uint32_t id;                     /* ID - ID_CONFIG                   */
+    uint16_t measurement_period;     /* measurement period in sec.       */
+    uint8_t  device_model;           /* manufacturer of electric meters  */
+    uint32_t device_address;         /* see address on dislpay ID-20109  */
+    uint32_t tariff_multiplier;
+    uint32_t tariff_devisor;
+    uint8_t  summation_formatting;
+    uint16_t voltage_multiplier;
+    uint16_t voltage_divisor;
+    uint16_t current_multiplier;
+    uint16_t current_divisor;
+    uint16_t crc;
 } dev_config_t;
 
 extern dev_config_t dev_config;
 
-void init_config(u8 print);
+void init_config(uint8_t print);
 void write_config();
 
 

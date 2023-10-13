@@ -19,102 +19,102 @@ typedef enum _command_t {
 } command_t;
 
 typedef struct __attribute__((packed)) _package_header_t {
-    u8  data_len   :5;     /* 0-4 bits - data lenght                               */
-    u8  from_to    :1;     /* 1 request to the device, 0 response from the device  */
-    u8  cpu_power  :1;     /* 1 sufficient computing power, 0 weak computing power */
-    u8  crypted    :1;     /* 1 crypted, 0 non crypted                             */
-    u8  reserved;
-    u16 address_to;
-    u16 address_from;
-    u8  command;
-    u32 password_status;
+    uint8_t  data_len   :5;     /* 0-4 bits - data lenght                               */
+    uint8_t  from_to    :1;     /* 1 request to the device, 0 response from the device  */
+    uint8_t  cpu_power  :1;     /* 1 sufficient computing power, 0 weak computing power */
+    uint8_t  crypted    :1;     /* 1 crypted, 0 non crypted                             */
+    uint8_t  reserved;
+    uint16_t address_to;
+    uint16_t address_from;
+    uint8_t  command;
+    uint32_t password_status;
 } package_header_t;
 
 typedef struct __attribute__((packed)) _response_status_t {
-    u8  role;
-    u8  info1;
-    u8  info2;
-    u8  error;
+    uint8_t  role;
+    uint8_t  info1;
+    uint8_t  info2;
+    uint8_t  error;
 } response_status_t;
 
 typedef struct __attribute__((packed)) _package_t {
-    u8  start;
-    u8  boundary;
+    uint8_t  start;
+    uint8_t  boundary;
     package_header_t header;
-    u8  data[PKT_BUFF_MAX_LEN];
-    u8  pkt_len;
+    uint8_t  data[PKT_BUFF_MAX_LEN];
+    uint8_t  pkt_len;
 } package_t;
 
 typedef struct __attribute__((packed)) _pkt_tariffs_t {
-    u32 sum_tariffs;
-    u8  byte_cfg;
-    u8  division_factor;
-    u8  role;
-    u8  multiplication_factor[3];
-    u32 tariff_1;
-    u32 tariff_2;
-    u32 tariff_3;
-    u32 tariff_4;
+    uint32_t sum_tariffs;
+    uint8_t  byte_cfg;
+    uint8_t  division_factor;
+    uint8_t  role;
+    uint8_t  multiplication_factor[3];
+    uint32_t tariff_1;
+    uint32_t tariff_2;
+    uint32_t tariff_3;
+    uint32_t tariff_4;
 } pkt_tariffs_t;
 
 typedef struct __attribute__((packed)) _pkt_amps_t {
-    u8  phase_num; /* number of phase    */
-    u8  amps[3];   /* maybe 2 or 3 bytes */
+    uint8_t  phase_num; /* number of phase    */
+    uint8_t  amps[3];   /* maybe 2 or 3 bytes */
 } pkt_amps_t;
 
 typedef struct __attribute__((packed)) _pkt_volts_t {
-    u8  phase_num;
-    u16 volts;
+    uint8_t  phase_num;
+    uint16_t volts;
 } pkt_volts_t;
 
 typedef struct __attribute__((packed)) _pkt_power_t {
-    u8  power[3];
-    u8  byte_cfg;
-    u8  division_factor;
+    uint8_t  power[3];
+    uint8_t  byte_cfg;
+    uint8_t  division_factor;
 } pkt_power_t;
 
 typedef struct __attribute__((packed)) _pkt_read_cfg_t {
-    u8  divisor            :2; /* 0 - "00000000", 1 - "0000000.0", 2 - "000000.00", 3 - "00000.000"    */
-    u8  current_tariff     :2; /* 0 - first, 1 - second, 2 - third, 3 - fourth                         */
-    u8  char_num           :2; /* 0 - 6, 1 - 7, 2 - 8, 3 - 8                                           */
-    u8  tariffs            :2; /* 0 - 1, 1 - 1+2, 2 - 1+2+3, 3 - 1+2+3+4                               */
-    u8  summer_winter_time :1; /* automatic switching to daylight saving time or winter time 1 - on    */
-    u8  tariff_schedule    :2; /* 0 - work, 1 - Sat., 2 - Sun., 3 - special                            */
-    u8  power_limits       :1;
-    u8  power_limits_emerg :1;
-    u8  power_limits_cmd   :1;
-    u8  access_cust_info   :1;
-    u8  reserve            :1;
-    u8  display_time;
-    u8  counter_passowrd;
-    u8  months_worked;         /* battery */
-    u8  remaining_months_work; /* battery */
-    u8  role;
+    uint8_t  divisor            :2; /* 0 - "00000000", 1 - "0000000.0", 2 - "000000.00", 3 - "00000.000"    */
+    uint8_t  current_tariff     :2; /* 0 - first, 1 - second, 2 - third, 3 - fourth                         */
+    uint8_t  char_num           :2; /* 0 - 6, 1 - 7, 2 - 8, 3 - 8                                           */
+    uint8_t  tariffs            :2; /* 0 - 1, 1 - 1+2, 2 - 1+2+3, 3 - 1+2+3+4                               */
+    uint8_t  summer_winter_time :1; /* automatic switching to daylight saving time or winter time 1 - on    */
+    uint8_t  tariff_schedule    :2; /* 0 - work, 1 - Sat., 2 - Sun., 3 - special                            */
+    uint8_t  power_limits       :1;
+    uint8_t  power_limits_emerg :1;
+    uint8_t  power_limits_cmd   :1;
+    uint8_t  access_cust_info   :1;
+    uint8_t  reserve            :1;
+    uint8_t  display_time;
+    uint8_t  counter_passowrd;
+    uint8_t  months_worked;         /* battery */
+    uint8_t  remaining_months_work; /* battery */
+    uint8_t  role;
 } pkt_read_cfg_t;
 
 typedef struct __attribute__((packed)) _pkt_resbat_t {
-    u8  lifetime;
-    u8  worktime;
+    uint8_t  lifetime;
+    uint8_t  worktime;
 } pkt_resbat_t;
 
 typedef struct __attribute__((packed)) _pkt_info_t {
-    u8  id;
-    u8  data[24];
-    u8  interface1;
-    u8  interface2;
-    u8  interface3;
-    u8  interface4;
-    u16 battery_mv;
+    uint8_t  id;
+    uint8_t  data[24];
+    uint8_t  interface1;
+    uint8_t  interface2;
+    uint8_t  interface3;
+    uint8_t  interface4;
+    uint16_t battery_mv;
 } pkt_info_t;
 
 typedef struct __attribute__((packed)) _pkt_data31_t {
-    u8  start;
-    u8  boundary;
+    uint8_t  start;
+    uint8_t  boundary;
     package_header_t header;
-    u8  sub_command;
-    u8  data[DATA_MAX_LEN];    /* data31 -> data[30] + sub_command = 31 */
-    u8  crc;
-    u8  stop;
+    uint8_t  sub_command;
+    uint8_t  data[DATA_MAX_LEN];    /* data31 -> data[30] + sub_command = 31 */
+    uint8_t  crc;
+    uint8_t  stop;
 } pkt_data31_t;
 
 

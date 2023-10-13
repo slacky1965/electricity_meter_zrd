@@ -9,18 +9,18 @@
 
 dev_config_t dev_config;
 
-static u16 checksum(const u8 *src_buffer, u8 len) {
+static uint16_t checksum(const uint8_t *src_buffer, uint8_t len) {
 
-    const u16 generator = 0xa010;
+    const uint16_t generator = 0xa010;
 
-    u16 crc = 0xffff;
+    uint16_t crc = 0xffff;
 
     len -= 2;
 
-    for (const u8 *ptr = src_buffer; ptr < src_buffer + len; ptr++) {
+    for (const uint8_t *ptr = src_buffer; ptr < src_buffer + len; ptr++) {
         crc ^= *ptr;
 
-        for (u8 bit = 8; bit > 0; bit--) {
+        for (uint8_t bit = 8; bit > 0; bit--) {
             if (crc & 1)
                 crc = (crc >> 1) ^ generator;
             else
@@ -37,7 +37,7 @@ static void init_default_config() {
     write_config();
 }
 
-void init_config(u8 print) {
+void init_config(uint8_t print) {
 
     nv_sts_t st = NV_SUCC;
 
@@ -49,9 +49,9 @@ void init_config(u8 print) {
 #error "NV_ENABLE must be enable in "stack_cfg.h" file!"
 #endif
 
-    st = nv_flashReadNew(1, NV_MODULE_APP,  NV_ITEM_APP_USER_CFG, sizeof(dev_config_t), (u8*)&dev_config);
+    st = nv_flashReadNew(1, NV_MODULE_APP,  NV_ITEM_APP_USER_CFG, sizeof(dev_config_t), (uint8_t*)&dev_config);
 
-    u16 crc = checksum((u8*)&dev_config, sizeof(dev_config_t));
+    uint16_t crc = checksum((uint8_t*)&dev_config, sizeof(dev_config_t));
 
     if (st != NV_SUCC || dev_config.id != ID_CONFIG || crc != dev_config.crc) {
 #if UART_PRINTF_MODE && DEBUG_CONFIG
@@ -68,8 +68,8 @@ void init_config(u8 print) {
 }
 
 void write_config() {
-    dev_config.crc = checksum((u8*)&(dev_config), sizeof(dev_config_t));
-    nv_flashWriteNew(1, NV_MODULE_APP,  NV_ITEM_APP_USER_CFG, sizeof(dev_config_t), (u8*)&dev_config);
+    dev_config.crc = checksum((uint8_t*)&(dev_config), sizeof(dev_config_t));
+    nv_flashWriteNew(1, NV_MODULE_APP,  NV_ITEM_APP_USER_CFG, sizeof(dev_config_t), (uint8_t*)&dev_config);
 
 #if UART_PRINTF_MODE && DEBUG_CONFIG
     printf("Save config to nv_ram in module NV_MODULE_APP (%d) item NV_ITEM_APP_USER_CFG (%d)\r\n",

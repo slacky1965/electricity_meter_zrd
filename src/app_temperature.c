@@ -10,7 +10,7 @@
 #define DIRECT_WRITE_LOW()  one_wire_gpio_write(0)
 #define DIRECT_READ         one_wire_gpio_read
 
-typedef u8 scratch_pad_t[9];
+typedef uint8_t scratch_pad_t[9];
 
 static void one_wire_mode_output() {
     drv_gpio_output_en(GPIO_TEMP, true);
@@ -20,7 +20,7 @@ static void one_wire_mode_input() {
     drv_gpio_output_en(GPIO_TEMP, false);
 }
 
-static u8 one_wire_gpio_read() {
+static uint8_t one_wire_gpio_read() {
     return drv_gpio_read(GPIO_TEMP);
 }
 
@@ -28,9 +28,9 @@ static void one_wire_gpio_write(bool v) {
     drv_gpio_write(GPIO_TEMP, v);
 }
 
-static u8 ds18b20_reset(void) {
-    u8 r;
-    u8 retries = 125;
+static uint8_t ds18b20_reset(void) {
+    uint8_t r;
+    uint8_t retries = 125;
 
     DIRECT_MODE_INPUT();
     // wait until the wire is high... just in case
@@ -49,9 +49,9 @@ static u8 ds18b20_reset(void) {
     return r;
 }
 
-u8 ds18b20_read_bit(void)
+uint8_t ds18b20_read_bit(void)
 {
-    u8 r;
+    uint8_t r;
 
     DIRECT_MODE_OUTPUT();
     DIRECT_WRITE_LOW();
@@ -63,9 +63,9 @@ u8 ds18b20_read_bit(void)
     return r;
 }
 
-u8 ds18b20_read_byte() {
-    u8 bitMask;
-    u8 r = 0;
+uint8_t ds18b20_read_byte() {
+    uint8_t bitMask;
+    uint8_t r = 0;
 
     for (bitMask = 0x01; bitMask; bitMask <<= 1) {
     if ( ds18b20_read_bit()) r |= bitMask;
@@ -73,7 +73,7 @@ u8 ds18b20_read_byte() {
     return r;
 }
 
-static void ds18b20_write_bit(u8 v)
+static void ds18b20_write_bit(uint8_t v)
 {
 
     if (v & 1) {
@@ -91,8 +91,8 @@ static void ds18b20_write_bit(u8 v)
     }
 }
 
-static void ds18b20_write_byte(u8 v) {
-    u8 bitMask;
+static void ds18b20_write_byte(uint8_t v) {
+    uint8_t bitMask;
 
     for (bitMask = 0x01; bitMask; bitMask <<= 1) {
         ds18b20_write_bit( (bitMask & v)?1:0);
@@ -105,12 +105,12 @@ static void ds18b20_request_temp(void) {
     ds18b20_write_byte(STARTCONVO);
 }
 
-static void ds18b20_read_scratch_pad(u8 *scratch_pad, u8 fields) {
+static void ds18b20_read_scratch_pad(uint8_t *scratch_pad, uint8_t fields) {
     ds18b20_reset();
     ds18b20_write_byte(SKIPROM);
     ds18b20_write_byte(READSCRATCH);
 
-    for(u8 i=0; i < fields; i++) {
+    for(uint8_t i=0; i < fields; i++) {
         scratch_pad[i] = ds18b20_read_byte();
     }
 }
@@ -125,7 +125,7 @@ static float ds18b20_get_temp() {
 
     scratch_pad_t scratch_pad;
     ds18b20_read_scratch_pad(scratch_pad, 2);
-    s16 rawTemperature = (((s16)scratch_pad[TEMP_MSB]) << 8) | scratch_pad[TEMP_LSB];
+    int16_t rawTemperature = (((int16_t)scratch_pad[TEMP_MSB]) << 8) | scratch_pad[TEMP_LSB];
     float temp = 0.0625 * rawTemperature;
     return temp;
 }
@@ -139,15 +139,15 @@ void ds18b20_init() {
     DIRECT_WRITE_HIGH();
 }
 
-s32 getTemperatureCb(void *arg) {
+int32_t getTemperatureCb(void *arg) {
 
-    s16 temperature = ds18b20_get_temp();
+    int16_t temperature = ds18b20_get_temp();
 
 #if UART_PRINTF_MODE && DEBUG_TEMPERATURE
     printf("Temperature: %d\r\n", temperature);
 #endif
 
-    zcl_setAttrVal(APP_ENDPOINT_1, ZCL_CLUSTER_GEN_DEVICE_TEMP_CONFIG, ZCL_ATTRID_DEV_TEMP_CURR_TEMP, (u8*)&temperature);
+    zcl_setAttrVal(APP_ENDPOINT_1, ZCL_CLUSTER_GEN_DEVICE_TEMP_CONFIG, ZCL_ATTRID_DEV_TEMP_CURR_TEMP, (uint8_t*)&temperature);
 
     return 0;
 }
@@ -175,9 +175,9 @@ s32 getTemperatureCb(void *arg) {
 //}
 //
 //
-//s16 adc_temp_result() {
-//    s16 adc_temp_value;
-//    u32 adc_data;
+//int16_t adc_temp_result() {
+//    int16_t adc_temp_value;
+//    uint32_t adc_data;
 //
 //    adc_data = drv_get_adc_data();
 //

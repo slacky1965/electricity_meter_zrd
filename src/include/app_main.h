@@ -9,9 +9,9 @@
 #include "app_utility.h"
 
 typedef struct{
-    u8 keyType; /* CERTIFICATION_KEY or MASTER_KEY key for touch-link or distribute network
+    uint8_t keyType; /* CERTIFICATION_KEY or MASTER_KEY key for touch-link or distribute network
                    SS_UNIQUE_LINK_KEY or SS_GLOBAL_LINK_KEY for distribute network */
-    u8 key[16]; /* the key used */
+    uint8_t key[16]; /* the key used */
 }app_linkKey_info_t;
 
 typedef struct{
@@ -24,12 +24,12 @@ typedef struct{
 
     button_t button;
 
-    u16 ledOnTime;
-    u16 ledOffTime;
-    u8  oriSta;     //original state before blink
-    u8  sta;        //current state in blink
-    u8  times;      //blink times
-    u8  state;
+    uint16_t ledOnTime;
+    uint16_t ledOffTime;
+    uint8_t  oriSta;     //original state before blink
+    uint8_t  sta;        //current state in blink
+    uint8_t  times;      //blink times
+    uint8_t  state;
 
     bool bdbFindBindFlg;
 //    bool lightAttrsChanged;
@@ -42,9 +42,9 @@ extern app_ctx_t g_appCtx;
 extern bdb_commissionSetting_t g_bdbCommissionSetting;
 extern bdb_appCb_t g_zbBdbCb;
 
-extern u8 device_online;
-extern u8 resp_time;
+extern uint8_t device_online;
+extern uint8_t resp_time;
 
-s32 getTimeCb(void *arg);
+int32_t getTimeCb(void *arg);
 
 #endif /* SRC_INCLUDE_APP_MAIN_H_ */

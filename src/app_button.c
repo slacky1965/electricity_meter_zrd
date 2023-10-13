@@ -85,7 +85,7 @@ void button_handler() {
     }
 }
 
-u8 button_idle() {
+uint8_t button_idle() {
     if ((g_appCtx.button.debounce != 1 && g_appCtx.button.debounce != DEBOUNCE_BUTTON)
             || g_appCtx.button.pressed
             || g_appCtx.button.counter) {

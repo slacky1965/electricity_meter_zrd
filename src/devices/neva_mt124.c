@@ -16,32 +16,32 @@
 #define MAX_VBAT_MV 3100                        /* 3100 mV - > battery = 100%         */
 #define MIN_VBAT_MV BATTERY_SAFETY_THRESHOLD    /* 2200 mV - > battery = 0%           */
 
-static u8 package_buff[PKT_BUFF_MAX_LEN];
-static u32 divisor = 1;
-static u16 multiplier = 1;
+static uint8_t package_buff[PKT_BUFF_MAX_LEN];
+static uint32_t divisor = 1;
+static uint16_t multiplier = 1;
 
-static const u8 cmd0[] = {0x2F, 0x3F, 0x21, 0x0D, 0x0A, 0x00};                                                                  /* open channel */
-static const u8 cmd1[] = {ACK, 0x30, 0x35, 0x31, 0x0D, 0x0A, 0x00};                                                             /* changing baudrate */
-static const u8 cmd2[] = {SOH, 0x52, 0x31, STX, 0x30, 0x46, 0x30, 0x38, 0x38, 0x30, 0x46, 0x46, 0x28, 0x53, 0x29, ETX, 0x46, 0x00};   /* tariffs  */
-static const u8 cmd3[] = {SOH, 0x52, 0x31, STX, 0x31, 0x30, 0x30, 0x37, 0x30, 0x30, 0x46, 0x46, 0x28, 0x29, ETX, 0x65, 0x00};   /* power    */
-static const u8 cmd4[] = {SOH, 0x52, 0x31, STX, 0x36, 0x30, 0x30, 0x31, 0x30, 0x30, 0x46, 0x46, 0x28, 0x29, ETX, 0x64, 0x00};   /* serial number */
-static const u8 cmd5[] = {SOH, 0x52, 0x31, STX, 0x36, 0x30, 0x30, 0x35, 0x30, 0x30, 0x46, 0x46, 0x28, 0x29, ETX, 0x60, 0x00};   /* sensors */
+static const uint8_t cmd0[] = {0x2F, 0x3F, 0x21, 0x0D, 0x0A, 0x00};                                                                  /* open channel */
+static const uint8_t cmd1[] = {ACK, 0x30, 0x35, 0x31, 0x0D, 0x0A, 0x00};                                                             /* changing baudrate */
+static const uint8_t cmd2[] = {SOH, 0x52, 0x31, STX, 0x30, 0x46, 0x30, 0x38, 0x38, 0x30, 0x46, 0x46, 0x28, 0x53, 0x29, ETX, 0x46, 0x00};   /* tariffs  */
+static const uint8_t cmd3[] = {SOH, 0x52, 0x31, STX, 0x31, 0x30, 0x30, 0x37, 0x30, 0x30, 0x46, 0x46, 0x28, 0x29, ETX, 0x65, 0x00};   /* power    */
+static const uint8_t cmd4[] = {SOH, 0x52, 0x31, STX, 0x36, 0x30, 0x30, 0x31, 0x30, 0x30, 0x46, 0x46, 0x28, 0x29, ETX, 0x64, 0x00};   /* serial number */
+static const uint8_t cmd5[] = {SOH, 0x52, 0x31, STX, 0x36, 0x30, 0x30, 0x35, 0x30, 0x30, 0x46, 0x46, 0x28, 0x29, ETX, 0x60, 0x00};   /* sensors */
 
-static const u8* command_array[] = {cmd0, cmd1, cmd2, cmd3, cmd4, cmd5};
+static const uint8_t* command_array[] = {cmd0, cmd1, cmd2, cmd3, cmd4, cmd5};
 
-static u8 checksum(const u8 *src_buffer, u8 len) {
-    u8 crc = 0;
+static uint8_t checksum(const uint8_t *src_buffer, uint8_t len) {
+    uint8_t crc = 0;
 
     len--;
 
-    for (u8 i = 1; i < len; i++) {
+    for (uint8_t i = 1; i < len; i++) {
         crc ^= src_buffer[i];
     }
 
     return crc & 0x7f;
 }
 
-static size_t sizeof_str(const u8 *str) {
+static size_t sizeof_str(const uint8_t *str) {
 
     size_t len = 0;
 
@@ -53,9 +53,9 @@ static size_t sizeof_str(const u8 *str) {
     return len;
 }
 
-static u32 str2uint(const u8* str) {
-    u32 num = 0;
-    u8 i = 0;
+static uint32_t str2uint(const uint8_t* str) {
+    uint32_t num = 0;
+    uint8_t i = 0;
     while (str[i] && (str[i] >= '0' && str[i] <= '9')){
         num = num * 10 + (str[i] - '0');
         i++;
@@ -63,11 +63,11 @@ static u32 str2uint(const u8* str) {
     return num;
 }
 
-static u32 number_from_brackets(u8 **p_str) {
+static uint32_t number_from_brackets(uint8_t **p_str) {
 
-    u32 value = 0;
-    u8 *remainder, *integer;
-    u8 *init_bracket, *end_bracket, *point;
+    uint32_t value = 0;
+    uint8_t *remainder, *integer;
+    uint8_t *init_bracket, *end_bracket, *point;
 
     init_bracket = *p_str;
 
@@ -99,7 +99,7 @@ static u32 number_from_brackets(u8 **p_str) {
                 }
                 remainder[rmndr_len] = 0;
                 if (rmndr_len != 0) {
-                    for (u8 i = 0; i < rmndr_len; i++) {
+                    for (uint8_t i = 0; i < rmndr_len; i++) {
                         value *= 10;
                         divisor *= 10;
                     }
@@ -120,11 +120,11 @@ static u32 number_from_brackets(u8 **p_str) {
 
 }
 
-static u32 number_from_tariffs(u8 **p_str) {
+static uint32_t number_from_tariffs(uint8_t **p_str) {
 
-    u32 value = 0;
-    u8 *remainder, *integer;
-    u8 *init_bracket, *end_bracket, *point;
+    uint32_t value = 0;
+    uint8_t *remainder, *integer;
+    uint8_t *init_bracket, *end_bracket, *point;
 
     init_bracket = *p_str;
 
@@ -152,7 +152,7 @@ static u32 number_from_tariffs(u8 **p_str) {
             }
             remainder[rmndr_len] = 0;
             if (rmndr_len != 0) {
-                for (u8 i = 0; i < rmndr_len; i++) {
+                for (uint8_t i = 0; i < rmndr_len; i++) {
                     value *= 10;
                     divisor *= 10;
                 }
@@ -176,9 +176,9 @@ static u32 number_from_tariffs(u8 **p_str) {
 
 }
 
-static u8 *str_from_brackets(u8 *p_str) {
+static uint8_t *str_from_brackets(uint8_t *p_str) {
 
-    u8 *init_bracket = p_str, *end_bracket, *str = NULL;
+    uint8_t *init_bracket = p_str, *end_bracket, *str = NULL;
 
     while (*init_bracket != '(' && *init_bracket != 0) {
         init_bracket++;
@@ -198,7 +198,7 @@ static u8 *str_from_brackets(u8 *p_str) {
     return str;
 }
 
-static u8 check_even_parity(u8 ch) {
+static uint8_t check_even_parity(uint8_t ch) {
 
          ch ^= ch >> 4;
          ch ^= ch >> 2;
@@ -210,13 +210,13 @@ static u8 check_even_parity(u8 ch) {
 static size_t send_command(command_t command) {
 
     size_t len, size = sizeof_str(command_array[command]);
-    u8 ch;
+    uint8_t ch;
 
 //    app_uart_rx_off();
     flush_buff_uart();
 
 
-    for(u8 i = 0; i < size; i++) {
+    for(uint8_t i = 0; i < size; i++) {
         ch = command_array[command][i];
         if (check_even_parity(ch)) {
             ch |= 0x80;
@@ -225,7 +225,7 @@ static size_t send_command(command_t command) {
     }
 
     /* three attempts to write to uart */
-    for (u8 attempt = 0; attempt < 3; attempt++) {
+    for (uint8_t attempt = 0; attempt < 3; attempt++) {
         len = write_bytes_to_uart(package_buff, size);
         if (len == size) {
             break;
@@ -244,10 +244,10 @@ static size_t send_command(command_t command) {
 
 #if UART_PRINTF_MODE && DEBUG_PACKAGE
     if (len == 0) {
-        u8 head[] = "write to uart error";
+        uint8_t head[] = "write to uart error";
         print_package(head, package_buff, size);
     } else {
-        u8 head[] = "write to uart";
+        uint8_t head[] = "write to uart";
         print_package(head, package_buff, len);
     }
 #endif
@@ -261,7 +261,7 @@ static pkt_error_t response_meter(command_t command) {
     pkt_error_no = PKT_ERR_TIMEOUT;
 
     /* trying to read for 1 seconds */
-    for(u8 i = 0; i < 100; i++ ) {
+    for(uint8_t i = 0; i < 100; i++ ) {
         load_size = 0;
         if (available_buff_uart()) {
             while (available_buff_uart() && load_size < PKT_BUFF_MAX_LEN) {
@@ -279,9 +279,9 @@ static pkt_error_t response_meter(command_t command) {
 
     if (load_size) {
 #if UART_PRINTF_MODE && DEBUG_PACKAGE
-        u8 head[] = "read from uart";
+        uint8_t head[] = "read from uart";
         print_package(head, package_buff, load_size);
-        for (u16 i = 0; i < load_size; i++) {
+        for (uint16_t i = 0; i < load_size; i++) {
             printf("%c", package_buff[i]);
         }
         printf("\r\n");
@@ -294,7 +294,7 @@ static pkt_error_t response_meter(command_t command) {
                 pkt_error_no = PKT_ERR_RESPONSE;
             }
         } else {
-            u8 crc = checksum(package_buff, load_size);
+            uint8_t crc = checksum(package_buff, load_size);
             if (crc == package_buff[load_size-1]) {
                 if (command == cmd_ack_start) {
                     if (package_buff[0] == SOH) {
@@ -320,7 +320,7 @@ static pkt_error_t response_meter(command_t command) {
 
         }
         if (command != cmd_open_channel) {
-            u8 crc = checksum(package_buff, load_size);
+            uint8_t crc = checksum(package_buff, load_size);
             if (crc == package_buff[load_size-1]) {
                 pkt_error_no = PKT_OK;
             } else {
@@ -329,7 +329,7 @@ static pkt_error_t response_meter(command_t command) {
         }
     } else {
 #if UART_PRINTF_MODE && DEBUG_PACKAGE
-        u8 head[] = "read from uart error";
+        uint8_t head[] = "read from uart error";
         print_package(head, package_buff, load_size);
 #endif
     }
@@ -343,7 +343,7 @@ static pkt_error_t response_meter(command_t command) {
 
 
 
-static u8 open_session() {
+static uint8_t open_session() {
 
 #if UART_PRINTF_MODE && (DEBUG_DEVICE_DATA || DEBUG_PACKAGE)
     printf("\r\nCommand open of channel\r\n");
@@ -358,7 +358,7 @@ static u8 open_session() {
     return false;
 }
 
-static u8 ack_start() {
+static uint8_t ack_start() {
 
 #if UART_PRINTF_MODE && (DEBUG_DEVICE_DATA || DEBUG_PACKAGE)
     printf("\r\nCommand start confirmation\r\n");
@@ -375,7 +375,7 @@ static u8 ack_start() {
     return false;
 }
 
-static u8 get_sensors_data() {
+static uint8_t get_sensors_data() {
 
 #if UART_PRINTF_MODE && (DEBUG_DEVICE_DATA || DEBUG_PACKAGE)
     printf("\r\nCommand get sensors\r\n");
@@ -396,30 +396,30 @@ static void get_tariffs_data() {
     printf("\r\nCommand get tariffs\r\n");
 #endif
 
-//    u8 buff[] = "0F0880FF([231006:232957]01242.39,00401.98,01234.99,05678.88)";
+//    uint8_t buff[] = "0F0880FF([231006:232957]01242.39,00401.98,01234.99,05678.88)";
 
     if (send_command(cmd_tariffs_data)) {
         if (response_meter(cmd_tariffs_data) == PKT_OK) {
-            u8 *p_str = package_buff;
-//            u8 *p_str = buff;
+            uint8_t *p_str = package_buff;
+//            uint8_t *p_str = buff;
 
             while(*p_str != ']' && *p_str != 0) {
                 p_str++;
             }
             if (*(p_str++) == ']') {
-                u64 tariff = number_from_tariffs(&p_str) & 0xffffffffffff;
-                u64 last_tariff;
+                uint64_t tariff = number_from_tariffs(&p_str) & 0xffffffffffff;
+                uint64_t last_tariff;
 
                 if (p_str) {
-                    u32 energy_divisor = divisor;
+                    uint32_t energy_divisor = divisor;
 
-                    zcl_setAttrVal(APP_ENDPOINT_1, ZCL_CLUSTER_SE_METERING, ZCL_ATTRID_DIVISOR, (u8*)&energy_divisor);
+                    zcl_setAttrVal(APP_ENDPOINT_1, ZCL_CLUSTER_SE_METERING, ZCL_ATTRID_DIVISOR, (uint8_t*)&energy_divisor);
 
-                    zcl_getAttrVal(APP_ENDPOINT_1, ZCL_CLUSTER_SE_METERING, ZCL_ATTRID_CURRENT_TIER_1_SUMMATION_DELIVERD, &attr_len, (u8*)&attr_data);
+                    zcl_getAttrVal(APP_ENDPOINT_1, ZCL_CLUSTER_SE_METERING, ZCL_ATTRID_CURRENT_TIER_1_SUMMATION_DELIVERD, &attr_len, (uint8_t*)&attr_data);
                     last_tariff = fromPtoInteger(attr_len, attr_data);
 
                     if (tariff > last_tariff) {
-                        zcl_setAttrVal(APP_ENDPOINT_1, ZCL_CLUSTER_SE_METERING, ZCL_ATTRID_CURRENT_TIER_1_SUMMATION_DELIVERD, (u8*)&tariff);
+                        zcl_setAttrVal(APP_ENDPOINT_1, ZCL_CLUSTER_SE_METERING, ZCL_ATTRID_CURRENT_TIER_1_SUMMATION_DELIVERD, (uint8_t*)&tariff);
                     }
 #if UART_PRINTF_MODE && DEBUG_DEVICE_DATA
                     printf("tariff1: %d\r\n", tariff);
@@ -427,11 +427,11 @@ static void get_tariffs_data() {
 
                     tariff = number_from_tariffs(&p_str) & 0xffffffffffff;
                     if (p_str) {
-                        zcl_getAttrVal(APP_ENDPOINT_1, ZCL_CLUSTER_SE_METERING, ZCL_ATTRID_CURRENT_TIER_2_SUMMATION_DELIVERD, &attr_len, (u8*)&attr_data);
+                        zcl_getAttrVal(APP_ENDPOINT_1, ZCL_CLUSTER_SE_METERING, ZCL_ATTRID_CURRENT_TIER_2_SUMMATION_DELIVERD, &attr_len, (uint8_t*)&attr_data);
                         last_tariff = fromPtoInteger(attr_len, attr_data);
 
                         if (tariff > last_tariff) {
-                            zcl_setAttrVal(APP_ENDPOINT_1, ZCL_CLUSTER_SE_METERING, ZCL_ATTRID_CURRENT_TIER_2_SUMMATION_DELIVERD, (u8*)&tariff);
+                            zcl_setAttrVal(APP_ENDPOINT_1, ZCL_CLUSTER_SE_METERING, ZCL_ATTRID_CURRENT_TIER_2_SUMMATION_DELIVERD, (uint8_t*)&tariff);
                         }
 
 #if UART_PRINTF_MODE && DEBUG_DEVICE_DATA
@@ -439,22 +439,22 @@ static void get_tariffs_data() {
 #endif
                         tariff = number_from_tariffs(&p_str) & 0xffffffffffff;
                         if (p_str) {
-                            zcl_getAttrVal(APP_ENDPOINT_1, ZCL_CLUSTER_SE_METERING, ZCL_ATTRID_CURRENT_TIER_3_SUMMATION_DELIVERD, &attr_len, (u8*)&attr_data);
+                            zcl_getAttrVal(APP_ENDPOINT_1, ZCL_CLUSTER_SE_METERING, ZCL_ATTRID_CURRENT_TIER_3_SUMMATION_DELIVERD, &attr_len, (uint8_t*)&attr_data);
                             last_tariff = fromPtoInteger(attr_len, attr_data);
 
                             if (tariff > last_tariff) {
-                                zcl_setAttrVal(APP_ENDPOINT_1, ZCL_CLUSTER_SE_METERING, ZCL_ATTRID_CURRENT_TIER_3_SUMMATION_DELIVERD, (u8*)&tariff);
+                                zcl_setAttrVal(APP_ENDPOINT_1, ZCL_CLUSTER_SE_METERING, ZCL_ATTRID_CURRENT_TIER_3_SUMMATION_DELIVERD, (uint8_t*)&tariff);
                             }
 #if UART_PRINTF_MODE && DEBUG_DEVICE_DATA
                             printf("tariff3: %d\r\n", tariff);
 #endif
                             tariff = number_from_tariffs(&p_str) & 0xffffffffffff;
                             if (p_str) {
-                                zcl_getAttrVal(APP_ENDPOINT_1, ZCL_CLUSTER_SE_METERING, ZCL_ATTRID_CURRENT_TIER_4_SUMMATION_DELIVERD, &attr_len, (u8*)&attr_data);
+                                zcl_getAttrVal(APP_ENDPOINT_1, ZCL_CLUSTER_SE_METERING, ZCL_ATTRID_CURRENT_TIER_4_SUMMATION_DELIVERD, &attr_len, (uint8_t*)&attr_data);
                                 last_tariff = fromPtoInteger(attr_len, attr_data);
 
                                 if (tariff > last_tariff) {
-                                    zcl_setAttrVal(APP_ENDPOINT_1, ZCL_CLUSTER_SE_METERING, ZCL_ATTRID_CURRENT_TIER_4_SUMMATION_DELIVERD, (u8*)&tariff);
+                                    zcl_setAttrVal(APP_ENDPOINT_1, ZCL_CLUSTER_SE_METERING, ZCL_ATTRID_CURRENT_TIER_4_SUMMATION_DELIVERD, (uint8_t*)&tariff);
                                 }
 #if UART_PRINTF_MODE && DEBUG_DEVICE_DATA
                                 printf("tariff4: %d\r\n", tariff);
@@ -474,14 +474,14 @@ static void get_power_data() {
     printf("\r\nCommand get power\r\n");
 #endif
 
-//    u8 buff[] = "100700FF(00025.45)";
+//    uint8_t buff[] = "100700FF(00025.45)";
 
     if (send_command(cmd_power_data)) {
         if (response_meter(cmd_power_data) == PKT_OK) {
-            u8 *p_str = package_buff;
-//            u8 *p_str = buff;
+            uint8_t *p_str = package_buff;
+//            uint8_t *p_str = buff;
 
-            u32 power = number_from_brackets(&p_str);
+            uint32_t power = number_from_brackets(&p_str);
             if (p_str) {
 
 
@@ -501,17 +501,17 @@ static void get_power_data() {
 
 //                printf("power: %d, multiplier: %d, divisor: %d\r\n", power, multiplier, divisor);
 
-                u16 pwr = power & 0xffff;
-                u16 power_divisor = divisor & 0xffff;
+                uint16_t pwr = power & 0xffff;
+                uint16_t power_divisor = divisor & 0xffff;
 
-                zcl_setAttrVal(APP_ENDPOINT_1, ZCL_CLUSTER_MS_ELECTRICAL_MEASUREMENT, ZCL_ATTRID_AC_POWER_DIVISOR, (u8*)&power_divisor);
-                zcl_setAttrVal(APP_ENDPOINT_1, ZCL_CLUSTER_MS_ELECTRICAL_MEASUREMENT, ZCL_ATTRID_AC_POWER_MULTIPLIER, (u8*)&multiplier);
+                zcl_setAttrVal(APP_ENDPOINT_1, ZCL_CLUSTER_MS_ELECTRICAL_MEASUREMENT, ZCL_ATTRID_AC_POWER_DIVISOR, (uint8_t*)&power_divisor);
+                zcl_setAttrVal(APP_ENDPOINT_1, ZCL_CLUSTER_MS_ELECTRICAL_MEASUREMENT, ZCL_ATTRID_AC_POWER_MULTIPLIER, (uint8_t*)&multiplier);
 
-                zcl_getAttrVal(APP_ENDPOINT_1, ZCL_CLUSTER_MS_ELECTRICAL_MEASUREMENT, ZCL_ATTRID_APPARENT_POWER, &attr_len, (u8*)&attr_data);
-                u16 last_pwr = fromPtoInteger(attr_len, attr_data);
+                zcl_getAttrVal(APP_ENDPOINT_1, ZCL_CLUSTER_MS_ELECTRICAL_MEASUREMENT, ZCL_ATTRID_APPARENT_POWER, &attr_len, (uint8_t*)&attr_data);
+                uint16_t last_pwr = fromPtoInteger(attr_len, attr_data);
 
                 if (pwr != last_pwr) {
-                    zcl_setAttrVal(APP_ENDPOINT_1, ZCL_CLUSTER_MS_ELECTRICAL_MEASUREMENT, ZCL_ATTRID_APPARENT_POWER, (u8*)&pwr);
+                    zcl_setAttrVal(APP_ENDPOINT_1, ZCL_CLUSTER_MS_ELECTRICAL_MEASUREMENT, ZCL_ATTRID_APPARENT_POWER, (uint8_t*)&pwr);
                 }
 
 #if UART_PRINTF_MODE && DEBUG_DEVICE_DATA
@@ -524,7 +524,7 @@ static void get_power_data() {
 
 static void get_serial_number_data() {
 
-    u8 *sn, *p_str;
+    uint8_t *sn, *p_str;
 
 #if UART_PRINTF_MODE && (DEBUG_DEVICE_DATA || DEBUG_PACKAGE)
     printf("\r\nCommand get serial number\r\n");
@@ -535,9 +535,9 @@ static void get_serial_number_data() {
             p_str = package_buff;
             sn = str_from_brackets(p_str);
             if (sn) {
-                u8 serial_number[SE_ATTR_SN_SIZE] = {0};
+                uint8_t serial_number[SE_ATTR_SN_SIZE] = {0};
                 if (set_zcl_str(sn, serial_number, SE_ATTR_SN_SIZE)) {
-                    zcl_setAttrVal(APP_ENDPOINT_1, ZCL_CLUSTER_SE_METERING, ZCL_ATTRID_METER_SERIAL_NUMBER, (u8*)&serial_number);
+                    zcl_setAttrVal(APP_ENDPOINT_1, ZCL_CLUSTER_SE_METERING, ZCL_ATTRID_METER_SERIAL_NUMBER, (uint8_t*)&serial_number);
 #if UART_PRINTF_MODE && DEBUG_DEVICE_DATA
                     printf("Serial Number: %s, len: %d\r\n", serial_number+1, *serial_number);
 #endif
@@ -550,15 +550,15 @@ static void get_serial_number_data() {
 
 
 static void get_date_release_data() {
-    u8 dr[] = "Not supported";
-    u8 date_release[DATA_MAX_LEN+2] = {0};
+    uint8_t dr[] = "Not supported";
+    uint8_t date_release[DATA_MAX_LEN+2] = {0};
 
 #if UART_PRINTF_MODE && (DEBUG_DEVICE_DATA || DEBUG_PACKAGE)
     printf("\r\nCommand get date release\r\n");
 #endif
 
     if (set_zcl_str(dr, date_release, DATA_MAX_LEN+1)) {
-        zcl_setAttrVal(APP_ENDPOINT_1, ZCL_CLUSTER_SE_METERING, ZCL_ATTRID_CUSTOM_DATE_RELEASE, (u8*)&date_release);
+        zcl_setAttrVal(APP_ENDPOINT_1, ZCL_CLUSTER_SE_METERING, ZCL_ATTRID_CUSTOM_DATE_RELEASE, (uint8_t*)&date_release);
 #if UART_PRINTF_MODE && DEBUG_DEVICE_DATA
         printf("Date of release: %s, len: %d\r\n", date_release+1, *date_release);
 #endif
@@ -571,11 +571,11 @@ static void get_resbat_data() {
     printf("\r\nCommand get resource of battery\r\n");
 #endif
 
-    u16 battery_mv = 0;
+    uint16_t battery_mv = 0;
 
     if (send_command(cmd_sensors_data)) {
         if (response_meter(cmd_sensors_data) == PKT_OK) {
-            u8 *p_str = package_buff;
+            uint8_t *p_str = package_buff;
 
             while (*p_str != '(' && *p_str != 0) {
                 p_str++;
@@ -588,13 +588,13 @@ static void get_resbat_data() {
                     battery_mv = str2uint(p_str++) * 1000;
                     battery_mv += str2uint(++p_str) * 10;
                     if (battery_mv < MIN_VBAT_MV) battery_mv = MIN_VBAT_MV;
-                    u8 battery_level = (battery_mv - MIN_VBAT_MV) / ((MAX_VBAT_MV - MIN_VBAT_MV) / 100);
+                    uint8_t battery_level = (battery_mv - MIN_VBAT_MV) / ((MAX_VBAT_MV - MIN_VBAT_MV) / 100);
                     if (battery_level > 100) battery_level = 100;
-                    zcl_getAttrVal(APP_ENDPOINT_1, ZCL_CLUSTER_SE_METERING, ZCL_ATTRID_REMAINING_BATTERY_LIFE, &attr_len, (u8*)&attr_data);
-                    u8 last_bl = fromPtoInteger(attr_len, attr_data);
+                    zcl_getAttrVal(APP_ENDPOINT_1, ZCL_CLUSTER_SE_METERING, ZCL_ATTRID_REMAINING_BATTERY_LIFE, &attr_len, (uint8_t*)&attr_data);
+                    uint8_t last_bl = fromPtoInteger(attr_len, attr_data);
 
                     if (battery_level != last_bl) {
-                        zcl_setAttrVal(APP_ENDPOINT_1, ZCL_CLUSTER_SE_METERING, ZCL_ATTRID_REMAINING_BATTERY_LIFE, (u8*)&battery_level);
+                        zcl_setAttrVal(APP_ENDPOINT_1, ZCL_CLUSTER_SE_METERING, ZCL_ATTRID_REMAINING_BATTERY_LIFE, (uint8_t*)&battery_level);
                     }
 
 #if UART_PRINTF_MODE && DEBUG_DEVICE_DATA
@@ -622,11 +622,11 @@ static void get_data() {
 }
 
 
-u8 measure_meter_neva_mt124() {
+uint8_t measure_meter_neva_mt124() {
 
     app_uart_init(300);
 
-    u8 ret = open_session();
+    uint8_t ret = open_session();
 
     if (ret) {
         ret = ack_start();

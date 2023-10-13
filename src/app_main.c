@@ -9,10 +9,11 @@
 #include "app_reporting.h"
 #include "app_uart.h"
 #include "se_custom_attr.h"
+//#include "nartis_100.h"
 
 app_ctx_t g_appCtx;
-u8 device_online = false;
-u8 resp_time = false;
+uint8_t device_online = false;
+uint8_t resp_time = false;
 
 #ifdef ZCL_OTA
 extern ota_callBack_t app_otaCb;
@@ -45,13 +46,13 @@ const zdo_appIndCb_t appCbLst = {
  */
 bdb_commissionSetting_t g_bdbCommissionSetting = {
     .linkKey.tcLinkKey.keyType = SS_GLOBAL_LINK_KEY,
-    .linkKey.tcLinkKey.key = (u8 *)tcLinkKeyCentralDefault,             //can use unique link key stored in NV
+    .linkKey.tcLinkKey.key = (uint8_t *)tcLinkKeyCentralDefault,             //can use unique link key stored in NV
 
     .linkKey.distributeLinkKey.keyType = MASTER_KEY,
-    .linkKey.distributeLinkKey.key = (u8 *)linkKeyDistributedMaster,    //use linkKeyDistributedCertification before testing
+    .linkKey.distributeLinkKey.key = (uint8_t *)linkKeyDistributedMaster,    //use linkKeyDistributedCertification before testing
 
     .linkKey.touchLinkKey.keyType = MASTER_KEY,
-    .linkKey.touchLinkKey.key = (u8 *)touchLinkKeyMaster,               //use touchLinkKeyCertification before testing
+    .linkKey.touchLinkKey.key = (uint8_t *)touchLinkKeyMaster,               //use touchLinkKeyCertification before testing
 
 #if TOUCHLINK_SUPPORT
     .touchlinkEnable = 1,                                               /* enable touch-link */
@@ -143,6 +144,8 @@ void user_app_init(void)
 
     /* set device model */
     set_device_model(dev_config.device_model);
+
+//    nartis_init();
 }
 
 void app_task(void) {
@@ -211,59 +214,59 @@ void user_init(bool isRetention)
     }
 
     /* Set default reporting configuration */
-    u8 reportableChange = 0x00;
+    uint8_t reportableChange = 0x00;
 
     /* Device temperature */
     bdb_defaultReportingCfg(APP_ENDPOINT_1, HA_PROFILE_ID, ZCL_CLUSTER_GEN_DEVICE_TEMP_CONFIG, ZCL_ATTRID_DEV_TEMP_CURR_TEMP,
-            0, 30, (u8 *)&reportableChange);
+            0, 30, (uint8_t *)&reportableChange);
 
     /* 4 tariffs and divisor, multiplier, battery life */
     bdb_defaultReportingCfg(APP_ENDPOINT_1, HA_PROFILE_ID, ZCL_CLUSTER_SE_METERING, ZCL_ATTRID_CURRENT_TIER_1_SUMMATION_DELIVERD,
-            0, 60, (u8 *)&reportableChange);
+            0, 60, (uint8_t *)&reportableChange);
     bdb_defaultReportingCfg(APP_ENDPOINT_1, HA_PROFILE_ID, ZCL_CLUSTER_SE_METERING, ZCL_ATTRID_CURRENT_TIER_2_SUMMATION_DELIVERD,
-            0, 60, (u8 *)&reportableChange);
+            0, 60, (uint8_t *)&reportableChange);
     bdb_defaultReportingCfg(APP_ENDPOINT_1, HA_PROFILE_ID, ZCL_CLUSTER_SE_METERING, ZCL_ATTRID_CURRENT_TIER_3_SUMMATION_DELIVERD,
-            0, 60, (u8 *)&reportableChange);
+            0, 60, (uint8_t *)&reportableChange);
     bdb_defaultReportingCfg(APP_ENDPOINT_1, HA_PROFILE_ID, ZCL_CLUSTER_SE_METERING, ZCL_ATTRID_CURRENT_TIER_4_SUMMATION_DELIVERD,
-            0, 60, (u8 *)&reportableChange);
+            0, 60, (uint8_t *)&reportableChange);
     bdb_defaultReportingCfg(APP_ENDPOINT_1, HA_PROFILE_ID, ZCL_CLUSTER_SE_METERING, ZCL_ATTRID_MULTIPLIER,
-            0, 60, (u8 *)&reportableChange);
+            0, 60, (uint8_t *)&reportableChange);
     bdb_defaultReportingCfg(APP_ENDPOINT_1, HA_PROFILE_ID, ZCL_CLUSTER_SE_METERING, ZCL_ATTRID_DIVISOR,
-            0, 60, (u8 *)&reportableChange);
+            0, 60, (uint8_t *)&reportableChange);
     bdb_defaultReportingCfg(APP_ENDPOINT_1, HA_PROFILE_ID, ZCL_CLUSTER_SE_METERING, ZCL_ATTRID_REMAINING_BATTERY_LIFE,
-            300, 900, (u8 *)&reportableChange);
+            300, 900, (uint8_t *)&reportableChange);
 
     /* Serial Number, Data Release and Model Name */
     bdb_defaultReportingCfg(APP_ENDPOINT_1, HA_PROFILE_ID, ZCL_CLUSTER_SE_METERING, ZCL_ATTRID_METER_SERIAL_NUMBER,
-            0, 300, (u8 *)&reportableChange);
+            0, 300, (uint8_t *)&reportableChange);
     bdb_defaultReportingCfg(APP_ENDPOINT_1, HA_PROFILE_ID, ZCL_CLUSTER_SE_METERING, ZCL_ATTRID_CUSTOM_DATE_RELEASE,
-            0, 300, (u8 *)&reportableChange);
+            0, 300, (uint8_t *)&reportableChange);
     bdb_defaultReportingCfg(APP_ENDPOINT_1, HA_PROFILE_ID, ZCL_CLUSTER_SE_METERING, ZCL_ATTRID_CUSTOM_DEVICE_MODEL,
-            0, 300, (u8 *)&reportableChange);
+            0, 300, (uint8_t *)&reportableChange);
 
     /* Voltage and divisor, multiplier */
     bdb_defaultReportingCfg(APP_ENDPOINT_1, HA_PROFILE_ID, ZCL_CLUSTER_MS_ELECTRICAL_MEASUREMENT, ZCL_ATTRID_RMS_VOLTAGE,
-            0, 60, (u8 *)&reportableChange);
+            0, 60, (uint8_t *)&reportableChange);
     bdb_defaultReportingCfg(APP_ENDPOINT_1, HA_PROFILE_ID, ZCL_CLUSTER_MS_ELECTRICAL_MEASUREMENT, ZCL_ATTRID_AC_VOLTAGE_MULTIPLIER,
-            0, 60, (u8 *)&reportableChange);
+            0, 60, (uint8_t *)&reportableChange);
     bdb_defaultReportingCfg(APP_ENDPOINT_1, HA_PROFILE_ID, ZCL_CLUSTER_MS_ELECTRICAL_MEASUREMENT, ZCL_ATTRID_AC_VOLTAGE_DIVISOR,
-            0, 60, (u8 *)&reportableChange);
+            0, 60, (uint8_t *)&reportableChange);
 
     /* Current and divisor, multiplier */
     bdb_defaultReportingCfg(APP_ENDPOINT_1, HA_PROFILE_ID, ZCL_CLUSTER_MS_ELECTRICAL_MEASUREMENT, ZCL_ATTRID_LINE_CURRENT,
-            0, 60, (u8 *)&reportableChange);
+            0, 60, (uint8_t *)&reportableChange);
     bdb_defaultReportingCfg(APP_ENDPOINT_1, HA_PROFILE_ID, ZCL_CLUSTER_MS_ELECTRICAL_MEASUREMENT, ZCL_ATTRID_AC_CURRENT_MULTIPLIER,
-            0, 60, (u8 *)&reportableChange);
+            0, 60, (uint8_t *)&reportableChange);
     bdb_defaultReportingCfg(APP_ENDPOINT_1, HA_PROFILE_ID, ZCL_CLUSTER_MS_ELECTRICAL_MEASUREMENT, ZCL_ATTRID_AC_CURRENT_DIVISOR,
-            0, 60, (u8 *)&reportableChange);
+            0, 60, (uint8_t *)&reportableChange);
 
     /* Power and divisor, multiplier */
     bdb_defaultReportingCfg(APP_ENDPOINT_1, HA_PROFILE_ID, ZCL_CLUSTER_MS_ELECTRICAL_MEASUREMENT, ZCL_ATTRID_APPARENT_POWER,
-            0, 60, (u8 *)&reportableChange);
+            0, 60, (uint8_t *)&reportableChange);
     bdb_defaultReportingCfg(APP_ENDPOINT_1, HA_PROFILE_ID, ZCL_CLUSTER_MS_ELECTRICAL_MEASUREMENT, ZCL_ATTRID_AC_POWER_MULTIPLIER,
-            0, 60, (u8 *)&reportableChange);
+            0, 60, (uint8_t *)&reportableChange);
     bdb_defaultReportingCfg(APP_ENDPOINT_1, HA_PROFILE_ID, ZCL_CLUSTER_MS_ELECTRICAL_MEASUREMENT, ZCL_ATTRID_AC_POWER_DIVISOR,
-            0, 60, (u8 *)&reportableChange);
+            0, 60, (uint8_t *)&reportableChange);
 
     /* custom reporting application (non SDK) */
     app_reporting_init();

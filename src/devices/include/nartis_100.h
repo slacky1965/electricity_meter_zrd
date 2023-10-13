@@ -1,0 +1,6 @@
+#ifndef SRC_DEVICES_INCLUDE_NARTIS_100_H_
+#define SRC_DEVICES_INCLUDE_NARTIS_100_H_
+
+void nartis_init();
+
+#endif /* SRC_DEVICES_INCLUDE_NARTIS_100_H_ */

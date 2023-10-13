@@ -11,18 +11,18 @@
  *  @brief Defined for basic cluster attributes
  */
 typedef struct {
-    u8  zclVersion;
-    u8  appVersion;
-    u8  stackVersion;
-    u8  hwVersion;
-    u8  manuName[ZCL_BASIC_MAX_LENGTH];
-    u8  modelId[ZCL_BASIC_MAX_LENGTH];
-    u8  dateCode[ZCL_BASIC_MAX_LENGTH];
-    u8  powerSource;
-    u8  genDevClass;                        //attr 8
-    u8  genDevType;                         //attr 9
-    u8  deviceEnable;
-    u8  swBuildId[ZCL_BASIC_MAX_LENGTH];    //attr 4000
+    uint8_t  zclVersion;
+    uint8_t  appVersion;
+    uint8_t  stackVersion;
+    uint8_t  hwVersion;
+    uint8_t  manuName[ZCL_BASIC_MAX_LENGTH];
+    uint8_t  modelId[ZCL_BASIC_MAX_LENGTH];
+    uint8_t  dateCode[ZCL_BASIC_MAX_LENGTH];
+    uint8_t  powerSource;
+    uint8_t  genDevClass;                        //attr 8
+    uint8_t  genDevType;                         //attr 9
+    uint8_t  deviceEnable;
+    uint8_t  swBuildId[ZCL_BASIC_MAX_LENGTH];    //attr 4000
 } zcl_basicAttr_t;
 
 
@@ -30,63 +30,63 @@ typedef struct {
  *  @brief Defined for identify cluster attributes
  */
 typedef struct{
-    u16 identifyTime;
+    uint16_t identifyTime;
 }zcl_identifyAttr_t;
 
 typedef struct {
-    u32 time_utc;
+    uint32_t time_utc;
 } zcl_timeAttr_t;
 
 typedef struct {
-    u64 tariff_1;
-    u64 tariff_2;
-    u64 tariff_3;
-    u64 tariff_4;
-    u8  unit_of_measure;        // 0x00 - kWh
-    u32 multiplier;
-    u32 divisor;
-    u8  summation_formatting;   // Bits 0 to 2: Number of Digits to the right of the Decimal Point
+    uint64_t tariff_1;
+    uint64_t tariff_2;
+    uint64_t tariff_3;
+    uint64_t tariff_4;
+    uint8_t  unit_of_measure;        // 0x00 - kWh
+    uint32_t multiplier;
+    uint32_t divisor;
+    uint8_t  summation_formatting;   // Bits 0 to 2: Number of Digits to the right of the Decimal Point
                                 // Bits 3 to 6: Number of Digits to the left of the Decimal Point
                                 // Bit  7:      If set, suppress leading zeros
-    u8  battery_percentage;
-    u8  serial_number[1+24];
-    u8  date_release[1+DATA_MAX_LEN];
-    u8  device_type;
-    u8  device_model;
-    u32 device_address;
-    u8  device_name[1+DEVICE_NAME_LEN];
-    u8  measurement_period;
-    u32 current;
-    u32 current_multiplier;
-    u32 current_divisor;
-    u32 voltage;
-    u32 voltage_multiplier;
-    u32 voltage_divisor;
-    u32 power;
-    u32 power_multiplier;
-    u32 power_divisor;
+    uint8_t  battery_percentage;
+    uint8_t  serial_number[1+24];
+    uint8_t  date_release[1+DATA_MAX_LEN];
+    uint8_t  device_type;
+    uint8_t  device_model;
+    uint32_t device_address;
+    uint8_t  device_name[1+DEVICE_NAME_LEN];
+    uint8_t  measurement_period;
+    uint32_t current;
+    uint32_t current_multiplier;
+    uint32_t current_divisor;
+    uint32_t voltage;
+    uint32_t voltage_multiplier;
+    uint32_t voltage_divisor;
+    uint32_t power;
+    uint32_t power_multiplier;
+    uint32_t power_divisor;
 } zcl_seAttr_t;
 
 typedef struct {
-    u32 type;
-    u16 current;
-    u16 current_multiplier;
-    u16 current_divisor;
-    u16 voltage;
-    u16 voltage_multiplier;
-    u16 voltage_divisor;
-    u16 power;
-    u16 power_multiplier;
-    u16 power_divisor;
+    uint32_t type;
+    uint16_t current;
+    uint16_t current_multiplier;
+    uint16_t current_divisor;
+    uint16_t voltage;
+    uint16_t voltage_multiplier;
+    uint16_t voltage_divisor;
+    uint16_t power;
+    uint16_t power_multiplier;
+    uint16_t power_divisor;
 } zcl_msAttr_t;
 
 typedef struct {
-    s16 temperature;
-    u8  alarm_mask;         /* bit0 = 0 (low alarm is disabled), bit1 = 1 (high alarm is enabled) */
-    s16 high_threshold;     /* 70 in degrees Celsius                                              */
+    int16_t temperature;
+    uint8_t  alarm_mask;         /* bit0 = 0 (low alarm is disabled), bit1 = 1 (high alarm is enabled) */
+    int16_t high_threshold;     /* 70 in degrees Celsius                                              */
 } zcl_tempAttr_t;
 
-extern u8 APP_CB_CLUSTER_NUM;
+extern uint8_t APP_CB_CLUSTER_NUM;
 extern const zcl_specClusterInfo_t g_appClusterList[];
 extern const af_simple_descriptor_t app_simpleDesc;
 
@@ -96,15 +96,15 @@ extern zcl_identifyAttr_t g_zcl_identifyAttrs;
 
 void app_zclProcessIncomingMsg(zclIncoming_t *pInHdlrMsg);
 
-status_t app_basicCb(zclIncomingAddrInfo_t *pAddrInfo, u8 cmdId, void *cmdPayload);
-status_t app_identifyCb(zclIncomingAddrInfo_t *pAddrInfo, u8 cmdId, void *cmdPayload);
-status_t app_sceneCb(zclIncomingAddrInfo_t *pAddrInfo, u8 cmdId, void *cmdPayload);
-status_t app_timeCb(zclIncomingAddrInfo_t *pAddrInfo, u8 cmdId, void *cmdPayload);
-status_t app_meteringCb(zclIncomingAddrInfo_t *pAddrInfo, u8 cmdId, void *cmdPayload);
+status_t app_basicCb(zclIncomingAddrInfo_t *pAddrInfo, uint8_t cmdId, void *cmdPayload);
+status_t app_identifyCb(zclIncomingAddrInfo_t *pAddrInfo, uint8_t cmdId, void *cmdPayload);
+status_t app_sceneCb(zclIncomingAddrInfo_t *pAddrInfo, uint8_t cmdId, void *cmdPayload);
+status_t app_timeCb(zclIncomingAddrInfo_t *pAddrInfo, uint8_t cmdId, void *cmdPayload);
+status_t app_meteringCb(zclIncomingAddrInfo_t *pAddrInfo, uint8_t cmdId, void *cmdPayload);
 
 void app_leaveCnfHandler(nlme_leave_cnf_t *pLeaveCnf);
 void app_leaveIndHandler(nlme_leave_ind_t *pLeaveInd);
-void app_otaProcessMsgHandler(u8 evt, u8 status);
+void app_otaProcessMsgHandler(uint8_t evt, uint8_t status);
 bool app_nwkUpdateIndicateHandler(nwkCmd_nwkUpdate_t *pNwkUpdate);
 
 

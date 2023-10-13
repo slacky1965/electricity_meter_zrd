@@ -33,19 +33,19 @@
 /**
  *  @brief Only support for 8258/8278/b91, if you want to this function, please contact to us.
  */
-u8 firmwareCheckWithUID(void)
+uint8_t firmwareCheckWithUID(void)
 {
 #if UID_ENABLE
-	u32 flash_mid = 0;
-	u8 flash_uid[16] = {0};
+	uint32_t flash_mid = 0;
+	uint8_t flash_uid[16] = {0};
 	int flag = flash_read_mid_uid_with_check(&flash_mid, flash_uid);
 	if(flag == 0){
 		return 1;
 	}
-	u8 ciphertext[16] = {0};
+	uint8_t ciphertext[16] = {0};
 	firmware_encrypt_based_on_uid(flash_uid, ciphertext);
 
-	u8 code[16] = {0};
+	uint8_t code[16] = {0};
 	flash_read(CFG_FIRMWARE_ENCRYPTION, 16, code);
 
 	if(memcmp(ciphertext, code, 16)){

@@ -47,9 +47,9 @@
 /**********************************************************************
  * LOCAL FUNCTIONS
  */
-void zb_bdbInitCb(u8 status, u8 joinedNetwork);
-void zb_bdbCommissioningCb(u8 status, void *arg);
-void zb_bdbIdentifyCb(u8 endpoint, u16 srcAddr, u16 identifyTime);
+void zb_bdbInitCb(uint8_t status, uint8_t joinedNetwork);
+void zb_bdbCommissioningCb(uint8_t status, void *arg);
+void zb_bdbIdentifyCb(uint8_t endpoint, uint16_t srcAddr, uint16_t identifyTime);
 
 
 /**********************************************************************
@@ -72,7 +72,7 @@ ota_callBack_t app_otaCb =
 /**********************************************************************
  * LOCAL VARIABLES
  */
-u32 heartInterval = 0;
+uint32_t heartInterval = 0;
 
 #if DEBUG_HEART
 ev_timer_event_t *heartTimerEvt = NULL;
@@ -82,7 +82,7 @@ ev_timer_event_t *heartTimerEvt = NULL;
  * FUNCTIONS
  */
 #if DEBUG_HEART
-static s32 heartTimerCb(void *arg){
+static int32_t heartTimerCb(void *arg){
 	if(heartInterval == 0){
 		heartTimerEvt = NULL;
 		return -1;
@@ -94,14 +94,14 @@ static s32 heartTimerCb(void *arg){
 }
 #endif
 
-s32 app_bdbNetworkSteerStart(void *arg){
+int32_t app_bdbNetworkSteerStart(void *arg){
 	bdb_networkSteerStart();
 
 	return -1;
 }
 
 #if FIND_AND_BIND_SUPPORT
-s32 app_bdbFindAndBindStart(void *arg){
+int32_t app_bdbFindAndBindStart(void *arg){
 	bdb_findAndBindStart(BDB_COMMISSIONING_ROLE_TARGET);
 
 	return -1;
@@ -119,7 +119,7 @@ s32 app_bdbFindAndBindStart(void *arg){
  *
  * @return  None
  */
-void zb_bdbInitCb(u8 status, u8 joinedNetwork){
+void zb_bdbInitCb(uint8_t status, uint8_t joinedNetwork){
 //	printf("bdbInitCb: sta = %x, joined = %x\n", status, joinedNetwork);
 
 	if(status == BDB_INIT_STATUS_SUCCESS){
@@ -140,7 +140,7 @@ void zb_bdbInitCb(u8 status, u8 joinedNetwork){
             device_online = false;
 
 #if	(!ZBHCI_EN)
-			u16 jitter = 0;
+			uint16_t jitter = 0;
 			do{
 				jitter = zb_random() % 0x0fff;
 			}while(jitter == 0);
@@ -170,7 +170,7 @@ void zb_bdbInitCb(u8 status, u8 joinedNetwork){
  *
  * @return  None
  */
-void zb_bdbCommissioningCb(u8 status, void *arg){
+void zb_bdbCommissioningCb(uint8_t status, void *arg){
 	//printf("bdbCommCb: sta = %x\n", status);
 
 	switch(status){
@@ -200,7 +200,7 @@ void zb_bdbCommissioningCb(u8 status, void *arg){
 		case BDB_COMMISSION_STA_TCLK_EX_FAILURE:
 		case BDB_COMMISSION_STA_TARGET_FAILURE:
 			{
-				u16 jitter = 0;
+				uint16_t jitter = 0;
 	            device_online = false;
 				do{
 					jitter = zb_random() % 0x2710;
@@ -233,8 +233,8 @@ void zb_bdbCommissioningCb(u8 status, void *arg){
 }
 
 
-extern void app_zclIdentifyCmdHandler(u8 endpoint, u16 srcAddr, u16 identifyTime);
-void zb_bdbIdentifyCb(u8 endpoint, u16 srcAddr, u16 identifyTime){
+extern void app_zclIdentifyCmdHandler(uint8_t endpoint, uint16_t srcAddr, uint16_t identifyTime);
+void zb_bdbIdentifyCb(uint8_t endpoint, uint16_t srcAddr, uint16_t identifyTime){
 #if FIND_AND_BIND_SUPPORT
 	app_zclIdentifyCmdHandler(endpoint, srcAddr, identifyTime);
 #endif
@@ -243,7 +243,7 @@ void zb_bdbIdentifyCb(u8 endpoint, u16 srcAddr, u16 identifyTime){
 
 
 #ifdef ZCL_OTA
-void app_otaProcessMsgHandler(u8 evt, u8 status) {
+void app_otaProcessMsgHandler(uint8_t evt, uint8_t status) {
 
 	if(evt == OTA_EVT_START){
 		if(status == ZCL_STA_SUCCESS){
@@ -274,7 +274,7 @@ void app_otaProcessMsgHandler(u8 evt, u8 status) {
 
 //extern ota_clientInfo_t otaClientInfo;
 //
-//void app_otaProcessMsgHandler(u8 evt, u8 status) {
+//void app_otaProcessMsgHandler(uint8_t evt, uint8_t status) {
 //    printf("app_otaProcessMsgHandler: status = %x\r\n", status);
 //    if (evt == OTA_EVT_START) {
 //        if (status == ZCL_STA_SUCCESS) {
@@ -308,7 +308,7 @@ void app_otaProcessMsgHandler(u8 evt, u8 status) {
 //            /* reset update OTA */
 //            nv_resetModule(NV_MODULE_OTA);
 //
-//            memset((u8*) &otaClientInfo, 0, sizeof(otaClientInfo));
+//            memset((uint8_t*) &otaClientInfo, 0, sizeof(otaClientInfo));
 //            otaClientInfo.clientOtaFlg = OTA_FLAG_INIT_DONE;
 //            otaClientInfo.crcValue = 0xffffffff;
 //
@@ -326,7 +326,7 @@ void app_otaProcessMsgHandler(u8 evt, u8 status) {
 
 #endif
 
-s32 app_softReset(void *arg){
+int32_t app_softReset(void *arg){
 	SYSTEM_RESET();
 
 	return -1;

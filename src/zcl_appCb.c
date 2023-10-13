@@ -55,11 +55,11 @@
 static void app_zclReadRspCmd(zclReadRspCmd_t *pReadRspCmd);
 #endif
 #ifdef ZCL_WRITE
-static void app_zclWriteReqCmd(u16 clusterId, zclWriteCmd_t *pWriteReqCmd);
+static void app_zclWriteReqCmd(uint16_t clusterId, zclWriteCmd_t *pWriteReqCmd);
 static void app_zclWriteRspCmd(zclWriteRspCmd_t *pWriteRspCmd);
 #endif
 #ifdef ZCL_REPORT
-static void app_zclCfgReportCmd(u8 endPoint, u16 clusterId, zclCfgReportCmd_t *pCfgReportCmd);
+static void app_zclCfgReportCmd(uint8_t endPoint, uint16_t clusterId, zclCfgReportCmd_t *pCfgReportCmd);
 static void app_zclCfgReportRspCmd(zclCfgReportRspCmd_t *pCfgReportRspCmd);
 static void app_zclReportCmd(zclReportCmd_t *pReportCmd);
 #endif
@@ -96,8 +96,8 @@ void app_zclProcessIncomingMsg(zclIncoming_t *pInHdlrMsg)
 {
 //  printf("app_zclProcessIncomingMsg\n");
 
-    u16 cluster = pInHdlrMsg->msg->indInfo.cluster_id;
-    u8 endPoint = pInHdlrMsg->msg->indInfo.dst_ep;
+    uint16_t cluster = pInHdlrMsg->msg->indInfo.cluster_id;
+    uint8_t endPoint = pInHdlrMsg->msg->indInfo.dst_ep;
 
     switch(pInHdlrMsg->hdr.cmd)
     {
@@ -147,10 +147,10 @@ static void app_zclReadRspCmd(zclReadRspCmd_t *pReadRspCmd)
 {
 //    printf("app_zclReadRspCmd\n");
 
-    u8 numAttr = pReadRspCmd->numAttr;
+    uint8_t numAttr = pReadRspCmd->numAttr;
     zclReadRspStatus_t *attrList = pReadRspCmd->attrList;
 
-    for (u8 i = 0; i < numAttr; i++) {
+    for (uint8_t i = 0; i < numAttr; i++) {
         if (attrList[i].attrID == ZCL_ATTRID_TIME && attrList[i].status == ZCL_STA_SUCCESS) {
             resp_time = true;
         }
@@ -169,43 +169,43 @@ static void app_zclReadRspCmd(zclReadRspCmd_t *pReadRspCmd)
  *
  * @return  None
  */
-static void app_zclWriteReqCmd(u16 clusterId, zclWriteCmd_t *pWriteReqCmd)
+static void app_zclWriteReqCmd(uint16_t clusterId, zclWriteCmd_t *pWriteReqCmd)
 {
 
 //    printf("app_zclWriteReqCmd()\r\n");
 
 
 
-    u8 numAttr = pWriteReqCmd->numAttr;
+    uint8_t numAttr = pWriteReqCmd->numAttr;
     zclWriteRec_t *attr = pWriteReqCmd->attrList;
 
     if (clusterId == ZCL_CLUSTER_SE_METERING) {
-        for (u8 i = 0; i < numAttr; i++) {
+        for (uint8_t i = 0; i < numAttr; i++) {
             if (attr[i].attrID == ZCL_ATTRID_CUSTOM_DEVICE_ADDRESS && attr[i].dataType == ZCL_DATA_TYPE_UINT32) {
-                u32 device_address = BUILD_U32(attr->attrData[0], attr->attrData[1], attr->attrData[2], attr->attrData[3]);
+                uint32_t device_address = BUILD_U32(attr->attrData[0], attr->attrData[1], attr->attrData[2], attr->attrData[3]);
                 if (dev_config.device_address != device_address) {
                     dev_config.device_address = device_address;
                     write_config();
 #if UART_PRINTF_MODE // && DEBUG_LEVEL
                     printf("New device address: %d\r\n", dev_config.device_address);
 #endif
-                    zcl_setAttrVal(APP_ENDPOINT_1, ZCL_CLUSTER_SE_METERING, ZCL_ATTRID_CUSTOM_DEVICE_ADDRESS, (u8*)&device_address);
+                    zcl_setAttrVal(APP_ENDPOINT_1, ZCL_CLUSTER_SE_METERING, ZCL_ATTRID_CUSTOM_DEVICE_ADDRESS, (uint8_t*)&device_address);
                 }
             } else if (attr[i].attrID == ZCL_ATTRID_CUSTOM_DEVICE_MANUFACTURER && attr[i].attrData) {
                 device_model_t model = *attr[i].attrData;
                 set_device_model(model);
-                zcl_setAttrVal(APP_ENDPOINT_1, ZCL_CLUSTER_SE_METERING, ZCL_ATTRID_CUSTOM_DEVICE_MANUFACTURER, (u8*)&model);
+                zcl_setAttrVal(APP_ENDPOINT_1, ZCL_CLUSTER_SE_METERING, ZCL_ATTRID_CUSTOM_DEVICE_MANUFACTURER, (uint8_t*)&model);
             } else if (attr[i].attrID == ZCL_ATTRID_CUSTOM_MEASUREMENT_PERIOD && attr[i].dataType == ZCL_DATA_TYPE_UINT8) {
-                u8 period_in_min = *attr[i].attrData;
+                uint8_t period_in_min = *attr[i].attrData;
                 if (period_in_min == 0) period_in_min = 1;
-                u16 period_in_sec = period_in_min * 60;
+                uint16_t period_in_sec = period_in_min * 60;
                 if (dev_config.measurement_period != period_in_sec) {
                     dev_config.measurement_period = period_in_sec;
                     write_config();
 #if UART_PRINTF_MODE // && DEBUG_LEVEL
                     printf("New measurement period: %d sec\r\n", dev_config.measurement_period);
 #endif
-                    zcl_setAttrVal(APP_ENDPOINT_1, ZCL_CLUSTER_SE_METERING, ZCL_ATTRID_CUSTOM_MEASUREMENT_PERIOD, (u8*)&period_in_min);
+                    zcl_setAttrVal(APP_ENDPOINT_1, ZCL_CLUSTER_SE_METERING, ZCL_ATTRID_CUSTOM_MEASUREMENT_PERIOD, (uint8_t*)&period_in_min);
                     if (g_appCtx.timerMeasurementEvt) {
                         TL_ZB_TIMER_CANCEL(&g_appCtx.timerMeasurementEvt);
                     }
@@ -217,7 +217,7 @@ static void app_zclWriteReqCmd(u16 clusterId, zclWriteCmd_t *pWriteReqCmd)
 
 //
 //  if(clusterId == ZCL_CLUSTER_GEN_ON_OFF){
-//      for(u8 i = 0; i < numAttr; i++){
+//      for(uint8_t i = 0; i < numAttr; i++){
 //          if(attr[i].attrID == ZCL_ATTRID_START_UP_ONOFF){
 //              zcl_onOffAttr_save();
 //          }
@@ -274,11 +274,11 @@ static void app_zclDfltRspCmd(zclDefaultRspCmd_t *pDftRspCmd)
  *
  * @return  None
  */
-static void app_zclCfgReportCmd(u8 endPoint, u16 clusterId, zclCfgReportCmd_t *pCfgReportCmd)
+static void app_zclCfgReportCmd(uint8_t endPoint, uint16_t clusterId, zclCfgReportCmd_t *pCfgReportCmd)
 {
     //printf("app_zclCfgReportCmd\r\n");
-    for(u8 i = 0; i < pCfgReportCmd->numAttr; i++) {
-        for (u8 ii = 0; ii < ZCL_REPORTING_TABLE_NUM; ii++) {
+    for(uint8_t i = 0; i < pCfgReportCmd->numAttr; i++) {
+        for (uint8_t ii = 0; ii < ZCL_REPORTING_TABLE_NUM; ii++) {
             if (app_reporting[ii].pEntry->used) {
                 if (app_reporting[ii].pEntry->endPoint == endPoint && app_reporting[ii].pEntry->attrID == pCfgReportCmd->attrList[i].attrID) {
 #if UART_PRINTF_MODE && DEBUG_REPORTING
@@ -340,7 +340,7 @@ static void app_zclReportCmd(zclReportCmd_t *pReportCmd)
  *
  * @return  status_t
  */
-status_t app_basicCb(zclIncomingAddrInfo_t *pAddrInfo, u8 cmdId, void *cmdPayload)
+status_t app_basicCb(zclIncomingAddrInfo_t *pAddrInfo, uint8_t cmdId, void *cmdPayload)
 {
     if(cmdId == ZCL_CMD_BASIC_RESET_FAC_DEFAULT){
         //Reset all the attributes of all its clusters to factory defaults
@@ -352,7 +352,7 @@ status_t app_basicCb(zclIncomingAddrInfo_t *pAddrInfo, u8 cmdId, void *cmdPayloa
 #endif
 
 #ifdef ZCL_IDENTIFY
-s32 app_zclIdentifyTimerCb(void *arg)
+int32_t app_zclIdentifyTimerCb(void *arg)
 {
     if(g_zcl_identifyAttrs.identifyTime <= 0){
         light_blink_stop();
@@ -382,7 +382,7 @@ void app_zclIdentifyTimerStop(void)
  *
  * @return  None
  */
-void app_zclIdentifyCmdHandler(u8 endpoint, u16 srcAddr, u16 identifyTime)
+void app_zclIdentifyCmdHandler(uint8_t endpoint, uint16_t srcAddr, uint16_t identifyTime)
 {
     g_zcl_identifyAttrs.identifyTime = identifyTime;
 
@@ -408,8 +408,8 @@ void app_zclIdentifyCmdHandler(u8 endpoint, u16 srcAddr, u16 identifyTime)
  */
 static void app_zcltriggerCmdHandler(zcl_triggerEffect_t *pTriggerEffect)
 {
-    u8 effectId = pTriggerEffect->effectId;
-//  u8 effectVariant = pTriggerEffect->effectVariant;
+    uint8_t effectId = pTriggerEffect->effectId;
+//  uint8_t effectVariant = pTriggerEffect->effectVariant;
 
     switch(effectId){
         case IDENTIFY_EFFECT_BLINK:
@@ -446,7 +446,7 @@ static void app_zcltriggerCmdHandler(zcl_triggerEffect_t *pTriggerEffect)
  *
  * @return  status_t
  */
-status_t app_identifyCb(zclIncomingAddrInfo_t *pAddrInfo, u8 cmdId, void *cmdPayload)
+status_t app_identifyCb(zclIncomingAddrInfo_t *pAddrInfo, uint8_t cmdId, void *cmdPayload)
 {
     if(pAddrInfo->dstEp == APP_ENDPOINT_1){
         if(pAddrInfo->dirCluster == ZCL_FRAME_CLIENT_SERVER_DIR){
@@ -478,7 +478,7 @@ status_t app_identifyCb(zclIncomingAddrInfo_t *pAddrInfo, u8 cmdId, void *cmdPay
  *
  * @return  status_t
  */
-status_t app_timeCb(zclIncomingAddrInfo_t *pAddrInfo, u8 cmdId, void *cmdPayload) {
+status_t app_timeCb(zclIncomingAddrInfo_t *pAddrInfo, uint8_t cmdId, void *cmdPayload) {
 
     printf("app_timeCb. cmd: 0x%x\r\n", cmdId);
 
@@ -497,13 +497,13 @@ status_t app_timeCb(zclIncomingAddrInfo_t *pAddrInfo, u8 cmdId, void *cmdPayload
  *
  * @return  status_t
  */
-status_t app_meteringCb(zclIncomingAddrInfo_t *pAddrInfo, u8 cmdId, void *cmdPayload)
+status_t app_meteringCb(zclIncomingAddrInfo_t *pAddrInfo, uint8_t cmdId, void *cmdPayload)
 {
 
     return ZCL_STA_SUCCESS;
 }
 
-static s32 checkRespTimeCb(void *arg) {
+static int32_t checkRespTimeCb(void *arg) {
 
     if (device_online) {
         if (!resp_time) {
@@ -527,7 +527,7 @@ static s32 checkRespTimeCb(void *arg) {
 }
 
 
-s32 getTimeCb(void *arg) {
+int32_t getTimeCb(void *arg) {
 
     if(zb_isDeviceJoinedNwk()){
         epInfo_t dstEpInfo;
@@ -544,14 +544,14 @@ s32 getTimeCb(void *arg) {
         zclAttrInfo_t *pAttrEntry;
         pAttrEntry = zcl_findAttribute(APP_ENDPOINT_1, ZCL_CLUSTER_GEN_TIME, ZCL_ATTRID_TIME);
 
-        zclReadCmd_t *pReadCmd = (zclReadCmd_t *)ev_buf_allocate(sizeof(zclReadCmd_t) + sizeof(u16));
+        zclReadCmd_t *pReadCmd = (zclReadCmd_t *)ev_buf_allocate(sizeof(zclReadCmd_t) + sizeof(uint16_t));
         if(pReadCmd){
             pReadCmd->numAttr = 1;
             pReadCmd->attrID[0] = ZCL_ATTRID_TIME;
 
             zcl_read(APP_ENDPOINT_1, &dstEpInfo, ZCL_CLUSTER_GEN_TIME, MANUFACTURER_CODE_NONE, 0, 0, 0, pReadCmd);
 
-            ev_buf_free((u8 *)pReadCmd);
+            ev_buf_free((uint8_t *)pReadCmd);
 
             TL_ZB_TIMER_SCHEDULE(checkRespTimeCb, NULL, TIMEOUT_2SEC);
         }

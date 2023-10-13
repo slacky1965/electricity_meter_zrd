@@ -66,16 +66,16 @@
 
 
 typedef struct{
-	u32 dataLen;
-	u8 dataPayload[1];
+	uint32_t dataLen;
+	uint8_t dataPayload[1];
 }uart_rxData_t;
 
-__attribute__((aligned(4))) u8 moduleTest_uartTxBuf[4] = {0};
-__attribute__((aligned(4))) u8 moduleTest_uartRxBuf[32] = {0};
-volatile u8  T_uartPktSentSeqNo = 0;
-volatile u32 T_uartPktRecvSeqNo = 0;
-volatile u32 T_uartPktRecvLen = 0;
-volatile u32 T_uartPktSentExcept = 0;
+__attribute__((aligned(4))) uint8_t moduleTest_uartTxBuf[4] = {0};
+__attribute__((aligned(4))) uint8_t moduleTest_uartRxBuf[32] = {0};
+volatile uint8_t  T_uartPktSentSeqNo = 0;
+volatile uint32_t T_uartPktRecvSeqNo = 0;
+volatile uint32_t T_uartPktRecvLen = 0;
+volatile uint32_t T_uartPktSentExcept = 0;
 
 void module_test_uartRcvHandler(void){
 	/*
@@ -102,7 +102,7 @@ void module_test_uartRcvHandler(void){
 void moduleTest_forUart(void){
 	UART_PIN_INIT();
 
-	drv_uart_init(115200, moduleTest_uartRxBuf, sizeof(moduleTest_uartRxBuf)/sizeof(u8), module_test_uartRcvHandler);
+	drv_uart_init(115200, moduleTest_uartRxBuf, sizeof(moduleTest_uartRxBuf)/sizeof(uint8_t), module_test_uartRcvHandler);
 
 	drv_adc_init();
 
@@ -119,7 +119,7 @@ void moduleTest_forUart(void){
 
 	drv_enable_irq();
 
-	for(int i = 0; i < sizeof(moduleTest_uartTxBuf)/sizeof(u8); i++){
+	for(int i = 0; i < sizeof(moduleTest_uartTxBuf)/sizeof(uint8_t); i++){
 		moduleTest_uartTxBuf[i] = i;
 	}
 
@@ -127,14 +127,14 @@ void moduleTest_forUart(void){
 	{
 		if(T_uartPktRecvSeqNo == 0xAA){
 			moduleTest_uartTxBuf[0] = T_uartPktSentSeqNo++;
-			if(drv_uart_tx_start(moduleTest_uartTxBuf, sizeof(moduleTest_uartTxBuf)/sizeof(u8)) == 1){
+			if(drv_uart_tx_start(moduleTest_uartTxBuf, sizeof(moduleTest_uartTxBuf)/sizeof(uint8_t)) == 1){
 				WaitMs(1000);
 			}else{
 				T_uartPktSentExcept++;
 				while(1);
 			}
 		}else if(T_uartPktRecvSeqNo == 0xBB){
-			u16 vBat = drv_get_adc_data();
+			uint16_t vBat = drv_get_adc_data();
 
 			moduleTest_uartTxBuf[0] = HI_UINT16(vBat);
 			moduleTest_uartTxBuf[1] = LO_UINT16(vBat);
@@ -146,7 +146,7 @@ void moduleTest_forUart(void){
 				while(1);
 			}
 		}else if(T_uartPktRecvSeqNo == 0xCC){
-			u16 random = zb_random();
+			uint16_t random = zb_random();
 
 			moduleTest_uartTxBuf[0] = HI_UINT16(random);
 			moduleTest_uartTxBuf[1] = LO_UINT16(random);
@@ -193,8 +193,8 @@ enum{
 };
 
 typedef struct{
-	u32 cnt;
-	u8 data[16];
+	uint32_t cnt;
+	uint8_t data[16];
 }nv_test_buf_t;
 
 nv_test_buf_t nv_test_buf =
@@ -203,21 +203,21 @@ nv_test_buf_t nv_test_buf =
 	.data = {0x00,0x11,0x22,0x33,0x44,0x55,0x66,0x77,0x88,0x99,0xaa,0xbb,0xcc,0xdd,0xee,0xff},
 };
 
-u8 nv_test_buf_0[32] = {
+uint8_t nv_test_buf_0[32] = {
 	0x00,0x11,0x22,0x33,0x44,0x55,0x66,0x77,0x88,0x99,0xaa,0xbb,0xcc,0xdd,0xee,0xff,
 	0x01,0x12,0x23,0x34,0x45,0x56,0x67,0x78,0x89,0x9a,0xab,0xbc,0xcd,0xde,0xef,0xf0,
 };
-u8 nv_test_buf_1[200];
-u8 test_chk_buf[256];
+uint8_t nv_test_buf_1[200];
+uint8_t test_chk_buf[256];
 
 static void nv_dataStoreSet(void){
-	u16 flag = 0x5a5a;
-	flash_write(CFG_FACTORY_RST_CNT + 4, 2, (u8 *)&flag);
+	uint16_t flag = 0x5a5a;
+	flash_write(CFG_FACTORY_RST_CNT + 4, 2, (uint8_t *)&flag);
 }
 
 static bool nv_dataStoreCheck(void){
-	u16 flag = 0xffff;
-	flash_read(CFG_FACTORY_RST_CNT + 4, 2, (u8 *)&flag);
+	uint16_t flag = 0xffff;
+	flash_read(CFG_FACTORY_RST_CNT + 4, 2, (uint8_t *)&flag);
 	if(flag != 0xffff){
 		return TRUE;
 	}else{
@@ -248,7 +248,7 @@ void moduleTest_NV(void){
 
 	while(1){
 		nv_test_buf.cnt++;
-		if(nv_flashWriteNew(1, NV_MODULE_APP, TEST_ITEM1, sizeof(nv_test_buf_t), (u8 *)&nv_test_buf) != NV_SUCC){
+		if(nv_flashWriteNew(1, NV_MODULE_APP, TEST_ITEM1, sizeof(nv_test_buf_t), (uint8_t *)&nv_test_buf) != NV_SUCC){
 			while(1);
 		}
 
@@ -256,7 +256,7 @@ void moduleTest_NV(void){
 			while(1);
 		}
 
-		if(memcmp((u8 *)&nv_test_buf, test_chk_buf, sizeof(nv_test_buf_t))){
+		if(memcmp((uint8_t *)&nv_test_buf, test_chk_buf, sizeof(nv_test_buf_t))){
 			while(1);
 		}
 
@@ -311,7 +311,7 @@ void moduleTest_PM(void){
 	wakeupSrc |= PM_WAKEUP_SRC_PAD;
 #endif
 
-	u32 interval = 0;
+	uint32_t interval = 0;
 #if TIMER_WAKUPUP_TEST
 	interval = 1000;
 	wakeupSrc |= PM_WAKEUP_SRC_TIMER;
@@ -334,7 +334,7 @@ void moduleTest_PM(void){
 	while(1){
 		ZB_RADIO_TX_START(txPktForPm);
 
-		for(u32 i = 0; i < 2; i++){
+		for(uint32_t i = 0; i < 2; i++){
 			light_on();
 			WaitUs(100*1000);
 			light_off();
@@ -399,18 +399,18 @@ void moduleTest_RF(void){
 
 #define MODULE_TEST_MMOHASH 	0
 #if MODULE_TEST_MMOHASH
-u8 T_DBG_installCode[18] = {0x83,0xfe,0xd3,0x40,0x7a,0x93,0x97,0x23,0xa5,0xc6,0x39,0xb2,0x69,0x16,0xd5,0x05};
-u16 T_DBG_insCodeCRC;
+uint8_t T_DBG_installCode[18] = {0x83,0xfe,0xd3,0x40,0x7a,0x93,0x97,0x23,0xa5,0xc6,0x39,0xb2,0x69,0x16,0xd5,0x05};
+uint16_t T_DBG_insCodeCRC;
 /*
  * expected: "66B6900981E1EE3CA4206B6B861C02BB"
  * crc: c3 b5
  */
-u8 T_DBG_hashOut[16] = {0};
+uint8_t T_DBG_hashOut[16] = {0};
 
 void moduleTest_hash(void){
 	T_DBG_insCodeCRC = tl_bdbInstallCodeCRC16(T_DBG_installCode, 16);
-	T_DBG_installCode[16] = (u8)(T_DBG_insCodeCRC & 0xff);
-	T_DBG_installCode[17] = (u8)(T_DBG_insCodeCRC >> 8);
+	T_DBG_installCode[16] = (uint8_t)(T_DBG_insCodeCRC & 0xff);
+	T_DBG_installCode[17] = (uint8_t)(T_DBG_insCodeCRC >> 8);
 	ss_mmoHash(T_DBG_installCode, 18, T_DBG_hashOut);
 	while(1);
 }
@@ -418,23 +418,23 @@ void moduleTest_hash(void){
 
 #define MODULE_TEST_CCM	0
 #if MODULE_TEST_CCM
-//u8 aes_ccmDecTran(u8 micLen, u8 *key, u8 *iv, u8 *mStr, u16 mStrLen, u8 *aStr, u8 aStrLen, u8 *mic)
+//uint8_t aes_ccmDecTran(uint8_t micLen, uint8_t *key, uint8_t *iv, uint8_t *mStr, uint16_t mStrLen, uint8_t *aStr, uint8_t aStrLen, uint8_t *mic)
 #if 0
-u8 key[] = {0xC0, 0xC1 , 0xC2 , 0xC3 , 0xC4 , 0xC5 , 0xC6 , 0xC7 , 0xC8 , 0xC9 , 0xCa, 0xCb , 0xCc , 0xCd , 0xCe , 0xCf};
-u8 nonce[] = {0x21, 0x43, 0x65, 0x87, 0x21, 0x43, 0x65, 0x87, 0x02, 0x00, 0x00, 0x00, 0x05};//0x02, 0x00, 0x00, 0x00, 0x05};
-u8 astring[] = {0x8c, 0x10, 0x21, 0x43, 0x65, 0x87, 0x02, 0x00, 0x00, 0x00, 0x20}; //0x02, 0x00, 0x00, 0x00, 0x20};
-u8 astrLen = 11;//10;//11;
-u8 mstring[] = {0x83};//, 0x20}; //0x02, 0x00, 0x00, 0x00, 0x20};
-u8 mstrLen = 0;//1;//11;
-u8 mic[] = {0xCF, 0x78, 0x7E, 0x72};// {0xCA, 0x43, 0x24, 0xDD};//{0xF6, 0x36, 0x78, 0x9E}; //{0xCF, 0x78, 0x7E, 0x72};
+uint8_t key[] = {0xC0, 0xC1 , 0xC2 , 0xC3 , 0xC4 , 0xC5 , 0xC6 , 0xC7 , 0xC8 , 0xC9 , 0xCa, 0xCb , 0xCc , 0xCd , 0xCe , 0xCf};
+uint8_t nonce[] = {0x21, 0x43, 0x65, 0x87, 0x21, 0x43, 0x65, 0x87, 0x02, 0x00, 0x00, 0x00, 0x05};//0x02, 0x00, 0x00, 0x00, 0x05};
+uint8_t astring[] = {0x8c, 0x10, 0x21, 0x43, 0x65, 0x87, 0x02, 0x00, 0x00, 0x00, 0x20}; //0x02, 0x00, 0x00, 0x00, 0x20};
+uint8_t astrLen = 11;//10;//11;
+uint8_t mstring[] = {0x83};//, 0x20}; //0x02, 0x00, 0x00, 0x00, 0x20};
+uint8_t mstrLen = 0;//1;//11;
+uint8_t mic[] = {0xCF, 0x78, 0x7E, 0x72};// {0xCA, 0x43, 0x24, 0xDD};//{0xF6, 0x36, 0x78, 0x9E}; //{0xCF, 0x78, 0x7E, 0x72};
 #else
-u8 key[] = {0xC0, 0xC1 , 0xC2 , 0xC3 , 0xC4 , 0xC5 , 0xC6 , 0xC7 , 0xC8 , 0xC9 , 0xCa, 0xCb , 0xCc , 0xCd , 0xCe , 0xCf};
-u8 nonce[] = {0x88, 0x77, 0x66, 0x55, 0x44, 0x33, 0x22, 0x11, 0x99, 0x00, 0x00, 0x00, 0x05};
-u8 astring[] = {0x8c, 0x12, 0x01, 0x00, 0x00, 0x00, 0x22};
-u8 astrLen = 7;
-u8 mstring[] = {0x67};
-u8 mstrLen = 0;
-u8 mic[] = {0x51, 0x3B, 0x81,0x3F}; // {0x1C, 0xF9, 0x06, 0xC0};  //{0xf3, 0xeb, 0x95,0xb1}; //{0x1C, 0xF9, 0x06, 0xC0};
+uint8_t key[] = {0xC0, 0xC1 , 0xC2 , 0xC3 , 0xC4 , 0xC5 , 0xC6 , 0xC7 , 0xC8 , 0xC9 , 0xCa, 0xCb , 0xCc , 0xCd , 0xCe , 0xCf};
+uint8_t nonce[] = {0x88, 0x77, 0x66, 0x55, 0x44, 0x33, 0x22, 0x11, 0x99, 0x00, 0x00, 0x00, 0x05};
+uint8_t astring[] = {0x8c, 0x12, 0x01, 0x00, 0x00, 0x00, 0x22};
+uint8_t astrLen = 7;
+uint8_t mstring[] = {0x67};
+uint8_t mstrLen = 0;
+uint8_t mic[] = {0x51, 0x3B, 0x81,0x3F}; // {0x1C, 0xF9, 0x06, 0xC0};  //{0xf3, 0xeb, 0x95,0xb1}; //{0x1C, 0xF9, 0x06, 0xC0};
 #endif
 
 
@@ -446,7 +446,7 @@ void moduleTest_ccm(void){
 
 	aes_ccmDecTran(4, key, nonce, mstring, mstrLen, astring, astrLen, mic);
 	//nonce[12] = 0xc5;
-	u8 ret = aes_ccmDecAuthTran(4, key, nonce, mstring, mstrLen, astring, astrLen, mic);
+	uint8_t ret = aes_ccmDecAuthTran(4, key, nonce, mstring, mstrLen, astring, astrLen, mic);
 
 	while(1);
 }
@@ -456,7 +456,7 @@ void moduleTest_ccm(void){
 
 #if MODULE_TEST_ADC
 
-volatile u16 Cvoltage_value = 0;
+volatile uint16_t Cvoltage_value = 0;
 
 void moduleTest_adc(void){
 	drv_adc_init();
@@ -506,9 +506,9 @@ void moduleTest_adc(void){
 	#error	"undefined TEST_MODULE"
 #endif
 
-volatile u8 moduleTestTimerFlg = 0;
-s32 moduleTestTimer0Cb(void *arg){
-	static u8 cnt = 0;
+volatile uint8_t moduleTestTimerFlg = 0;
+int32_t moduleTestTimer0Cb(void *arg){
+	static uint8_t cnt = 0;
 
 	gpio_toggle(TEST_GPIO_0);
 
@@ -522,7 +522,7 @@ s32 moduleTestTimer0Cb(void *arg){
 	return 0;
 }
 
-s32 moduleTestTimer1Cb(void *arg){
+int32_t moduleTestTimer1Cb(void *arg){
 	gpio_toggle(TEST_GPIO_1);
 
 	if(moduleTestTimerFlg){
@@ -566,17 +566,17 @@ void moduleTest_pwm(void){
 	PWM_R_CHANNEL_SET();
 	drv_pwm_init();
 
-	u8 duty = 5;
-	u8 fullDuty = 100;
-	u32 max_tick = PWM_CLOCK_SOURCE / 1000;
-	u32 cmp_tick = (duty * max_tick) / fullDuty;
+	uint8_t duty = 5;
+	uint8_t fullDuty = 100;
+	uint32_t max_tick = PWM_CLOCK_SOURCE / 1000;
+	uint32_t cmp_tick = (duty * max_tick) / fullDuty;
 
-	drv_pwm_cfg(PWM_R_CHANNEL, (u16)cmp_tick, (u16)max_tick);
+	drv_pwm_cfg(PWM_R_CHANNEL, (uint16_t)cmp_tick, (uint16_t)max_tick);
 	drv_pwm_start(PWM_R_CHANNEL);
 
 	while(1){
 		if(cmp_tick <= max_tick){
-			drv_pwm_cfg(PWM_R_CHANNEL, (u16)cmp_tick, (u16)max_tick);
+			drv_pwm_cfg(PWM_R_CHANNEL, (uint16_t)cmp_tick, (uint16_t)max_tick);
 			cmp_tick += 2400;
 			WaitMs(500);
 		}else{
@@ -655,11 +655,11 @@ void moduleTest_pwm(void){
 #define DBG_DATA_LEN    			16
 
 
-u8 cmd_buf[CMD_BUF_LEN] = {0};
+uint8_t cmd_buf[CMD_BUF_LEN] = {0};
 //write buff
-u8 spi_master_tx_buff[DBG_DATA_LEN] = {0x00,0x11,0x22,0x33,0x44,0x55,0x66,0x77,0x88,0x99,0xaa,0xbb,0xcc,0xdd,0xee,0xff};
+uint8_t spi_master_tx_buff[DBG_DATA_LEN] = {0x00,0x11,0x22,0x33,0x44,0x55,0x66,0x77,0x88,0x99,0xaa,0xbb,0xcc,0xdd,0xee,0xff};
 //read buff
-u8 spi_master_rx_buff[DBG_DATA_LEN] = {0x00};
+uint8_t spi_master_rx_buff[DBG_DATA_LEN] = {0x00};
 
 
 
@@ -694,8 +694,8 @@ void spi_master_test(void){
 	spi_master_tx_buff[0] += 1;
 	spi_master_tx_buff[0] &= 0xff;
 
-	u8 idx = 0;
-	for(u8 i = 0; i < SPI_SLAVE_ADDR_LEN; i++){
+	uint8_t idx = 0;
+	for(uint8_t i = 0; i < SPI_SLAVE_ADDR_LEN; i++){
 		cmd_buf[idx++] = (SPI_SLAVE_ADDR >> ((SPI_SLAVE_ADDR_LEN - 1 - i) << 3));
 	}
 
@@ -758,9 +758,9 @@ void moduleTest_spi(void){
 
 #define DBG_DATA_LEN				16
 //write buff
-u8 i2c_master_tx_buff[DBG_DATA_LEN] = {0x00,0x11,0x22,0x33,0x44,0x55,0x66,0x77,0x88,0x99,0xaa,0xbb,0xcc,0xdd,0xee,0xff};
+uint8_t i2c_master_tx_buff[DBG_DATA_LEN] = {0x00,0x11,0x22,0x33,0x44,0x55,0x66,0x77,0x88,0x99,0xaa,0xbb,0xcc,0xdd,0xee,0xff};
 //read buff
-u8 i2c_master_rx_buff[DBG_DATA_LEN] = {0x00};
+uint8_t i2c_master_rx_buff[DBG_DATA_LEN] = {0x00};
 
 void i2c_master_test_init(void){
 	drv_i2c_master_init(I2C_CLOCK);
@@ -844,19 +844,19 @@ void moduleTest_i2c(void){
 #endif
 
 
-volatile u8 T_DBG_gpioIrqCb1 = 0;
+volatile uint8_t T_DBG_gpioIrqCb1 = 0;
 void moduleTest_gpioIrqCb1(void){
 	T_DBG_gpioIrqCb1++;
 	gpio_toggle(TEST_LED1);
 }
 
-volatile u8 T_DBG_gpioIrqCb2 = 0;
+volatile uint8_t T_DBG_gpioIrqCb2 = 0;
 void moduleTest_gpioIrqCb2(void){
 	T_DBG_gpioIrqCb2++;
 	gpio_toggle(TEST_LED2);
 }
 
-volatile u8 T_DBG_gpioIrqCb3 = 0;
+volatile uint8_t T_DBG_gpioIrqCb3 = 0;
 void moduleTest_gpioIrqCb3(void){
 	T_DBG_gpioIrqCb3++;
 	gpio_toggle(TEST_LED1);
@@ -879,7 +879,7 @@ void moduleTest_gpioIrqCb3(void){
 	}
 }
 
-volatile u8 T_DBG_mainCnt = 0;
+volatile uint8_t T_DBG_mainCnt = 0;
 void moduleTest_gpioIrq(void)		//comment out user_init
 {
 	//1.init the LED pin,for indication

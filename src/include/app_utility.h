@@ -26,12 +26,12 @@
 #define TIMEOUT_15MIN       900  * 1000     /* timeout 15 min   */
 #define TIMEOUT_30MIN       1800 * 1000     /* timeout 30 min   */
 
-s32 delayedMcuResetCb(void *arg);
-s32 delayedFactoryResetCb(void *arg);
-s32 delayedFullResetCb(void *arg);
-u32 itoa(u32 value, u8 *ptr);
-u32 from24to32(const u8 *str);
-u64 fromPtoInteger(u16 len, u8 *data);
-u8 set_zcl_str(u8 *str_in, u8 *str_out, u8 len);
+int32_t delayedMcuResetCb(void *arg);
+int32_t delayedFactoryResetCb(void *arg);
+int32_t delayedFullResetCb(void *arg);
+uint32_t itoa(uint32_t value, uint8_t *ptr);
+uint32_t from24to32(const uint8_t *str);
+uint64_t fromPtoInteger(uint16_t len, uint8_t *data);
+uint8_t set_zcl_str(uint8_t *str_in, uint8_t *str_out, uint8_t len);
 
 #endif /* SRC_INCLUDE_APP_UTILITY_H_ */

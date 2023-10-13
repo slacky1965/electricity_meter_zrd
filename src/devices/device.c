@@ -7,15 +7,15 @@
 #include "app_main.h"
 #include "app_uart.h"
 
-u16 attr_len;
-u8 attr_data[8];
-u8 new_start = true;
+uint16_t attr_len;
+uint8_t attr_data[8];
+uint8_t new_start = true;
 pkt_error_t pkt_error_no;
 measure_meter_f measure_meter = NULL;
-u8 fault_measure_flag = 0;
+uint8_t fault_measure_flag = 0;
 ev_timer_event_t *timerFaultMeasurementEvt = NULL;
 
-u8 device_model[DEVICE_MAX][32] = {
+uint8_t device_model[DEVICE_MAX][32] = {
     {"No Device"},
     {"KASKAD-1-MT"},
     {"KASKAD-11-C1"},
@@ -24,26 +24,28 @@ u8 device_model[DEVICE_MAX][32] = {
     {"NEVA-MT124"},
 };
 
-u8 set_device_model(device_model_t model) {
+uint8_t set_device_model(device_model_t model) {
 
-    u8 save = false;
+    uint8_t save = false;
     new_start = true;
-    u32 baudrate = BAUDRATE_UART;
+    uint32_t baudrate = BAUDRATE_UART;
 
-    u32 energy_divisor = 1, energy_multiplier = 1;
-    u16 voltage_multiplier = 1, voltage_divisor = 1;
-    u16 current_multiplier = 1, current_divisor = 1;
-    u16 power_multiplier = 1, power_divisor = 1;
-    u8 name[DEVICE_NAME_LEN] = {0};
+    uint32_t energy_divisor = 1, energy_multiplier = 1;
+    uint16_t voltage_multiplier = 1, voltage_divisor = 1;
+    uint16_t current_multiplier = 1, current_divisor = 1;
+    uint16_t power_multiplier = 1, power_divisor = 1;
+    uint8_t name[DEVICE_NAME_LEN] = {0};
 
-    u64 tariff = 0;
-    u16 power = 0;
-    u16 volts = 0;
-    u16 current = 0;
-    u8 sn[] = "11111111";
-    u8 serial_number[SE_ATTR_SN_SIZE] = {0};
-    u8 dr[] = "xx.xx.xxxx";
-    u8 date_release[DATA_MAX_LEN+2] = {0};
+    uint64_t tariff = 0;
+    uint16_t power = 0;
+    uint16_t volts = 0;
+    uint16_t current = 0;
+    uint8_t sn[] = "11111111";
+    uint8_t serial_number[SE_ATTR_SN_SIZE] = {0};
+    uint8_t dr[] = "xx.xx.xxxx";
+    uint8_t date_release[DATA_MAX_LEN+2] = {0};
+
+    fault_measure_flag = false;
 
     switch (model) {
         case DEVICE_KASKAD_1_MT: {
@@ -54,7 +56,7 @@ u8 set_device_model(device_model_t model) {
             current_divisor = 1000;
             power_divisor = 100;
             if (set_zcl_str(device_model[DEVICE_KASKAD_1_MT], name, DEVICE_NAME_LEN)) {
-                zcl_setAttrVal(APP_ENDPOINT_1, ZCL_CLUSTER_SE_METERING, ZCL_ATTRID_CUSTOM_DEVICE_MODEL, (u8*)&name);
+                zcl_setAttrVal(APP_ENDPOINT_1, ZCL_CLUSTER_SE_METERING, ZCL_ATTRID_CUSTOM_DEVICE_MODEL, (uint8_t*)&name);
             }
             break;
         }
@@ -63,7 +65,7 @@ u8 set_device_model(device_model_t model) {
             measure_meter = NULL;
             baudrate = 2400;
             if (set_zcl_str(device_model[DEVICE_KASKAD_11], name, DEVICE_NAME_LEN)) {
-                zcl_setAttrVal(APP_ENDPOINT_1, ZCL_CLUSTER_SE_METERING, ZCL_ATTRID_CUSTOM_DEVICE_MODEL, (u8*)&name);
+                zcl_setAttrVal(APP_ENDPOINT_1, ZCL_CLUSTER_SE_METERING, ZCL_ATTRID_CUSTOM_DEVICE_MODEL, (uint8_t*)&name);
             }
             break;
         }
@@ -74,7 +76,7 @@ u8 set_device_model(device_model_t model) {
             voltage_divisor = 10;
             current_divisor = 100;
             if (set_zcl_str(device_model[DEVICE_MERCURY_206], name, DEVICE_NAME_LEN)) {
-                zcl_setAttrVal(APP_ENDPOINT_1, ZCL_CLUSTER_SE_METERING, ZCL_ATTRID_CUSTOM_DEVICE_MODEL, (u8*)&name);
+                zcl_setAttrVal(APP_ENDPOINT_1, ZCL_CLUSTER_SE_METERING, ZCL_ATTRID_CUSTOM_DEVICE_MODEL, (uint8_t*)&name);
             }
             break;
         }
@@ -82,7 +84,7 @@ u8 set_device_model(device_model_t model) {
             measure_meter = measure_meter_energomera_ce102m;
             baudrate = 9600;
             if (set_zcl_str(device_model[DEVICE_ENERGOMERA_CE102M], name, DEVICE_NAME_LEN)) {
-                zcl_setAttrVal(APP_ENDPOINT_1, ZCL_CLUSTER_SE_METERING, ZCL_ATTRID_CUSTOM_DEVICE_MODEL, (u8*)&name);
+                zcl_setAttrVal(APP_ENDPOINT_1, ZCL_CLUSTER_SE_METERING, ZCL_ATTRID_CUSTOM_DEVICE_MODEL, (uint8_t*)&name);
             }
             break;
         }
@@ -90,14 +92,14 @@ u8 set_device_model(device_model_t model) {
             measure_meter = measure_meter_neva_mt124;
             baudrate = 300;
             if (set_zcl_str(device_model[DEVICE_NEVA_MT124], name, DEVICE_NAME_LEN)) {
-                zcl_setAttrVal(APP_ENDPOINT_1, ZCL_CLUSTER_SE_METERING, ZCL_ATTRID_CUSTOM_DEVICE_MODEL, (u8*)&name);
+                zcl_setAttrVal(APP_ENDPOINT_1, ZCL_CLUSTER_SE_METERING, ZCL_ATTRID_CUSTOM_DEVICE_MODEL, (uint8_t*)&name);
             }
             break;
         }
         default:
             measure_meter = NULL;
             if (set_zcl_str(device_model[DEVICE_UNDEFINED], name, DEVICE_NAME_LEN)) {
-                zcl_setAttrVal(APP_ENDPOINT_1, ZCL_CLUSTER_SE_METERING, ZCL_ATTRID_CUSTOM_DEVICE_MODEL, (u8*)&name);
+                zcl_setAttrVal(APP_ENDPOINT_1, ZCL_CLUSTER_SE_METERING, ZCL_ATTRID_CUSTOM_DEVICE_MODEL, (uint8_t*)&name);
             }
             break;
     }
@@ -111,28 +113,28 @@ u8 set_device_model(device_model_t model) {
 #endif
     }
 
-    zcl_setAttrVal(APP_ENDPOINT_1, ZCL_CLUSTER_SE_METERING, ZCL_ATTRID_CURRENT_TIER_1_SUMMATION_DELIVERD, (u8*)&tariff);
-    zcl_setAttrVal(APP_ENDPOINT_1, ZCL_CLUSTER_SE_METERING, ZCL_ATTRID_CURRENT_TIER_2_SUMMATION_DELIVERD, (u8*)&tariff);
-    zcl_setAttrVal(APP_ENDPOINT_1, ZCL_CLUSTER_SE_METERING, ZCL_ATTRID_CURRENT_TIER_3_SUMMATION_DELIVERD, (u8*)&tariff);
-    zcl_setAttrVal(APP_ENDPOINT_1, ZCL_CLUSTER_SE_METERING, ZCL_ATTRID_CURRENT_TIER_4_SUMMATION_DELIVERD, (u8*)&tariff);
-    zcl_setAttrVal(APP_ENDPOINT_1, ZCL_CLUSTER_MS_ELECTRICAL_MEASUREMENT, ZCL_ATTRID_APPARENT_POWER, (u8*)&power);
-    zcl_setAttrVal(APP_ENDPOINT_1, ZCL_CLUSTER_MS_ELECTRICAL_MEASUREMENT, ZCL_ATTRID_RMS_VOLTAGE, (u8*)&volts);
-    zcl_setAttrVal(APP_ENDPOINT_1, ZCL_CLUSTER_MS_ELECTRICAL_MEASUREMENT, ZCL_ATTRID_LINE_CURRENT, (u8*)&current);
+    zcl_setAttrVal(APP_ENDPOINT_1, ZCL_CLUSTER_SE_METERING, ZCL_ATTRID_CURRENT_TIER_1_SUMMATION_DELIVERD, (uint8_t*)&tariff);
+    zcl_setAttrVal(APP_ENDPOINT_1, ZCL_CLUSTER_SE_METERING, ZCL_ATTRID_CURRENT_TIER_2_SUMMATION_DELIVERD, (uint8_t*)&tariff);
+    zcl_setAttrVal(APP_ENDPOINT_1, ZCL_CLUSTER_SE_METERING, ZCL_ATTRID_CURRENT_TIER_3_SUMMATION_DELIVERD, (uint8_t*)&tariff);
+    zcl_setAttrVal(APP_ENDPOINT_1, ZCL_CLUSTER_SE_METERING, ZCL_ATTRID_CURRENT_TIER_4_SUMMATION_DELIVERD, (uint8_t*)&tariff);
+    zcl_setAttrVal(APP_ENDPOINT_1, ZCL_CLUSTER_MS_ELECTRICAL_MEASUREMENT, ZCL_ATTRID_APPARENT_POWER, (uint8_t*)&power);
+    zcl_setAttrVal(APP_ENDPOINT_1, ZCL_CLUSTER_MS_ELECTRICAL_MEASUREMENT, ZCL_ATTRID_RMS_VOLTAGE, (uint8_t*)&volts);
+    zcl_setAttrVal(APP_ENDPOINT_1, ZCL_CLUSTER_MS_ELECTRICAL_MEASUREMENT, ZCL_ATTRID_LINE_CURRENT, (uint8_t*)&current);
     if (set_zcl_str(sn, serial_number, SE_ATTR_SN_SIZE)) {
-        zcl_setAttrVal(APP_ENDPOINT_1, ZCL_CLUSTER_SE_METERING, ZCL_ATTRID_METER_SERIAL_NUMBER, (u8*)&serial_number);
+        zcl_setAttrVal(APP_ENDPOINT_1, ZCL_CLUSTER_SE_METERING, ZCL_ATTRID_METER_SERIAL_NUMBER, (uint8_t*)&serial_number);
     }
     if (set_zcl_str(dr, date_release, DATA_MAX_LEN+1)) {
-        zcl_setAttrVal(APP_ENDPOINT_1, ZCL_CLUSTER_SE_METERING, ZCL_ATTRID_CUSTOM_DATE_RELEASE, (u8*)&date_release);
+        zcl_setAttrVal(APP_ENDPOINT_1, ZCL_CLUSTER_SE_METERING, ZCL_ATTRID_CUSTOM_DATE_RELEASE, (uint8_t*)&date_release);
     }
 
-    zcl_setAttrVal(APP_ENDPOINT_1, ZCL_CLUSTER_SE_METERING, ZCL_ATTRID_MULTIPLIER, (u8*)&energy_multiplier);
-    zcl_setAttrVal(APP_ENDPOINT_1, ZCL_CLUSTER_SE_METERING, ZCL_ATTRID_DIVISOR, (u8*)&energy_divisor);
-    zcl_setAttrVal(APP_ENDPOINT_1, ZCL_CLUSTER_MS_ELECTRICAL_MEASUREMENT, ZCL_ATTRID_AC_VOLTAGE_MULTIPLIER, (u8*)&voltage_multiplier);
-    zcl_setAttrVal(APP_ENDPOINT_1, ZCL_CLUSTER_MS_ELECTRICAL_MEASUREMENT, ZCL_ATTRID_AC_VOLTAGE_DIVISOR, (u8*)&voltage_divisor);
-    zcl_setAttrVal(APP_ENDPOINT_1, ZCL_CLUSTER_MS_ELECTRICAL_MEASUREMENT, ZCL_ATTRID_AC_CURRENT_MULTIPLIER, (u8*)&current_multiplier);
-    zcl_setAttrVal(APP_ENDPOINT_1, ZCL_CLUSTER_MS_ELECTRICAL_MEASUREMENT, ZCL_ATTRID_AC_CURRENT_DIVISOR, (u8*)&current_divisor);
-    zcl_setAttrVal(APP_ENDPOINT_1, ZCL_CLUSTER_MS_ELECTRICAL_MEASUREMENT, ZCL_ATTRID_AC_POWER_MULTIPLIER, (u8*)&power_multiplier);
-    zcl_setAttrVal(APP_ENDPOINT_1, ZCL_CLUSTER_MS_ELECTRICAL_MEASUREMENT, ZCL_ATTRID_AC_POWER_DIVISOR, (u8*)&power_divisor);
+    zcl_setAttrVal(APP_ENDPOINT_1, ZCL_CLUSTER_SE_METERING, ZCL_ATTRID_MULTIPLIER, (uint8_t*)&energy_multiplier);
+    zcl_setAttrVal(APP_ENDPOINT_1, ZCL_CLUSTER_SE_METERING, ZCL_ATTRID_DIVISOR, (uint8_t*)&energy_divisor);
+    zcl_setAttrVal(APP_ENDPOINT_1, ZCL_CLUSTER_MS_ELECTRICAL_MEASUREMENT, ZCL_ATTRID_AC_VOLTAGE_MULTIPLIER, (uint8_t*)&voltage_multiplier);
+    zcl_setAttrVal(APP_ENDPOINT_1, ZCL_CLUSTER_MS_ELECTRICAL_MEASUREMENT, ZCL_ATTRID_AC_VOLTAGE_DIVISOR, (uint8_t*)&voltage_divisor);
+    zcl_setAttrVal(APP_ENDPOINT_1, ZCL_CLUSTER_MS_ELECTRICAL_MEASUREMENT, ZCL_ATTRID_AC_CURRENT_MULTIPLIER, (uint8_t*)&current_multiplier);
+    zcl_setAttrVal(APP_ENDPOINT_1, ZCL_CLUSTER_MS_ELECTRICAL_MEASUREMENT, ZCL_ATTRID_AC_CURRENT_DIVISOR, (uint8_t*)&current_divisor);
+    zcl_setAttrVal(APP_ENDPOINT_1, ZCL_CLUSTER_MS_ELECTRICAL_MEASUREMENT, ZCL_ATTRID_AC_POWER_MULTIPLIER, (uint8_t*)&power_multiplier);
+    zcl_setAttrVal(APP_ENDPOINT_1, ZCL_CLUSTER_MS_ELECTRICAL_MEASUREMENT, ZCL_ATTRID_AC_POWER_DIVISOR, (uint8_t*)&power_divisor);
 
     app_uart_init(baudrate);
 
@@ -143,9 +145,9 @@ u8 set_device_model(device_model_t model) {
     return save;
 }
 
-s32 measure_meterCb(void *arg) {
+int32_t measure_meterCb(void *arg) {
 
-    s32 period = DEFAULT_MEASUREMENT_PERIOD * 1000;
+    int32_t period = DEFAULT_MEASUREMENT_PERIOD * 1000;
 
     if (dev_config.device_model && measure_meter) {
         if (measure_meter()) {
@@ -159,7 +161,7 @@ s32 measure_meterCb(void *arg) {
     return period;
 }
 
-s32 fault_measure_meterCb(void *arg) {
+int32_t fault_measure_meterCb(void *arg) {
 
     if (fault_measure_flag) {
 #if UART_PRINTF_MODE
@@ -210,9 +212,9 @@ void print_error(pkt_error_t err_no) {
 }
 
 #if DEBUG_PACKAGE
-void print_package(u8 *head, u8 *buff, size_t len) {
+void print_package(uint8_t *head, uint8_t *buff, size_t len) {
 
-    u8 ch;
+    uint8_t ch;
 
     if (len) {
         printf("%s. len: %d, data: 0x", head, len);

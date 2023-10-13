@@ -17,7 +17,7 @@
 /**
  *  @brief Definition for Incoming cluster / Sever Cluster
  */
-const u16 app_inClusterList[] = {
+const uint16_t app_inClusterList[] = {
     ZCL_CLUSTER_GEN_BASIC,
     ZCL_CLUSTER_GEN_IDENTIFY,
 #ifdef ZCL_ZLL_COMMISSIONING
@@ -33,7 +33,7 @@ const u16 app_inClusterList[] = {
 /**
  *  @brief Definition for Outgoing cluster / Client Cluster
  */
-const u16 app_outClusterList[] = {
+const uint16_t app_outClusterList[] = {
     ZCL_CLUSTER_GEN_BASIC,
 #ifdef ZCL_GROUP
     ZCL_CLUSTER_GEN_GROUPS,
@@ -76,8 +76,8 @@ const af_simple_descriptor_t app_simpleDesc =
     0,                                      /* Reserved */
     APP_IN_CLUSTER_NUM,                     /* Application input cluster count */
     APP_OUT_CLUSTER_NUM,                    /* Application output cluster count */
-    (u16 *)app_inClusterList,               /* Application input cluster list */
-    (u16 *)app_outClusterList,              /* Application output cluster list */
+    (uint16_t *)app_inClusterList,               /* Application input cluster list */
+    (uint16_t *)app_outClusterList,              /* Application output cluster list */
 };
 
 /* Basic */
@@ -95,32 +95,32 @@ zcl_basicAttr_t g_zcl_basicAttrs =
     .deviceEnable   = TRUE,
 };
 
-u8 zclVersionServer;
+uint8_t zclVersionServer;
 
 const zclAttrInfo_t basic_attrTbl[] =
 {
-    { ZCL_ATTRID_BASIC_ZCL_VER,             ZCL_DATA_TYPE_UINT8,    ACCESS_CONTROL_READ,                        (u8*)&g_zcl_basicAttrs.zclVersion},
-    { ZCL_ATTRID_BASIC_APP_VER,             ZCL_DATA_TYPE_UINT8,    ACCESS_CONTROL_READ,                        (u8*)&g_zcl_basicAttrs.appVersion},
-    { ZCL_ATTRID_BASIC_STACK_VER,           ZCL_DATA_TYPE_UINT8,    ACCESS_CONTROL_READ,                        (u8*)&g_zcl_basicAttrs.stackVersion},
-    { ZCL_ATTRID_BASIC_HW_VER,              ZCL_DATA_TYPE_UINT8,    ACCESS_CONTROL_READ,                        (u8*)&g_zcl_basicAttrs.hwVersion},
-    { ZCL_ATTRID_BASIC_MFR_NAME,            ZCL_DATA_TYPE_CHAR_STR, ACCESS_CONTROL_READ,                        (u8*)g_zcl_basicAttrs.manuName},
-    { ZCL_ATTRID_BASIC_MODEL_ID,            ZCL_DATA_TYPE_CHAR_STR, ACCESS_CONTROL_READ,                        (u8*)g_zcl_basicAttrs.modelId},
-    { ZCL_ATTRID_BASIC_POWER_SOURCE,        ZCL_DATA_TYPE_ENUM8,    ACCESS_CONTROL_READ,                        (u8*)&g_zcl_basicAttrs.powerSource},
-    { ZCL_ATTRID_BASIC_DEV_ENABLED,         ZCL_DATA_TYPE_BOOLEAN,  ACCESS_CONTROL_READ | ACCESS_CONTROL_WRITE, (u8*)&g_zcl_basicAttrs.deviceEnable},
-    { ZCL_ATTRID_BASIC_SW_BUILD_ID,         ZCL_DATA_TYPE_CHAR_STR, ACCESS_CONTROL_READ,                        (u8*)&g_zcl_basicAttrs.swBuildId},
+    { ZCL_ATTRID_BASIC_ZCL_VER,             ZCL_DATA_TYPE_UINT8,    ACCESS_CONTROL_READ,                        (uint8_t*)&g_zcl_basicAttrs.zclVersion},
+    { ZCL_ATTRID_BASIC_APP_VER,             ZCL_DATA_TYPE_UINT8,    ACCESS_CONTROL_READ,                        (uint8_t*)&g_zcl_basicAttrs.appVersion},
+    { ZCL_ATTRID_BASIC_STACK_VER,           ZCL_DATA_TYPE_UINT8,    ACCESS_CONTROL_READ,                        (uint8_t*)&g_zcl_basicAttrs.stackVersion},
+    { ZCL_ATTRID_BASIC_HW_VER,              ZCL_DATA_TYPE_UINT8,    ACCESS_CONTROL_READ,                        (uint8_t*)&g_zcl_basicAttrs.hwVersion},
+    { ZCL_ATTRID_BASIC_MFR_NAME,            ZCL_DATA_TYPE_CHAR_STR, ACCESS_CONTROL_READ,                        (uint8_t*)g_zcl_basicAttrs.manuName},
+    { ZCL_ATTRID_BASIC_MODEL_ID,            ZCL_DATA_TYPE_CHAR_STR, ACCESS_CONTROL_READ,                        (uint8_t*)g_zcl_basicAttrs.modelId},
+    { ZCL_ATTRID_BASIC_POWER_SOURCE,        ZCL_DATA_TYPE_ENUM8,    ACCESS_CONTROL_READ,                        (uint8_t*)&g_zcl_basicAttrs.powerSource},
+    { ZCL_ATTRID_BASIC_DEV_ENABLED,         ZCL_DATA_TYPE_BOOLEAN,  ACCESS_CONTROL_READ | ACCESS_CONTROL_WRITE, (uint8_t*)&g_zcl_basicAttrs.deviceEnable},
+    { ZCL_ATTRID_BASIC_SW_BUILD_ID,         ZCL_DATA_TYPE_CHAR_STR, ACCESS_CONTROL_READ,                        (uint8_t*)&g_zcl_basicAttrs.swBuildId},
 
-    { ZCL_ATTRID_GLOBAL_CLUSTER_REVISION,   ZCL_DATA_TYPE_UINT16,   ACCESS_CONTROL_READ,                        (u8*)&zcl_attr_global_clusterRevision},
+    { ZCL_ATTRID_GLOBAL_CLUSTER_REVISION,   ZCL_DATA_TYPE_UINT16,   ACCESS_CONTROL_READ,                        (uint8_t*)&zcl_attr_global_clusterRevision},
 };
 
 #define ZCL_BASIC_ATTR_NUM    sizeof(basic_attrTbl) / sizeof(zclAttrInfo_t)
 
-u8 zclVersionServer;
+uint8_t zclVersionServer;
 
 const zclAttrInfo_t version_attrTbl[] =
 {
-    { ZCL_ATTRID_BASIC_ZCL_VER,             ZCL_DATA_TYPE_UINT8,    ACCESS_CONTROL_READ,    (u8*)&zclVersionServer},
+    { ZCL_ATTRID_BASIC_ZCL_VER,             ZCL_DATA_TYPE_UINT8,    ACCESS_CONTROL_READ,    (uint8_t*)&zclVersionServer},
 
-    { ZCL_ATTRID_GLOBAL_CLUSTER_REVISION,   ZCL_DATA_TYPE_UINT16,   ACCESS_CONTROL_READ,    (u8*)&zcl_attr_global_clusterRevision},
+    { ZCL_ATTRID_GLOBAL_CLUSTER_REVISION,   ZCL_DATA_TYPE_UINT16,   ACCESS_CONTROL_READ,    (uint8_t*)&zcl_attr_global_clusterRevision},
 };
 
 #define ZCL_BASIC_SERVER_ATTR_NUM    sizeof(version_attrTbl) / sizeof(zclAttrInfo_t)
@@ -134,9 +134,9 @@ zcl_identifyAttr_t g_zcl_identifyAttrs =
 
 const zclAttrInfo_t identify_attrTbl[] =
 {
-    { ZCL_ATTRID_IDENTIFY_TIME,             ZCL_DATA_TYPE_UINT16,   ACCESS_CONTROL_READ | ACCESS_CONTROL_WRITE, (u8*)&g_zcl_identifyAttrs.identifyTime },
+    { ZCL_ATTRID_IDENTIFY_TIME,             ZCL_DATA_TYPE_UINT16,   ACCESS_CONTROL_READ | ACCESS_CONTROL_WRITE, (uint8_t*)&g_zcl_identifyAttrs.identifyTime },
 
-    { ZCL_ATTRID_GLOBAL_CLUSTER_REVISION,   ZCL_DATA_TYPE_UINT16,   ACCESS_CONTROL_READ,                        (u8*)&zcl_attr_global_clusterRevision},
+    { ZCL_ATTRID_GLOBAL_CLUSTER_REVISION,   ZCL_DATA_TYPE_UINT16,   ACCESS_CONTROL_READ,                        (uint8_t*)&zcl_attr_global_clusterRevision},
 };
 
 #define ZCL_IDENTIFY_ATTR_NUM    sizeof(identify_attrTbl) / sizeof(zclAttrInfo_t)
@@ -146,9 +146,9 @@ zcl_timeAttr_t g_zcl_timeAttrs = {
 };
 
 const zclAttrInfo_t time_attrTbl[] = {
-    { ZCL_ATTRID_TIME, ZCL_DATA_TYPE_UTC,   ACCESS_CONTROL_READ | ACCESS_CONTROL_WRITE, (u8*)&g_zcl_timeAttrs.time_utc },
+    { ZCL_ATTRID_TIME, ZCL_DATA_TYPE_UTC,   ACCESS_CONTROL_READ | ACCESS_CONTROL_WRITE, (uint8_t*)&g_zcl_timeAttrs.time_utc },
 
-    { ZCL_ATTRID_GLOBAL_CLUSTER_REVISION,   ZCL_DATA_TYPE_UINT16,   ACCESS_CONTROL_READ, (u8*)&zcl_attr_global_clusterRevision},
+    { ZCL_ATTRID_GLOBAL_CLUSTER_REVISION,   ZCL_DATA_TYPE_UINT16,   ACCESS_CONTROL_READ, (uint8_t*)&zcl_attr_global_clusterRevision},
 };
 
 #define ZCL_TIME_ATTR_NUM    sizeof(time_attrTbl) / sizeof(zclAttrInfo_t)
@@ -172,24 +172,24 @@ zcl_seAttr_t g_zcl_seAttrs = {
 };
 
 const zclAttrInfo_t se_attrTbl[] = {
-    {ZCL_ATTRID_CURRENT_TIER_1_SUMMATION_DELIVERD,  ZCL_DATA_TYPE_UINT48,       ACCESS_CONTROL_READ | ACCESS_CONTROL_REPORTABLE,    (u8*)&g_zcl_seAttrs.tariff_1},
-    {ZCL_ATTRID_CURRENT_TIER_2_SUMMATION_DELIVERD,  ZCL_DATA_TYPE_UINT48,       ACCESS_CONTROL_READ | ACCESS_CONTROL_REPORTABLE,    (u8*)&g_zcl_seAttrs.tariff_2},
-    {ZCL_ATTRID_CURRENT_TIER_3_SUMMATION_DELIVERD,  ZCL_DATA_TYPE_UINT48,       ACCESS_CONTROL_READ | ACCESS_CONTROL_REPORTABLE,    (u8*)&g_zcl_seAttrs.tariff_3},
-    {ZCL_ATTRID_CURRENT_TIER_4_SUMMATION_DELIVERD,  ZCL_DATA_TYPE_UINT48,       ACCESS_CONTROL_READ | ACCESS_CONTROL_REPORTABLE,    (u8*)&g_zcl_seAttrs.tariff_4},
-    {ZCL_ATTRID_UNIT_OF_MEASURE,                    ZCL_DATA_TYPE_UINT8,        ACCESS_CONTROL_READ,                                (u8*)&g_zcl_seAttrs.unit_of_measure},
-    {ZCL_ATTRID_MULTIPLIER,                         ZCL_DATA_TYPE_UINT24,       ACCESS_CONTROL_READ | ACCESS_CONTROL_REPORTABLE,    (u8*)&g_zcl_seAttrs.multiplier},
-    {ZCL_ATTRID_DIVISOR,                            ZCL_DATA_TYPE_UINT24,       ACCESS_CONTROL_READ | ACCESS_CONTROL_REPORTABLE,    (u8*)&g_zcl_seAttrs.divisor},
-    {ZCL_ATTRID_SUMMATION_FORMATTING,               ZCL_DATA_TYPE_BITMAP8,      ACCESS_CONTROL_READ,                                (u8*)&g_zcl_seAttrs.summation_formatting},
-    {ZCL_ATTRID_REMAINING_BATTERY_LIFE,             ZCL_DATA_TYPE_UINT8,        ACCESS_CONTROL_READ | ACCESS_CONTROL_REPORTABLE,    (u8*)&g_zcl_seAttrs.battery_percentage},
-    {ZCL_ATTRID_METER_SERIAL_NUMBER,                ZCL_DATA_TYPE_OCTET_STR,    ACCESS_CONTROL_READ | ACCESS_CONTROL_REPORTABLE,    (u8*)&g_zcl_seAttrs.serial_number},
-    {ZCL_ATTRID_METERING_DEVICE_TYPE,               ZCL_DATA_TYPE_BITMAP8,      ACCESS_CONTROL_READ,                                (u8*)&g_zcl_seAttrs.device_type},
-    {ZCL_ATTRID_CUSTOM_DEVICE_MANUFACTURER,         ZCL_DATA_TYPE_ENUM8,        ACCESS_CONTROL_READ | ACCESS_CONTROL_WRITE,         (u8*)&g_zcl_seAttrs.device_model},
-    {ZCL_ATTRID_CUSTOM_DEVICE_ADDRESS,              ZCL_DATA_TYPE_UINT32,       ACCESS_CONTROL_READ | ACCESS_CONTROL_WRITE,         (u8*)&g_zcl_seAttrs.device_address},
-    {ZCL_ATTRID_CUSTOM_MEASUREMENT_PERIOD,          ZCL_DATA_TYPE_UINT8,        ACCESS_CONTROL_READ | ACCESS_CONTROL_WRITE,         (u8*)&g_zcl_seAttrs.measurement_period},
-    {ZCL_ATTRID_CUSTOM_DATE_RELEASE,                ZCL_DATA_TYPE_OCTET_STR,    ACCESS_CONTROL_READ | ACCESS_CONTROL_REPORTABLE,    (u8*)&g_zcl_seAttrs.date_release},
-    {ZCL_ATTRID_CUSTOM_DEVICE_MODEL,                ZCL_DATA_TYPE_OCTET_STR,    ACCESS_CONTROL_READ | ACCESS_CONTROL_REPORTABLE,    (u8*)&g_zcl_seAttrs.device_name},
+    {ZCL_ATTRID_CURRENT_TIER_1_SUMMATION_DELIVERD,  ZCL_DATA_TYPE_UINT48,       ACCESS_CONTROL_READ | ACCESS_CONTROL_REPORTABLE,    (uint8_t*)&g_zcl_seAttrs.tariff_1},
+    {ZCL_ATTRID_CURRENT_TIER_2_SUMMATION_DELIVERD,  ZCL_DATA_TYPE_UINT48,       ACCESS_CONTROL_READ | ACCESS_CONTROL_REPORTABLE,    (uint8_t*)&g_zcl_seAttrs.tariff_2},
+    {ZCL_ATTRID_CURRENT_TIER_3_SUMMATION_DELIVERD,  ZCL_DATA_TYPE_UINT48,       ACCESS_CONTROL_READ | ACCESS_CONTROL_REPORTABLE,    (uint8_t*)&g_zcl_seAttrs.tariff_3},
+    {ZCL_ATTRID_CURRENT_TIER_4_SUMMATION_DELIVERD,  ZCL_DATA_TYPE_UINT48,       ACCESS_CONTROL_READ | ACCESS_CONTROL_REPORTABLE,    (uint8_t*)&g_zcl_seAttrs.tariff_4},
+    {ZCL_ATTRID_UNIT_OF_MEASURE,                    ZCL_DATA_TYPE_UINT8,        ACCESS_CONTROL_READ,                                (uint8_t*)&g_zcl_seAttrs.unit_of_measure},
+    {ZCL_ATTRID_MULTIPLIER,                         ZCL_DATA_TYPE_UINT24,       ACCESS_CONTROL_READ | ACCESS_CONTROL_REPORTABLE,    (uint8_t*)&g_zcl_seAttrs.multiplier},
+    {ZCL_ATTRID_DIVISOR,                            ZCL_DATA_TYPE_UINT24,       ACCESS_CONTROL_READ | ACCESS_CONTROL_REPORTABLE,    (uint8_t*)&g_zcl_seAttrs.divisor},
+    {ZCL_ATTRID_SUMMATION_FORMATTING,               ZCL_DATA_TYPE_BITMAP8,      ACCESS_CONTROL_READ,                                (uint8_t*)&g_zcl_seAttrs.summation_formatting},
+    {ZCL_ATTRID_REMAINING_BATTERY_LIFE,             ZCL_DATA_TYPE_UINT8,        ACCESS_CONTROL_READ | ACCESS_CONTROL_REPORTABLE,    (uint8_t*)&g_zcl_seAttrs.battery_percentage},
+    {ZCL_ATTRID_METER_SERIAL_NUMBER,                ZCL_DATA_TYPE_OCTET_STR,    ACCESS_CONTROL_READ | ACCESS_CONTROL_REPORTABLE,    (uint8_t*)&g_zcl_seAttrs.serial_number},
+    {ZCL_ATTRID_METERING_DEVICE_TYPE,               ZCL_DATA_TYPE_BITMAP8,      ACCESS_CONTROL_READ,                                (uint8_t*)&g_zcl_seAttrs.device_type},
+    {ZCL_ATTRID_CUSTOM_DEVICE_MANUFACTURER,         ZCL_DATA_TYPE_ENUM8,        ACCESS_CONTROL_READ | ACCESS_CONTROL_WRITE,         (uint8_t*)&g_zcl_seAttrs.device_model},
+    {ZCL_ATTRID_CUSTOM_DEVICE_ADDRESS,              ZCL_DATA_TYPE_UINT32,       ACCESS_CONTROL_READ | ACCESS_CONTROL_WRITE,         (uint8_t*)&g_zcl_seAttrs.device_address},
+    {ZCL_ATTRID_CUSTOM_MEASUREMENT_PERIOD,          ZCL_DATA_TYPE_UINT8,        ACCESS_CONTROL_READ | ACCESS_CONTROL_WRITE,         (uint8_t*)&g_zcl_seAttrs.measurement_period},
+    {ZCL_ATTRID_CUSTOM_DATE_RELEASE,                ZCL_DATA_TYPE_OCTET_STR,    ACCESS_CONTROL_READ | ACCESS_CONTROL_REPORTABLE,    (uint8_t*)&g_zcl_seAttrs.date_release},
+    {ZCL_ATTRID_CUSTOM_DEVICE_MODEL,                ZCL_DATA_TYPE_OCTET_STR,    ACCESS_CONTROL_READ | ACCESS_CONTROL_REPORTABLE,    (uint8_t*)&g_zcl_seAttrs.device_name},
 
-    { ZCL_ATTRID_GLOBAL_CLUSTER_REVISION,           ZCL_DATA_TYPE_UINT16,       ACCESS_CONTROL_READ,                                (u8*)&zcl_attr_global_clusterRevision},
+    { ZCL_ATTRID_GLOBAL_CLUSTER_REVISION,           ZCL_DATA_TYPE_UINT16,       ACCESS_CONTROL_READ,                                (uint8_t*)&zcl_attr_global_clusterRevision},
 };
 
 #define ZCL_SE_ATTR_NUM    sizeof(se_attrTbl) / sizeof(zclAttrInfo_t)
@@ -208,18 +208,18 @@ zcl_msAttr_t g_zcl_msAttrs = {
 };
 
 const zclAttrInfo_t ms_attrTbl[] = {
-    {ZCL_ATTRID_MEASUREMENT_TYPE,           ZCL_DATA_TYPE_BITMAP32, ACCESS_CONTROL_READ,                                (u8*)&g_zcl_msAttrs.type},
-    {ZCL_ATTRID_LINE_CURRENT,               ZCL_DATA_TYPE_UINT16,   ACCESS_CONTROL_READ | ACCESS_CONTROL_REPORTABLE,    (u8*)&g_zcl_msAttrs.current},
-    {ZCL_ATTRID_AC_CURRENT_MULTIPLIER,      ZCL_DATA_TYPE_UINT16,   ACCESS_CONTROL_READ | ACCESS_CONTROL_REPORTABLE,    (u8*)&g_zcl_msAttrs.current_multiplier},
-    {ZCL_ATTRID_AC_CURRENT_DIVISOR,         ZCL_DATA_TYPE_UINT16,   ACCESS_CONTROL_READ | ACCESS_CONTROL_REPORTABLE,    (u8*)&g_zcl_msAttrs.current_divisor},
-    {ZCL_ATTRID_RMS_VOLTAGE,                ZCL_DATA_TYPE_UINT16,   ACCESS_CONTROL_READ | ACCESS_CONTROL_REPORTABLE,    (u8*)&g_zcl_msAttrs.voltage},
-    {ZCL_ATTRID_AC_VOLTAGE_MULTIPLIER,      ZCL_DATA_TYPE_UINT16,   ACCESS_CONTROL_READ | ACCESS_CONTROL_REPORTABLE,    (u8*)&g_zcl_msAttrs.voltage_multiplier},
-    {ZCL_ATTRID_AC_VOLTAGE_DIVISOR,         ZCL_DATA_TYPE_UINT16,   ACCESS_CONTROL_READ | ACCESS_CONTROL_REPORTABLE,    (u8*)&g_zcl_msAttrs.voltage_divisor},
-    {ZCL_ATTRID_APPARENT_POWER,             ZCL_DATA_TYPE_UINT16,   ACCESS_CONTROL_READ | ACCESS_CONTROL_REPORTABLE,    (u8*)&g_zcl_msAttrs.power},
-    {ZCL_ATTRID_AC_POWER_MULTIPLIER,        ZCL_DATA_TYPE_UINT16,   ACCESS_CONTROL_READ | ACCESS_CONTROL_REPORTABLE,    (u8*)&g_zcl_msAttrs.power_multiplier},
-    {ZCL_ATTRID_AC_POWER_DIVISOR,           ZCL_DATA_TYPE_UINT16,   ACCESS_CONTROL_READ | ACCESS_CONTROL_REPORTABLE,    (u8*)&g_zcl_msAttrs.power_divisor},
+    {ZCL_ATTRID_MEASUREMENT_TYPE,           ZCL_DATA_TYPE_BITMAP32, ACCESS_CONTROL_READ,                                (uint8_t*)&g_zcl_msAttrs.type},
+    {ZCL_ATTRID_LINE_CURRENT,               ZCL_DATA_TYPE_UINT16,   ACCESS_CONTROL_READ | ACCESS_CONTROL_REPORTABLE,    (uint8_t*)&g_zcl_msAttrs.current},
+    {ZCL_ATTRID_AC_CURRENT_MULTIPLIER,      ZCL_DATA_TYPE_UINT16,   ACCESS_CONTROL_READ | ACCESS_CONTROL_REPORTABLE,    (uint8_t*)&g_zcl_msAttrs.current_multiplier},
+    {ZCL_ATTRID_AC_CURRENT_DIVISOR,         ZCL_DATA_TYPE_UINT16,   ACCESS_CONTROL_READ | ACCESS_CONTROL_REPORTABLE,    (uint8_t*)&g_zcl_msAttrs.current_divisor},
+    {ZCL_ATTRID_RMS_VOLTAGE,                ZCL_DATA_TYPE_UINT16,   ACCESS_CONTROL_READ | ACCESS_CONTROL_REPORTABLE,    (uint8_t*)&g_zcl_msAttrs.voltage},
+    {ZCL_ATTRID_AC_VOLTAGE_MULTIPLIER,      ZCL_DATA_TYPE_UINT16,   ACCESS_CONTROL_READ | ACCESS_CONTROL_REPORTABLE,    (uint8_t*)&g_zcl_msAttrs.voltage_multiplier},
+    {ZCL_ATTRID_AC_VOLTAGE_DIVISOR,         ZCL_DATA_TYPE_UINT16,   ACCESS_CONTROL_READ | ACCESS_CONTROL_REPORTABLE,    (uint8_t*)&g_zcl_msAttrs.voltage_divisor},
+    {ZCL_ATTRID_APPARENT_POWER,             ZCL_DATA_TYPE_UINT16,   ACCESS_CONTROL_READ | ACCESS_CONTROL_REPORTABLE,    (uint8_t*)&g_zcl_msAttrs.power},
+    {ZCL_ATTRID_AC_POWER_MULTIPLIER,        ZCL_DATA_TYPE_UINT16,   ACCESS_CONTROL_READ | ACCESS_CONTROL_REPORTABLE,    (uint8_t*)&g_zcl_msAttrs.power_multiplier},
+    {ZCL_ATTRID_AC_POWER_DIVISOR,           ZCL_DATA_TYPE_UINT16,   ACCESS_CONTROL_READ | ACCESS_CONTROL_REPORTABLE,    (uint8_t*)&g_zcl_msAttrs.power_divisor},
 
-    { ZCL_ATTRID_GLOBAL_CLUSTER_REVISION,   ZCL_DATA_TYPE_UINT16,   ACCESS_CONTROL_READ,                                (u8*)&zcl_attr_global_clusterRevision},
+    { ZCL_ATTRID_GLOBAL_CLUSTER_REVISION,   ZCL_DATA_TYPE_UINT16,   ACCESS_CONTROL_READ,                                (uint8_t*)&zcl_attr_global_clusterRevision},
 };
 
 #define ZCL_MS_ATTR_NUM    sizeof(ms_attrTbl) / sizeof(zclAttrInfo_t)
@@ -231,11 +231,11 @@ zcl_tempAttr_t g_zcl_tempAttrs = {
 };
 
 const zclAttrInfo_t temp_attrTbl[] = {
-        {ZCL_ATTRID_DEV_TEMP_CURR_TEMP,     ZCL_DATA_TYPE_INT16,    ACCESS_CONTROL_READ | ACCESS_CONTROL_REPORTABLE,    (u8*)&g_zcl_tempAttrs.temperature},
-        {ZCL_ATTRID_DEV_TEMP_ALARM_MASK,    ZCL_DATA_TYPE_BITMAP8,  ACCESS_CONTROL_READ | ACCESS_CONTROL_WRITE,         (u8*)&g_zcl_tempAttrs.alarm_mask},
-        {ZCL_ATTRID_DEV_TEMP_HIGH_THRE,     ZCL_DATA_TYPE_INT16,    ACCESS_CONTROL_READ | ACCESS_CONTROL_WRITE,         (u8*)&g_zcl_tempAttrs.high_threshold},
+        {ZCL_ATTRID_DEV_TEMP_CURR_TEMP,     ZCL_DATA_TYPE_INT16,    ACCESS_CONTROL_READ | ACCESS_CONTROL_REPORTABLE,    (uint8_t*)&g_zcl_tempAttrs.temperature},
+        {ZCL_ATTRID_DEV_TEMP_ALARM_MASK,    ZCL_DATA_TYPE_BITMAP8,  ACCESS_CONTROL_READ | ACCESS_CONTROL_WRITE,         (uint8_t*)&g_zcl_tempAttrs.alarm_mask},
+        {ZCL_ATTRID_DEV_TEMP_HIGH_THRE,     ZCL_DATA_TYPE_INT16,    ACCESS_CONTROL_READ | ACCESS_CONTROL_WRITE,         (uint8_t*)&g_zcl_tempAttrs.high_threshold},
 
-        { ZCL_ATTRID_GLOBAL_CLUSTER_REVISION,   ZCL_DATA_TYPE_UINT16,   ACCESS_CONTROL_READ,                            (u8*)&zcl_attr_global_clusterRevision},
+        { ZCL_ATTRID_GLOBAL_CLUSTER_REVISION,   ZCL_DATA_TYPE_UINT16,   ACCESS_CONTROL_READ,                            (uint8_t*)&zcl_attr_global_clusterRevision},
 };
 
 #define ZCL_TEMP_ATTR_NUM    sizeof(temp_attrTbl) / sizeof(zclAttrInfo_t)
@@ -249,9 +249,9 @@ zcl_groupAttr_t g_zcl_groupAttrs =
 
 const zclAttrInfo_t group_attrTbl[] =
 {
-    { ZCL_ATTRID_GROUP_NAME_SUPPORT,        ZCL_DATA_TYPE_BITMAP8,  ACCESS_CONTROL_READ,  (u8*)&g_zcl_groupAttrs.nameSupport },
+    { ZCL_ATTRID_GROUP_NAME_SUPPORT,        ZCL_DATA_TYPE_BITMAP8,  ACCESS_CONTROL_READ,  (uint8_t*)&g_zcl_groupAttrs.nameSupport },
 
-    { ZCL_ATTRID_GLOBAL_CLUSTER_REVISION,   ZCL_DATA_TYPE_UINT16,   ACCESS_CONTROL_READ,  (u8*)&zcl_attr_global_clusterRevision},
+    { ZCL_ATTRID_GLOBAL_CLUSTER_REVISION,   ZCL_DATA_TYPE_UINT16,   ACCESS_CONTROL_READ,  (uint8_t*)&zcl_attr_global_clusterRevision},
 };
 
 #define ZCL_GROUP_ATTR_NUM    sizeof(group_attrTbl) / sizeof(zclAttrInfo_t)
@@ -270,13 +270,13 @@ zcl_sceneAttr_t g_zcl_sceneAttrs =
 
 const zclAttrInfo_t scene_attrTbl[] =
 {
-    { ZCL_ATTRID_SCENE_SCENE_COUNT,         ZCL_DATA_TYPE_UINT8,    ACCESS_CONTROL_READ,  (u8*)&g_zcl_sceneAttrs.sceneCount     },
-    { ZCL_ATTRID_SCENE_CURRENT_SCENE,       ZCL_DATA_TYPE_UINT8,    ACCESS_CONTROL_READ,  (u8*)&g_zcl_sceneAttrs.currentScene   },
-    { ZCL_ATTRID_SCENE_CURRENT_GROUP,       ZCL_DATA_TYPE_UINT16,   ACCESS_CONTROL_READ,  (u8*)&g_zcl_sceneAttrs.currentGroup   },
-    { ZCL_ATTRID_SCENE_SCENE_VALID,         ZCL_DATA_TYPE_BOOLEAN,  ACCESS_CONTROL_READ,  (u8*)&g_zcl_sceneAttrs.sceneValid     },
-    { ZCL_ATTRID_SCENE_NAME_SUPPORT,        ZCL_DATA_TYPE_BITMAP8,  ACCESS_CONTROL_READ,  (u8*)&g_zcl_sceneAttrs.nameSupport    },
+    { ZCL_ATTRID_SCENE_SCENE_COUNT,         ZCL_DATA_TYPE_UINT8,    ACCESS_CONTROL_READ,  (uint8_t*)&g_zcl_sceneAttrs.sceneCount     },
+    { ZCL_ATTRID_SCENE_CURRENT_SCENE,       ZCL_DATA_TYPE_UINT8,    ACCESS_CONTROL_READ,  (uint8_t*)&g_zcl_sceneAttrs.currentScene   },
+    { ZCL_ATTRID_SCENE_CURRENT_GROUP,       ZCL_DATA_TYPE_UINT16,   ACCESS_CONTROL_READ,  (uint8_t*)&g_zcl_sceneAttrs.currentGroup   },
+    { ZCL_ATTRID_SCENE_SCENE_VALID,         ZCL_DATA_TYPE_BOOLEAN,  ACCESS_CONTROL_READ,  (uint8_t*)&g_zcl_sceneAttrs.sceneValid     },
+    { ZCL_ATTRID_SCENE_NAME_SUPPORT,        ZCL_DATA_TYPE_BITMAP8,  ACCESS_CONTROL_READ,  (uint8_t*)&g_zcl_sceneAttrs.nameSupport    },
 
-    { ZCL_ATTRID_GLOBAL_CLUSTER_REVISION,   ZCL_DATA_TYPE_UINT16,   ACCESS_CONTROL_READ,  (u8*)&zcl_attr_global_clusterRevision},
+    { ZCL_ATTRID_GLOBAL_CLUSTER_REVISION,   ZCL_DATA_TYPE_UINT16,   ACCESS_CONTROL_READ,  (uint8_t*)&zcl_attr_global_clusterRevision},
 };
 
 #define ZCL_SCENE_ATTR_NUM   sizeof(scene_attrTbl) / sizeof(zclAttrInfo_t)
@@ -303,5 +303,5 @@ const zcl_specClusterInfo_t g_appClusterList[] =
     {ZCL_CLUSTER_GEN_DEVICE_TEMP_CONFIG,    MANUFACTURER_CODE_NONE, ZCL_TEMP_ATTR_NUM,      temp_attrTbl,       zcl_devTemperatureCfg_register, NULL},
 };
 
-u8 APP_CB_CLUSTER_NUM = (sizeof(g_appClusterList)/sizeof(g_appClusterList[0]));
+uint8_t APP_CB_CLUSTER_NUM = (sizeof(g_appClusterList)/sizeof(g_appClusterList[0]));
 

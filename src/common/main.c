@@ -34,7 +34,7 @@ extern void user_init(bool isRetention);
 int main(void){
 	startup_state_e state = drv_platform_init();
 
-	u8 isRetention = (state == SYSTEM_DEEP_RETENTION) ? 1 : 0;
+	uint8_t isRetention = (state == SYSTEM_DEEP_RETENTION) ? 1 : 0;
 
 	os_init(isRetention);
 
@@ -53,7 +53,7 @@ int main(void){
 #endif
 
 #if VOLTAGE_DETECT_ENABLE
-    u32 tick = clock_time();
+    uint32_t tick = clock_time();
 #endif
 
 	while(1){

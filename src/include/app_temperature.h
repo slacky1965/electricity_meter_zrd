@@ -23,11 +23,11 @@
 #define SCRATCHPAD_CRC  8
 
 void ds18b20_init();
-s32 getTemperatureCb(void *arg);
+int32_t getTemperatureCb(void *arg);
 
 //#if defined(MCU_CORE_8258)
 //void adc_temp_init();
-//s16 adc_temp_result();
+//int16_t adc_temp_result();
 //#endif
 
 #endif /* SRC_INCLUDE_APP_TEMPERATURE_H_ */

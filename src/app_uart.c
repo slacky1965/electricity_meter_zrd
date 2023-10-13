@@ -5,10 +5,10 @@
 #include "device.h"
 
 uart_data_t rec_buff = {0,  {0, } };
-u8  uart_buff[UART_BUFF_SIZE];
-u16 uart_head, uart_tail;
+uint8_t  uart_buff[UART_BUFF_SIZE];
+uint16_t uart_head, uart_tail;
 
-u8 available_buff_uart() {
+uint8_t available_buff_uart() {
     if (uart_head != uart_tail) {
         return true;
     }
@@ -28,14 +28,14 @@ void flush_buff_uart() {
     memset(uart_buff, 0, UART_BUFF_SIZE);
 }
 
-u8 read_byte_from_buff_uart() {
-    u8 ch = uart_buff[uart_tail++];
+uint8_t read_byte_from_buff_uart() {
+    uint8_t ch = uart_buff[uart_tail++];
     uart_tail &= UART_BUFF_MASK;
     return ch;
 
 }
 
-static size_t write_bytes_to_buff_uart(u8 *data, size_t len) {
+static size_t write_bytes_to_buff_uart(uint8_t *data, size_t len) {
 
     size_t free_space = get_freespace_buff_uart();
     size_t put_len;
@@ -54,7 +54,7 @@ static size_t write_bytes_to_buff_uart(u8 *data, size_t len) {
 
 static void app_uartRecvCb() {
 
-    u8 write_len;
+    uint8_t write_len;
 
     write_len = write_bytes_to_buff_uart(rec_buff.data, rec_buff.dma_len);
 
@@ -68,9 +68,9 @@ static void app_uartRecvCb() {
     }
 }
 
-void app_uart_init(u32 baudrate) {
+void app_uart_init(uint32_t baudrate) {
 
-//    u32 baudrate = BAUDRATE_UART;
+//    uint32_t baudrate = BAUDRATE_UART;
 
     flush_buff_uart();
     drv_uart_pin_set(GPIO_UART_TX, GPIO_UART_RX);
@@ -84,10 +84,10 @@ void app_uart_init(u32 baudrate) {
 //            break;
 //    }
 
-    drv_uart_init(baudrate, (u8*)&rec_buff, sizeof(uart_data_t), app_uartRecvCb);
+    drv_uart_init(baudrate, (uint8_t*)&rec_buff, sizeof(uart_data_t), app_uartRecvCb);
 }
 
-size_t write_bytes_to_uart(u8 *data, size_t len) {
+size_t write_bytes_to_uart(uint8_t *data, size_t len) {
 
     if (len > UART_DATA_LEN) len = UART_DATA_LEN;
 

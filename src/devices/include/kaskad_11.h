@@ -19,106 +19,106 @@ typedef enum _net_parameters_t {
 } net_parameters_t;
 
 typedef struct __attribute__((packed)) _package_t {
-    u8  len;
-    u8  cmd;
-    u16 address;
-    u8  data[DATA_MAX_LEN];
+    uint8_t  len;
+    uint8_t  cmd;
+    uint16_t address;
+    uint8_t  data[DATA_MAX_LEN];
 } package_t;
 
 typedef struct __attribute__((packed)) _pkt_release_t {
-    u8  len;
-    u8  cmd;
-    u16 address;
-    u8  year;
-    u8  month;
-    u8  day;
-    u8  status;
-    u8  crc;
+    uint8_t  len;
+    uint8_t  cmd;
+    uint16_t address;
+    uint8_t  year;
+    uint8_t  month;
+    uint8_t  day;
+    uint8_t  status;
+    uint8_t  crc;
 } pkt_release_t;
 
 typedef struct __attribute__((packed)) _pkt_tariff_t {
-    u8  len;
-    u8  cmd;
-    u16 address;
-    u8  tariff_num;
-    u32 value;
-    u8  status;
-    u8  crc;
+    uint8_t  len;
+    uint8_t  cmd;
+    uint16_t address;
+    uint8_t  tariff_num;
+    uint32_t value;
+    uint8_t  status;
+    uint8_t  crc;
 } pkt_tariff_t;
 
 typedef struct __attribute__((packed)) _pkt_voltage_t {
-    u8  len;
-    u8  cmd;
-    u16 address;
-    u8  param;
-    u16 voltage;
-    u8  status;
-    u8  crc;
+    uint8_t  len;
+    uint8_t  cmd;
+    uint16_t address;
+    uint8_t  param;
+    uint16_t voltage;
+    uint8_t  status;
+    uint8_t  crc;
 } pkt_voltage_t;
 
 typedef struct __attribute__((packed)) _pkt_voltage3_t {
-    u8  len;
-    u8  cmd;
-    u16 address;
-    u8  param;
-    u16 voltageA;
-    u16 voltageB;
-    u16 voltageC;
-    u8  status;
-    u8  crc;
+    uint8_t  len;
+    uint8_t  cmd;
+    uint16_t address;
+    uint8_t  param;
+    uint16_t voltageA;
+    uint16_t voltageB;
+    uint16_t voltageC;
+    uint8_t  status;
+    uint8_t  crc;
 } pkt_voltage3_t;
 
 typedef struct __attribute__((packed)) _pkt_amps_t {
-    u8  len;
-    u8  cmd;
-    u16 address;
-    u8  param;
-    u16 amps;
-    u8  status;
-    u8  crc;
+    uint8_t  len;
+    uint8_t  cmd;
+    uint16_t address;
+    uint8_t  param;
+    uint16_t amps;
+    uint8_t  status;
+    uint8_t  crc;
 } pkt_amps_t;
 
 typedef struct __attribute__((packed)) _pkt_amps3_t {
-    u8  len;
-    u8  cmd;
-    u16 address;
-    u8  param;
-    u8  ampsA[3];
-    u8  ampsB[3];
-    u8  ampsC[3];
-    u8  status;
-    u8  crc;
+    uint8_t  len;
+    uint8_t  cmd;
+    uint16_t address;
+    uint8_t  param;
+    uint8_t  ampsA[3];
+    uint8_t  ampsB[3];
+    uint8_t  ampsC[3];
+    uint8_t  status;
+    uint8_t  crc;
 } pkt_amps3_t;
 
 typedef struct __attribute__((packed)) _pkt_power_t {
-    u8  len;
-    u8  cmd;
-    u16 address;
-    u8  param;
-    u8  power[3];
-    u8  status;
-    u8  crc;
+    uint8_t  len;
+    uint8_t  cmd;
+    uint16_t address;
+    uint8_t  param;
+    uint8_t  power[3];
+    uint8_t  status;
+    uint8_t  crc;
 } pkt_power_t;
 
 typedef struct __attribute__((packed)) _pkt_power3_t {
-    u8  len;
-    u8  cmd;
-    u16 address;
-    u8  param;
-    u8  powerA[3];
-    u8  powerB[3];
-    u8  powerC[3];
-    u8  status;
-    u8  crc;
+    uint8_t  len;
+    uint8_t  cmd;
+    uint16_t address;
+    uint8_t  param;
+    uint8_t  powerA[3];
+    uint8_t  powerB[3];
+    uint8_t  powerC[3];
+    uint8_t  status;
+    uint8_t  crc;
 } pkt_power3_t;
 
 typedef struct __attribute__((packed)) _pkt_datetime_t {
-    u8  len;
-    u8  cmd;
-    u16 address;
-    u8  datetime[5];
-    u8  status;
-    u8  crc;
+    uint8_t  len;
+    uint8_t  cmd;
+    uint16_t address;
+    uint8_t  datetime[5];
+    uint8_t  status;
+    uint8_t  crc;
 } pkt_datetime_t;
 
 #endif /* SRC_INCLUDE_KASKAD_11_H_ */
