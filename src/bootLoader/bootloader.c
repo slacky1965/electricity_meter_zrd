@@ -87,30 +87,30 @@ typedef enum{
 }msg_status_e;
 
 typedef struct{
-	uint32_t dataLen;
-	uint8_t dataPayload[1];
+	u32 dataLen;
+	u8 dataPayload[1];
 }uart_rxData_t;
 
 typedef struct{
-	uint8_t  startFlag;
-	uint8_t	msgType16H;
-	uint8_t	msgType16L;
-	uint8_t	msgLen16H;
-	uint8_t	msgLen16L;
-	uint8_t	checkSum;
-	uint8_t	pData[1];
+	u8  startFlag;
+	u8	msgType16H;
+	u8	msgType16L;
+	u8	msgLen16H;
+	u8	msgLen16L;
+	u8	checkSum;
+	u8	pData[1];
 }uart_msg_t;
 
 typedef struct{
 	ev_timer_event_t *upgradeTimer;
-	uint32_t flashStartAddr;
-	uint32_t totalImageSize;
-	uint32_t offset;
-	uint8_t	retryCnt;
+	u32 flashStartAddr;
+	u32 totalImageSize;
+	u32 offset;
+	u8	retryCnt;
 }upgradeInfo_t;
 
-__attribute__((aligned(4))) uint8_t uartTxBuf[UART_TX_BUF_SIZE] = {0};
-__attribute__((aligned(4))) uint8_t uartRxBuf[UART_RX_BUF_SIZE] = {0};
+__attribute__((aligned(4))) u8 uartTxBuf[UART_TX_BUF_SIZE] = {0};
+__attribute__((aligned(4))) u8 uartRxBuf[UART_RX_BUF_SIZE] = {0};
 
 static ev_queue_t msgQ;
 static upgradeInfo_t upgradeInfo;
@@ -119,35 +119,35 @@ static upgradeInfo_t upgradeInfo;
 static ev_timer_event_t *otaChkTimerEvt = NULL;
 static bool noAppFlg = FALSE;
 
-static bool is_valid_fw_bootloader(uint32_t addr_fw){
-	uint32_t startup_flag = 0;
-    flash_read(addr_fw + FLASH_TLNK_FLAG_OFFSET, 4, (uint8_t *)&startup_flag);
+static bool is_valid_fw_bootloader(u32 addr_fw){
+	u32 startup_flag = 0;
+    flash_read(addr_fw + FLASH_TLNK_FLAG_OFFSET, 4, (u8 *)&startup_flag);
 
     return ((startup_flag == FW_START_UP_FLAG_WHOLE) ? TRUE : FALSE);
 }
 
-void bootloader_with_ota_check(uint32_t addr_load, uint32_t new_image_addr){
+void bootloader_with_ota_check(u32 addr_load, u32 new_image_addr){
 	drv_disable_irq();
 
 	if(new_image_addr != addr_load){
 		if(is_valid_fw_bootloader(new_image_addr)){
 			bool isNewImageValid = FALSE;
 
-			uint32_t bufCache[256/4];  //align-4
-			uint8_t *buf = (uint8_t *)bufCache;
+			u32 bufCache[256/4];  //align-4
+			u8 *buf = (u8 *)bufCache;
 
 			flash_read(new_image_addr, 256, buf);
-			uint32_t fw_size = *(uint32_t *)(buf + 0x18);
+			u32 fw_size = *(u32 *)(buf + 0x18);
 
 			if(fw_size <= FLASH_OTA_IMAGE_MAX_SIZE){
-				int32_t totalLen = fw_size - 4;
-				uint32_t wLen = 0;
-				uint32_t sAddr = new_image_addr;
+				s32 totalLen = fw_size - 4;
+				u32 wLen = 0;
+				u32 sAddr = new_image_addr;
 
-				uint32_t crcVal = 0;
-				flash_read(new_image_addr + fw_size - 4, 4, (uint8_t *)&crcVal);
+				u32 crcVal = 0;
+				flash_read(new_image_addr + fw_size - 4, 4, (u8 *)&crcVal);
 
-				uint32_t curCRC = 0xffffffff;
+				u32 curCRC = 0xffffffff;
 
 				while(totalLen > 0){
 					wLen = (totalLen > 256) ? 256 : totalLen;
@@ -164,7 +164,7 @@ void bootloader_with_ota_check(uint32_t addr_load, uint32_t new_image_addr){
 			}
 
 			if(isNewImageValid){
-				uint8_t readBuf[256];
+				u8 readBuf[256];
 
 				for(int i = 0; i < fw_size; i += 256){
 					if((i & 0xfff) == 0){
@@ -195,14 +195,14 @@ void bootloader_with_ota_check(uint32_t addr_load, uint32_t new_image_addr){
 
     if(is_valid_fw_bootloader(addr_load)){
 #if !defined(MCU_CORE_B91)
-    	uint32_t ramcode_size = 0;
-        flash_read(addr_load + 0x0c, 2, (uint8_t *)&ramcode_size);
+    	u32 ramcode_size = 0;
+        flash_read(addr_load + 0x0c, 2, (u8 *)&ramcode_size);
         ramcode_size *= 16;
 
         if(ramcode_size > FW_RAMCODE_SIZE_MAX){
             ramcode_size = FW_RAMCODE_SIZE_MAX; // error, should not run here
         }
-        flash_read(addr_load, ramcode_size, (uint8_t *)MCU_RAM_START_ADDR); // copy ram code
+        flash_read(addr_load, ramcode_size, (u8 *)MCU_RAM_START_ADDR); // copy ram code
 #endif
         REBOOT();
     }else{
@@ -212,14 +212,14 @@ void bootloader_with_ota_check(uint32_t addr_load, uint32_t new_image_addr){
 
 
 
-int32_t otaChkDelayCb(void *arg){
+s32 otaChkDelayCb(void *arg){
 	bootloader_with_ota_check(APP_RUNNING_ADDR, APP_NEW_IMAGE_ADDR);
 
 	otaChkTimerEvt = NULL;
 	return -1;
 }
 
-void bootloader_ota_check_delay(uint32_t delayMs){
+void bootloader_ota_check_delay(u32 delayMs){
 	if(delayMs){
 		if(otaChkTimerEvt){
 			TL_ZB_TIMER_CANCEL(&otaChkTimerEvt);
@@ -237,8 +237,8 @@ void bootloader_ota_check_Stop(void){
 }
 
 #if UART_ENABLE
-uint8_t crc8Calc(uint16_t type, uint16_t len, uint8_t *data){
-	uint8_t crc8;
+u8 crc8Calc(uint16_t type, uint16_t len, u8 *data){
+	u8 crc8;
 
 	crc8  = (type >> 0) & 0xff;
 	crc8 ^= (type >> 8) & 0xff;
@@ -252,10 +252,10 @@ uint8_t crc8Calc(uint16_t type, uint16_t len, uint8_t *data){
 	return crc8;
 }
 
-void bootloader_uartTx(uint16_t type, uint16_t len, uint8_t *data){
-    uint8_t crc8 = crc8Calc(type, len, data);
+void bootloader_uartTx(uint16_t type, uint16_t len, u8 *data){
+    u8 crc8 = crc8Calc(type, len, data);
 
-    uint8_t *pData = uartTxBuf;
+    u8 *pData = uartTxBuf;
 
     *pData++ = MSG_START_FLAG;
     *pData++ = (type >> 8) & 0xff;
@@ -271,8 +271,8 @@ void bootloader_uartTx(uint16_t type, uint16_t len, uint8_t *data){
     drv_uart_tx_start(uartTxBuf, pData - uartTxBuf);
 }
 
-void bootloader_uartAck(uint16_t type, uint8_t status){
-	uint8_t array[4] = {0};
+void bootloader_uartAck(uint16_t type, u8 status){
+	u8 array[4] = {0};
 
 	array[0] = (type >> 8) & 0xff;
 	array[1] = (type >> 0) & 0xff;
@@ -282,9 +282,9 @@ void bootloader_uartAck(uint16_t type, uint8_t status){
 	bootloader_uartTx(MSG_CMD_ACKNOWLEDGE, 4, array);
 }
 
-void bootloader_uartOtaStartRsp(uint8_t status){
-	uint8_t array[16] = {0};
-	uint8_t *pBuf = array;
+void bootloader_uartOtaStartRsp(u8 status){
+	u8 array[16] = {0};
+	u8 *pBuf = array;
 
 	*pBuf++ = (upgradeInfo.flashStartAddr >> 24) & 0xff;
 	*pBuf++ = (upgradeInfo.flashStartAddr >> 16) & 0xff;
@@ -303,9 +303,9 @@ void bootloader_uartOtaStartRsp(uint8_t status){
 	bootloader_uartTx(MSG_CMD_OTA_START_RESPONSE, pBuf - array, array);
 }
 
-void bootloader_uartOtaEnd(uint8_t status){
-	uint8_t array[16] = {0};
-	uint8_t *pBuf = array;
+void bootloader_uartOtaEnd(u8 status){
+	u8 array[16] = {0};
+	u8 *pBuf = array;
 
 	*pBuf++ = (upgradeInfo.totalImageSize >> 24) & 0xff;
 	*pBuf++ = (upgradeInfo.totalImageSize >> 16) & 0xff;
@@ -321,10 +321,10 @@ void bootloader_uartOtaEnd(uint8_t status){
 }
 
 void bootloader_uartBlockReq(void){
-	uint8_t array[6] = {0};
-	uint8_t *pBuf = array;
+	u8 array[6] = {0};
+	u8 *pBuf = array;
 
-	uint8_t blockReqLen = 0;
+	u8 blockReqLen = 0;
 
 	if(upgradeInfo.totalImageSize - upgradeInfo.offset >= MSG_BLOCK_REQUEST_SIZE_MAX){
 		blockReqLen = MSG_BLOCK_REQUEST_SIZE_MAX;
@@ -341,16 +341,16 @@ void bootloader_uartBlockReq(void){
 	bootloader_uartTx(MSG_CMD_OTA_BLOCK_REQUEST, pBuf - array, array);
 }
 
-void bootloader_uartOtaComplete(uint8_t status){
+void bootloader_uartOtaComplete(u8 status){
 	bootloader_uartOtaEnd(status);
 
 	if(upgradeInfo.upgradeTimer){
 		TL_ZB_TIMER_CANCEL(&upgradeInfo.upgradeTimer);
 	}
-	memset((uint8_t *)&upgradeInfo, 0, sizeof(upgradeInfo_t));
+	memset((u8 *)&upgradeInfo, 0, sizeof(upgradeInfo_t));
 }
 
-int32_t upgradeBlockReqTimerCb(void *arg){
+s32 upgradeBlockReqTimerCb(void *arg){
 	if(upgradeInfo.retryCnt++ < MSG_BLOCK_REQUEST_RETRY_MAX){
 		bootloader_uartBlockReq();
 
@@ -359,21 +359,21 @@ int32_t upgradeBlockReqTimerCb(void *arg){
 		//upgrade fail.
 		bootloader_uartOtaEnd(MSG_STA_OTA_GET_BLOCK_TIMEOUT);
 
-		memset((uint8_t *)&upgradeInfo, 0, sizeof(upgradeInfo_t));
+		memset((u8 *)&upgradeInfo, 0, sizeof(upgradeInfo_t));
 
 		upgradeInfo.upgradeTimer = NULL;
 		return -1;
 	}
 }
 
-void bootloader_upgrade(uint16_t type, uint16_t len, uint8_t *data){
-	uint8_t sta = MSG_STA_SUCCESS;
-	uint8_t *pData = data;
+void bootloader_upgrade(uint16_t type, uint16_t len, u8 *data){
+	u8 sta = MSG_STA_SUCCESS;
+	u8 *pData = data;
 
 	switch(type){
 		case MSG_CMD_OTA_START_REQUEST:
 			if(upgradeInfo.flashStartAddr == 0){
-				uint32_t totalImageSize = (pData[0] << 24)
+				u32 totalImageSize = (pData[0] << 24)
 								   + (pData[1] << 16)
 								   + (pData[2] << 8)
 								   + (pData[3]);
@@ -388,7 +388,7 @@ void bootloader_upgrade(uint16_t type, uint16_t len, uint8_t *data){
 					upgradeInfo.totalImageSize = totalImageSize;
 
 					//erase the new image area.
-					for(uint32_t i = 0; i < ((upgradeInfo.totalImageSize + 4095) / 4096); i++) {
+					for(u32 i = 0; i < ((upgradeInfo.totalImageSize + 4095) / 4096); i++) {
 						flash_erase(APP_NEW_IMAGE_ADDR + i * 4096);
 					}
 
@@ -413,18 +413,18 @@ void bootloader_upgrade(uint16_t type, uint16_t len, uint8_t *data){
 					TL_ZB_TIMER_CANCEL(&upgradeInfo.upgradeTimer);
 				}
 
-				uint8_t rspStatus = *pData++;
+				u8 rspStatus = *pData++;
 
 				if((rspStatus != MSG_STA_SUCCESS) || (upgradeInfo.totalImageSize == 0)){
 					bootloader_uartOtaComplete(MSG_STA_OTA_ERR_BLOCK_RSP);
 					return;
 				}else{
-					uint32_t rcvOffset = (pData[0] << 24)
+					u32 rcvOffset = (pData[0] << 24)
 								  + (pData[1] << 16)
 								  + (pData[2] << 8)
 								  + (pData[3]);
 					pData += 4;
-					uint8_t rcvBlockLen = *pData++;
+					u8 rcvBlockLen = *pData++;
 
 					if((rcvOffset == upgradeInfo.offset) &&
 					   (rcvBlockLen && (rcvBlockLen <= MSG_BLOCK_REQUEST_SIZE_MAX))){
@@ -439,7 +439,7 @@ void bootloader_upgrade(uint16_t type, uint16_t len, uint8_t *data){
 
 						if(upgradeInfo.offset == upgradeInfo.totalImageSize){
 							//upgrade success, enable boot-up flag
-							uint8_t startUpFlg = FW_START_UP_FLAG;
+							u8 startUpFlg = FW_START_UP_FLAG;
 							flash_write((upgradeInfo.flashStartAddr + FLASH_TLNK_FLAG_OFFSET), 1, &startUpFlg);
 
 							bootloader_ota_check_delay(50);
@@ -472,13 +472,13 @@ void bootloader_uartRxDataProc(void){
 	/* process messages in the uart ISR, and we must check the uart RX state in main loop. */
 	drv_uart_exceptionProcess();
 
-	uint8_t *buf = ev_queue_pop(&msgQ);
+	u8 *buf = ev_queue_pop(&msgQ);
 	if(buf){
 		gpio_toggle(LED_POWER);
 
 		uart_msg_t *pMsg = (uart_msg_t *)buf;
 
-		uint8_t sta = MSG_STA_SUCCESS;
+		u8 sta = MSG_STA_SUCCESS;
 		uint16_t msgType = 0xffff;
 		uint16_t msgLen = 0;
 
@@ -488,7 +488,7 @@ void bootloader_uartRxDataProc(void){
 
 			if(*(pMsg->pData + msgLen) == MSG_END_FLAG){
 				if((msgType == MSG_CMD_OTA_START_REQUEST) || (msgType == MSG_CMD_OTA_BLOCK_RESPONSE)){
-					uint8_t crc8 = crc8Calc(msgType, msgLen, pMsg->pData);
+					u8 crc8 = crc8Calc(msgType, msgLen, pMsg->pData);
 
 					if(pMsg->checkSum == crc8){
 						bootloader_upgrade(msgType, msgLen, pMsg->pData);
@@ -516,7 +516,7 @@ void bootloader_uartRxDataProc(void){
 void bootloader_uartRxHandler(void){
 	uart_rxData_t *rxData = (uart_rxData_t *)uartRxBuf;
 	if(rxData->dataLen && (rxData->dataLen <= (UART_RX_BUF_SIZE - 4))){
-		uint8_t *buf = ev_buf_allocate(rxData->dataLen);
+		u8 *buf = ev_buf_allocate(rxData->dataLen);
 		if(buf){
 			memcpy(buf, rxData->dataPayload, rxData->dataLen);
 
@@ -526,7 +526,7 @@ void bootloader_uartRxHandler(void){
 }
 
 void bootloader_keyPressedCb(kb_data_t *kbEvt){
-	uint8_t keyCode = kbEvt->keycode[0];
+	u8 keyCode = kbEvt->keycode[0];
 
 	if(keyCode == VK_SW1){
 		//cancel the timeout timer, wait for UART upgrade message.
@@ -560,7 +560,7 @@ void bootloader_init(bool isBoot){
 
 		ev_on_poll(EV_POLL_KEY_PRESS, bootloader_keyPressProc);
 
-		memset((uint8_t *)&upgradeInfo, 0, sizeof(upgradeInfo_t));
+		memset((u8 *)&upgradeInfo, 0, sizeof(upgradeInfo_t));
 
 		//start a timer delay for waiting for uart messages.
 		bootloader_ota_check_delay(2000);

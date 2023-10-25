@@ -22,6 +22,7 @@ typedef enum {
     DEVICE_MERCURY_206,
     DEVICE_ENERGOMERA_CE102M,
     DEVICE_NEVA_MT124,
+    DEVICE_NARTIS_100,
     DEVICE_MAX,
 } device_model_t;
 
@@ -34,9 +35,13 @@ typedef enum _pkt_error_t {
     PKT_ERR_INCOMPLETE,
     PKT_ERR_UNSTUFFING,
     PKT_ERR_ADDRESS,
+    PKT_ERR_DEST_ADDRESS,
+    PKT_ERR_SRC_ADDRESS,
     PKT_ERR_RESPONSE,
     PKT_ERR_CRC,
-    PKT_ERR_UART
+    PKT_ERR_UART,
+    PKT_ERR_TYPE,
+    PKT_ERR_SEGMENTATION,
 } pkt_error_t;
 
 uint16_t attr_len;
@@ -60,6 +65,7 @@ uint8_t measure_meter_kaskad_11();
 uint8_t measure_meter_mercury_206();
 uint8_t measure_meter_energomera_ce102m();
 uint8_t measure_meter_neva_mt124();
-
+void nartis100_init();
+uint8_t measure_meter_nartis_100();
 
 #endif /* SRC_INCLUDE_DEVICE_H_ */

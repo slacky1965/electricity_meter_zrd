@@ -11,6 +11,7 @@ ifeq ($(COMPILE_OS),$(LINUX_OS))
 	COMPILE_PREFIX = /opt/tc32/bin/tc32
 else
 	COMPILE_PREFIX = C:/TelinkSDK/opt/tc32/bin/tc32
+	WIN32 = -DWIN32=1
 endif
 
 AS      = $(COMPILE_PREFIX)-elf-as
@@ -57,6 +58,9 @@ INCLUDE_PATHS := \
 -I$(SRC_PATH)/include \
 -I$(SRC_PATH)/include/boards \
 -I$(SRC_PATH)/devices/include \
+-I$(SRC_PATH)/devices/cosemlib/hdlc \
+-I$(SRC_PATH)/devices/cosemlib/src \
+-I$(SRC_PATH)/devices/cosemlib/share/util \
 -I$(SRC_PATH)/common \
 -I./common
 
@@ -78,6 +82,9 @@ GCC_FLAGS := \
 GCC_FLAGS += \
 $(DEVICE_TYPE) \
 $(MCU_TYPE)
+
+#$(WIN32)
+
 
 OBJ_SRCS := 
 S_SRCS := 
@@ -140,7 +147,8 @@ reset:
 	@python3 $(TOOLS_PATH)/TlsrPgm.py -p$(DOWNLOAD_PORT) -t50 -a2550 -m -w i
 
 # Main-build Target
-main-build: clean $(ELF_FILE) secondary-outputs
+#main-build: clean $(ELF_FILE) secondary-outputs
+main-build: clean-project $(ELF_FILE) secondary-outputs
 
 # Tool invocations
 $(ELF_FILE): $(OBJS) $(USER_OBJS)
@@ -184,6 +192,7 @@ clean-project:
 	-$(RM) -R $(OUT_PATH)/$(SRC_PATH)/common/*.o
 	-$(RM) -R $(OUT_PATH)/$(SRC_PATH)/devices/*.o
 	-@echo ' '
+	
 	
 pre-build:
 	mkdir -p $(foreach s,$(OUT_DIR),$(OUT_PATH)$(s))

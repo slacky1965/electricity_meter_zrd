@@ -9,7 +9,6 @@
 #include "app_reporting.h"
 #include "app_uart.h"
 #include "se_custom_attr.h"
-//#include "nartis_100.h"
 
 app_ctx_t g_appCtx;
 uint8_t device_online = false;
@@ -144,8 +143,6 @@ void user_app_init(void)
 
     /* set device model */
     set_device_model(dev_config.device_model);
-
-//    nartis_init();
 }
 
 void app_task(void) {

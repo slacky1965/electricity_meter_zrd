@@ -35,6 +35,9 @@ extern "C" {
  */
 #include "version_cfg.h"
 
+#define ON  1
+#define OFF 0
+
 /**********************************************************************
  * Product Information
  */

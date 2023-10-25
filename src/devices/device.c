@@ -22,6 +22,7 @@ uint8_t device_model[DEVICE_MAX][32] = {
     {"MERCURY-206"},
     {"ENERGOMERA-CE102M"},
     {"NEVA-MT124"},
+    {"NARTIS-100"},
 };
 
 uint8_t set_device_model(device_model_t model) {
@@ -62,11 +63,13 @@ uint8_t set_device_model(device_model_t model) {
         }
         case DEVICE_KASKAD_11: {
 //                measure_meter = measure_meter_kaskad_11;
-            measure_meter = NULL;
-            baudrate = 2400;
-            if (set_zcl_str(device_model[DEVICE_KASKAD_11], name, DEVICE_NAME_LEN)) {
-                zcl_setAttrVal(APP_ENDPOINT_1, ZCL_CLUSTER_SE_METERING, ZCL_ATTRID_CUSTOM_DEVICE_MODEL, (uint8_t*)&name);
-            }
+            nartis100_init();
+            measure_meter = measure_meter_nartis_100;
+            baudrate = 9600;
+//            baudrate = 2400;
+//            if (set_zcl_str(device_model[DEVICE_KASKAD_11], name, DEVICE_NAME_LEN)) {
+//                zcl_setAttrVal(APP_ENDPOINT_1, ZCL_CLUSTER_SE_METERING, ZCL_ATTRID_CUSTOM_DEVICE_MODEL, (uint8_t*)&name);
+//            }
             break;
         }
         case DEVICE_MERCURY_206: {
@@ -200,13 +203,26 @@ void print_error(pkt_error_t err_no) {
         case PKT_ERR_ADDRESS:
             printf("Invalid device address\r\n");
             break;
+        case PKT_ERR_DEST_ADDRESS:
+            printf("Invalid destination address\r\n");
+            break;
+        case PKT_ERR_SRC_ADDRESS:
+            printf("Invalid source address\r\n");
+            break;
         case PKT_ERR_CRC:
             printf("Wrong CRC\r\n");
             break;
         case PKT_ERR_UART:
             printf("UART is busy\r\n");
             break;
+        case PKT_ERR_TYPE:
+            printf("Package type not type 3\r\n");
+            break;
+        case PKT_ERR_SEGMENTATION:
+            printf("Segmentation not support\r\n");
+            break;
         default:
+            printf("Unknown error\r\n");
             break;
     }
 }

@@ -2,7 +2,7 @@
 #define SRC_INCLUDE_APP_UART_H_
 
 #define UART_DATA_LEN  188
-#define UART_BUFF_SIZE 512              /* size ring buffer  */
+#define UART_BUFF_SIZE 2048             /* size ring buffer  */
 #define UART_BUFF_MASK UART_BUFF_SIZE-1 /* mask ring buffer  */
 
 #define app_uart_rx_on  app_uart_init

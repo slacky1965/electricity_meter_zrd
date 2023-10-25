@@ -33,7 +33,7 @@
 /**
  *  @brief Only support for 8258/8278/b91, if you want to this function, please contact to us.
  */
-uint8_t firmwareCheckWithUID(void)
+u8 firmwareCheckWithUID(void)
 {
 #if UID_ENABLE
 	uint32_t flash_mid = 0;
