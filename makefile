@@ -148,7 +148,7 @@ reset:
 
 # Main-build Target
 #main-build: clean $(ELF_FILE) secondary-outputs
-main-build: clean-project $(ELF_FILE) secondary-outputs
+main-build: clean $(ELF_FILE) secondary-outputs
 
 # Tool invocations
 $(ELF_FILE): $(OBJS) $(USER_OBJS)
