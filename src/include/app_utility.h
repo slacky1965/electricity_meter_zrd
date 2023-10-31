@@ -33,5 +33,7 @@ uint32_t itoa(uint32_t value, uint8_t *ptr);
 uint32_t from24to32(const uint8_t *str);
 uint64_t fromPtoInteger(uint16_t len, uint8_t *data);
 uint8_t set_zcl_str(uint8_t *str_in, uint8_t *str_out, uint8_t len);
+uint32_t reverse32(uint32_t in);
+uint16_t reverse16(uint16_t in);
 
 #endif /* SRC_INCLUDE_APP_UTILITY_H_ */
