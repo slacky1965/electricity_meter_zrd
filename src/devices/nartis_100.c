@@ -45,27 +45,21 @@ static uint8_t present_month;
 static uint16_t present_year;
 
 
-request_t attr_descriptor_serial_number = {
+static request_t attr_descriptor_serial_number = {
         .class =     {0x00, 0x01},
         .obis =      {0x00, 0x00, 0x60, 0x01, 0x00, 0xff},   /* 0.0.96.01.00.255 */
         .attribute = {0x02, 0x00}
 };
 
-request_t attr_descriptor_date_release = {
+static request_t attr_descriptor_date_release = {
         .class =     {0x00, 0x01},
         .obis =      {0x00, 0x00, 0x60, 0x01, 0x04, 0xff},   /* 0.0.96.1.4.255   */
         .attribute = {0x02, 0x00}
 };
 
-request_t attr_descriptor_list = {
+static request_t attr_descriptor_list = {
         .class  =    {0x00, 0x07},
         .obis   =    {0x01, 0x00, 0x5e, 0x07, 0x00, 0xff},   /* 1.0.94.7.0.255   */
-        .attribute = {0x02, 0x00}
-};
-
-request_t attr_descriptor_time_device = {
-        .class  =    {0x00, 0x08},
-        .obis   =    {0x00, 0x00, 0x01, 0x00, 0x00, 0xff},   /* 0.0.1.0.0.255   */
         .attribute = {0x02, 0x00}
 };
 
@@ -1112,7 +1106,5 @@ uint8_t measure_meter_nartis_100() {
     }
 
     return ret;
-
-//     return true;
 }
 
