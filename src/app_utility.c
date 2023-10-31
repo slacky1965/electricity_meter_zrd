@@ -95,3 +95,27 @@ uint8_t set_zcl_str(uint8_t *str_in, uint8_t *str_out, uint8_t len) {
     return *str_len;
 }
 
+uint32_t reverse32(uint32_t in) {
+    uint32_t out;
+    uint8_t *source = (uint8_t*)&in;
+    uint8_t *destination = (uint8_t*)&out;
+
+    destination[3] = source[0];
+    destination[2] = source[1];
+    destination[1] = source[2];
+    destination[0] = source[3];
+
+    return out;
+}
+
+uint16_t reverse16(uint16_t in) {
+    uint16_t out;
+    uint8_t *source = (uint8_t*)&in;
+    uint8_t *destination = (uint8_t*)&out;
+
+    destination[1] = source[0];
+    destination[0] = source[1];
+
+    return out;
+}
+

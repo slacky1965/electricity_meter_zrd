@@ -31,19 +31,6 @@ static uint16_t checksum(const uint8_t *src_buffer, uint8_t len) {
     return crc;
 }
 
-static uint32_t reverse32(uint32_t in) {
-    uint32_t out;
-    uint8_t *source = (uint8_t*)&in;
-    uint8_t *destination = (uint8_t*)&out;
-
-    destination[3] = source[0];
-    destination[2] = source[1];
-    destination[1] = source[2];
-    destination[0] = source[3];
-
-    return out;
-}
-
 static uint8_t from_bcd_to_dec(uint8_t bcd) {
 
     uint8_t dec = ((bcd >> 4) & 0x0f) * 10 + (bcd & 0x0f);
@@ -415,7 +402,7 @@ static void get_date_release_data() {
             if (set_zcl_str(dr, date_release, DATA_MAX_LEN+1)) {
                 zcl_setAttrVal(APP_ENDPOINT_1, ZCL_CLUSTER_SE_METERING, ZCL_ATTRID_CUSTOM_DATE_RELEASE, (uint8_t*)&date_release);
 #if UART_PRINTF_MODE && DEBUG_DEVICE_DATA
-        printf("Date of release: %s, len: %d\r\n", date_release+1, *date_release);
+                printf("Date of release: %s, len: %d\r\n", date_release+1, *date_release);
 #endif
             }
         }
