@@ -6,17 +6,22 @@
 #include "app_led.h"
 #include "app_main.h"
 #include "app_dev_config.h"
+#include "device.h"
 
 int32_t flashLedStatusCb(void *arg) {
     if (zb_isDeviceJoinedNwk() && device_online) {
         light_blink_stop();
-//        if (dev_config.new_ota) {
-//            light_blink_start(2, 30, 250);
-//        } else {
+        if (fault_measure_flag) {
+            light_blink_start(2, 30, 250);
+        } else {
             light_blink_start(1, 30, 30);
-//        }
+        }
     } else {
-        light_blink_start(3, 30, 250);
+        if (fault_measure_flag) {
+            light_blink_start(4, 30, 250);
+        } else {
+            light_blink_start(3, 30, 250);
+        }
     }
 
     return 0;
