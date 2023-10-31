@@ -23,7 +23,11 @@ typedef struct __attribute__((packed)) {
     uint8_t     format[2];                  /* type, segmentation and length            */
     uint8_t     addr[3];                    /* addr0+addr1 addr2 or addr0 addr1+addr2   */
     uint8_t     control;                    /* control - srnm, disc, etc.               */
-    uint8_t     data[PKT_BUFF_MAX_LEN*2];   /* | HCS | Information | FCS | Flag |       */
+} header_t;
+
+typedef struct __attribute__((packed)) {
+    header_t    header;                     /* | FLAG | Format | Dest addr | Src addr | Control |   */
+    uint8_t     data[PKT_BUFF_MAX_LEN*2];   /* | HCS | Information | FCS | Flag |                   */
 } package_t;
 
 
@@ -39,6 +43,22 @@ typedef struct __attribute__((packed)) {
     uint8_t     value[PKT_BUFF_MAX_LEN];
 } parameter_t;
 
+typedef struct __attribute__((packed)) {
+    uint8_t     class[2];
+    uint8_t     obis[6];
+    uint8_t     attribute[2];
+} request_t;
+
+typedef struct __attribute__((packed)) {
+    uint8_t     type;
+    uint8_t     size;
+    uint8_t     str;
+} type_octet_string_t;
+
+typedef struct __attribute__((packed)) {
+    uint8_t     type;                       /* 0x05 or 0x06 */
+    uint32_t    value;
+} type_digit_t; /* int8_t, uint8_t, int16_t, uint16_t, int32_t, uint32_t, int64_t, uint64_t */
 
 typedef struct __attribute__((packed)) {
     uint8_t     client_addr;
@@ -50,8 +70,15 @@ typedef struct __attribute__((packed)) {
     uint16_t    max_info_field_rx;
     uint32_t    window_tx;
     uint32_t    window_rx;
-    package_t   package;
+    uint8_t     rrr;
+    uint8_t     sss;
 } meter_t;
+
+typedef struct __attribute__((packed)) {
+    size_t      size;
+    uint8_t     complete;                   /* 1 - complete, 0 - not complete */
+    uint8_t     buff[UART_BUFF_SIZE*2];
+} result_package_t;
 
 
 #endif /* SRC_DEVICES_INCLUDE_NARTIS_100_H_ */

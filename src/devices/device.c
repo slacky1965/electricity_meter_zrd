@@ -63,9 +63,7 @@ uint8_t set_device_model(device_model_t model) {
         }
         case DEVICE_KASKAD_11: {
 //                measure_meter = measure_meter_kaskad_11;
-            nartis100_init();
-            measure_meter = measure_meter_nartis_100;
-            baudrate = 9600;
+            measure_meter = NULL;
 //            baudrate = 2400;
 //            if (set_zcl_str(device_model[DEVICE_KASKAD_11], name, DEVICE_NAME_LEN)) {
 //                zcl_setAttrVal(APP_ENDPOINT_1, ZCL_CLUSTER_SE_METERING, ZCL_ATTRID_CUSTOM_DEVICE_MODEL, (uint8_t*)&name);
@@ -95,6 +93,19 @@ uint8_t set_device_model(device_model_t model) {
             measure_meter = measure_meter_neva_mt124;
             baudrate = 300;
             if (set_zcl_str(device_model[DEVICE_NEVA_MT124], name, DEVICE_NAME_LEN)) {
+                zcl_setAttrVal(APP_ENDPOINT_1, ZCL_CLUSTER_SE_METERING, ZCL_ATTRID_CUSTOM_DEVICE_MODEL, (uint8_t*)&name);
+            }
+            break;
+        }
+        case DEVICE_NARTIS_100: {
+            nartis100_init();
+            measure_meter = measure_meter_nartis_100;
+            baudrate = 9600;
+            energy_divisor = 1000;
+            voltage_divisor = 100;
+            current_divisor = 1000;
+            power_divisor = 1000;
+            if (set_zcl_str(device_model[DEVICE_NARTIS_100], name, DEVICE_NAME_LEN)) {
                 zcl_setAttrVal(APP_ENDPOINT_1, ZCL_CLUSTER_SE_METERING, ZCL_ATTRID_CUSTOM_DEVICE_MODEL, (uint8_t*)&name);
             }
             break;
