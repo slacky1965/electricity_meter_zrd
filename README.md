@@ -125,7 +125,7 @@ Not finished! In the process!
 
 Далее компилируем уже саму прошивку и прошиваем.
 
-<img src="https://raw.githubusercontent.com/slacky1965/electricity_meter_zrd/main/doc/images/eclipse/eclipse5.jpg"/>
+<img src="https://raw.githubusercontent.com/slacky1965/electricity_meter_zrd/main/doc/images/eclipse/eclipse6.jpg"/>
 
 Если все прошло без ошибок, то модуль запустится и начнет работу.
 
