@@ -12,15 +12,15 @@ int32_t flashLedStatusCb(void *arg) {
     if (zb_isDeviceJoinedNwk() && device_online) {
         light_blink_stop();
         if (fault_measure_flag) {
-            light_blink_start(2, 30, 250);
+            light_blink_start(2, 30, 200);
         } else {
             light_blink_start(1, 30, 30);
         }
     } else {
         if (fault_measure_flag) {
-            light_blink_start(4, 30, 250);
+            light_blink_start(4, 30, 200);
         } else {
-            light_blink_start(3, 30, 250);
+            light_blink_start(3, 30, 200);
         }
     }
 
