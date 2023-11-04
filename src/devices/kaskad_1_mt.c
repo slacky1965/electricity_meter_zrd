@@ -315,7 +315,7 @@ static pkt_error_t response_meter(command_t command) {
 #endif
     }
 
-#if UART_PRINTF_MODE
+#if UART_PRINTF_MODE && (DEBUG_DEVICE_DATA || DEBUG_PACKAGE)
     if (pkt_error_no != PKT_OK) print_error(pkt_error_no);
 #endif
 
