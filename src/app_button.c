@@ -5,6 +5,7 @@
 
 #include "app_utility.h"
 #include "app_button.h"
+#include "app_reporting.h"
 #include "app_main.h"
 
 #define DEBOUNCE_BUTTON     16                          /* number of polls for debounce       */
@@ -63,10 +64,8 @@ void button_handler() {
             TL_ZB_TIMER_SCHEDULE(delayedMcuResetCb, NULL, TIMEOUT_1SEC);
         } else { /* short pressed < 5 sec. */
             light_blink_start(1, 30, 30);
-
-//            if (!g_appCtx.timerForcedReportEvt) {
-//                g_appCtx.timerForcedReportEvt = TL_ZB_TIMER_SCHEDULE(forcedReportCb, NULL, TIMEOUT_5SEC);
-//            }
+            // for test
+            //app_forcedReport(APP_ENDPOINT_1, ZCL_CLUSTER_GEN_DEVICE_TEMP_CONFIG, ZCL_ATTRID_DEV_TEMP_CURR_TEMP);
         }
     } else if (!g_appCtx.button.pressed) {
         if (clock_time_exceed(g_appCtx.button.released_time, TIMEOUT_TICK_1SEC)) {
