@@ -11,6 +11,7 @@
 #define TIMEOUT_TICK_30MIN  1800*1000*1000  /* timeout 30 min   */
 
 /* for TL_ZB_TIMER_SCHEDULE() */
+#define TIMEOUT_250MS       250             /* timeout 250 ms   */
 #define TIMEOUT_1SEC        1    * 1000     /* timeout 1 sec    */
 #define TIMEOUT_2SEC        2    * 1000     /* timeout 2 sec    */
 #define TIMEOUT_3SEC        3    * 1000     /* timeout 3 sec    */
