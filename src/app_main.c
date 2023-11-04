@@ -156,11 +156,13 @@ void app_task(void) {
     }
 }
 
-static void app_sysException(void)
-{
+
+extern volatile u16 T_evtExcept[4];
+
+static void app_sysException(void) {
 
 #if UART_PRINTF_MODE
-    printf("app_sysException, reset\r\n");
+    printf("app_sysException, line: %d, event: %d, reset\r\n", T_evtExcept[0], T_evtExcept[1]);
 #endif
 
 #if 1
