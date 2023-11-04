@@ -16,6 +16,8 @@ extern void reportAttr(reportCfgInfo_t *pEntry);
 
 /**********************************************************************
  * Custom reporting application
+ *
+ * Local function
  */
 
 static uint8_t app_reportableChangeValueChk(uint8_t dataType, uint8_t *curValue, uint8_t *prevValue, uint8_t *reportableChange) {
@@ -46,7 +48,7 @@ static int32_t app_reportMinAttrTimerCb(void *arg) {
     reportCfgInfo_t *pEntry = app_reporting->pEntry;
 
     zclAttrInfo_t *pAttrEntry = zcl_findAttribute(pEntry->endPoint, pEntry->clusterID, pEntry->attrID);
-    if(!pAttrEntry){
+    if (!pAttrEntry) {
         //should not happen.
         ZB_EXCEPTION_POST(SYS_EXCEPTTION_ZB_ZCL_ENTRY);
         app_reporting->timerReportMinEvt = NULL;
@@ -68,7 +70,7 @@ static int32_t app_reportMinAttrTimerCb(void *arg) {
 
     len = (len>8) ? (8):(len);
 
-    if( (!zcl_analogDataType(pAttrEntry->type) && (memcmp(pEntry->prevData, pAttrEntry->data, len) != SUCCESS)) ||
+    if ((!zcl_analogDataType(pAttrEntry->type) && (memcmp(pEntry->prevData, pAttrEntry->data, len) != SUCCESS)) ||
             ((zcl_analogDataType(pAttrEntry->type) && app_reportableChangeValueChk(pAttrEntry->type,
             pAttrEntry->data, pEntry->prevData, pEntry->reportableChange)))) {
 
@@ -101,18 +103,18 @@ static int32_t app_reportMaxAttrTimerCb(void *arg) {
     return 0;
 }
 
-void app_reportAttrTimerStart() {
+static void app_reportAttrTimerStart() {
     static uint8_t first = 1;
 
-    if(zcl_reportingEntryActiveNumGet()) {
+    if (zcl_reportingEntryActiveNumGet()) {
         for(uint8_t i = 0; i < ZCL_REPORTING_TABLE_NUM; i++) {
             reportCfgInfo_t *pEntry = &reportingTab.reportCfgInfo[i];
             app_reporting[i].pEntry = pEntry;
             if (first) {
                 first = 0;
             }
-            if(pEntry->used && (pEntry->maxInterval != 0xFFFF) && (pEntry->minInterval || pEntry->maxInterval)){
-                if(zb_bindingTblSearched(pEntry->clusterID, pEntry->endPoint)) {
+            if (pEntry->used && (pEntry->maxInterval != 0xFFFF) && (pEntry->minInterval || pEntry->maxInterval)) {
+                if (zb_bindingTblSearched(pEntry->clusterID, pEntry->endPoint)) {
                     if (!app_reporting[i].timerReportMinEvt) {
                         if (pEntry->minInterval && pEntry->maxInterval && pEntry->minInterval <= pEntry->maxInterval) {
 #if UART_PRINTF_MODE && DEBUG_REPORTING
@@ -142,18 +144,18 @@ void app_reportAttrTimerStart() {
     }
 }
 
-void app_reportNoMinLimit(void)
-{
-    if(zcl_reportingEntryActiveNumGet()){
+static void app_reportNoMinLimit(void) {
+
+    if (zcl_reportingEntryActiveNumGet()) {
         zclAttrInfo_t *pAttrEntry = NULL;
         uint16_t len = 0;
 
-        for(uint8_t i = 0; i < ZCL_REPORTING_TABLE_NUM; i++){
+        for (uint8_t i = 0; i < ZCL_REPORTING_TABLE_NUM; i++) {
             reportCfgInfo_t *pEntry = &reportingTab.reportCfgInfo[i];
-            if(pEntry->used && (pEntry->maxInterval != 0xFFFF) && (pEntry->minInterval == 0)){
+            if (pEntry->used && (pEntry->maxInterval == 0 || ((pEntry->maxInterval != 0xFFFF) && (pEntry->minInterval == 0)))) {
                 //there is no minimum limit
                 pAttrEntry = zcl_findAttribute(pEntry->endPoint, pEntry->clusterID, pEntry->attrID);
-                if(!pAttrEntry){
+                if (!pAttrEntry) {
                     //should not happen.
                     ZB_EXCEPTION_POST(SYS_EXCEPTTION_ZB_ZCL_ENTRY);
                     return;
@@ -162,11 +164,11 @@ void app_reportNoMinLimit(void)
                 len = zcl_getAttrSize(pAttrEntry->type, pAttrEntry->data);
                 len = (len>8) ? (8):(len);
 
-                if( (!zcl_analogDataType(pAttrEntry->type) && (memcmp(pEntry->prevData, pAttrEntry->data, len) != SUCCESS)) ||
+                if ((!zcl_analogDataType(pAttrEntry->type) && (memcmp(pEntry->prevData, pAttrEntry->data, len) != SUCCESS)) ||
                         ((zcl_analogDataType(pAttrEntry->type) && app_reportableChangeValueChk(pAttrEntry->type,
                         pAttrEntry->data, pEntry->prevData, pEntry->reportableChange)))) {
 
-                    if(zb_bindingTblSearched(pEntry->clusterID, pEntry->endPoint)) {
+                    if (zb_bindingTblSearched(pEntry->clusterID, pEntry->endPoint)) {
 
                         reportAttr(pEntry);
 
@@ -178,15 +180,48 @@ void app_reportNoMinLimit(void)
                         if (app_reporting[i].timerReportMaxEvt) {
                             TL_ZB_TIMER_CANCEL(&app_reporting[i].timerReportMaxEvt);
                         }
-                        app_reporting[i].timerReportMaxEvt = TL_ZB_TIMER_SCHEDULE(app_reportMaxAttrTimerCb, &app_reporting[i], pEntry->maxInterval*1000);
-#if UART_PRINTF_MODE && DEBUG_REPORTING
-                        printf("Start maxTimer. endPoint: %d, clusterID: 0x%x, attrID: 0x%x, min: %d, max: %d\r\n", pEntry->endPoint, pEntry->clusterID, pEntry->attrID, pEntry->minInterval, pEntry->maxInterval);
-#endif
+
+                        if (pEntry->maxInterval != 0) {
+                            app_reporting[i].timerReportMaxEvt = TL_ZB_TIMER_SCHEDULE(app_reportMaxAttrTimerCb, &app_reporting[i], pEntry->maxInterval*1000);
+    #if UART_PRINTF_MODE && DEBUG_REPORTING
+                            printf("Start maxTimer. endPoint: %d, clusterID: 0x%x, attrID: 0x%x, min: %d, max: %d\r\n", pEntry->endPoint, pEntry->clusterID, pEntry->attrID, pEntry->minInterval, pEntry->maxInterval);
+    #endif
+                        }
                     }
                 }
             }
         }
     }
+}
+
+/**********************************************************************
+ *  Global function
+ */
+
+void app_forcedReport(uint8_t endpoint, uint16_t claster_id, uint16_t attr_id) {
+
+    if (zb_isDeviceJoinedNwk()) {
+        epInfo_t dstEpInfo;
+        TL_SETSTRUCTCONTENT(dstEpInfo, 0);
+
+        dstEpInfo.profileId = HA_PROFILE_ID;
+#if FIND_AND_BIND_SUPPORT
+        dstEpInfo.dstAddrMode = APS_DSTADDR_EP_NOTPRESETNT;
+#else
+        dstEpInfo.dstAddrMode = APS_SHORT_DSTADDR_WITHEP;
+        dstEpInfo.dstEp = endpoint;
+        dstEpInfo.dstAddr.shortAddr = 0xfffc;
+#endif
+        zclAttrInfo_t *pAttrEntry;
+        pAttrEntry = zcl_findAttribute(endpoint, claster_id, attr_id);
+        zcl_sendReportCmd(endpoint, &dstEpInfo,  TRUE, ZCL_FRAME_SERVER_CLIENT_DIR,
+                claster_id, pAttrEntry->id, pAttrEntry->type, pAttrEntry->data);
+
+        printf("forceReportCb. endpoint: 0x%x, claster_id: 0x%x, attr_id: 0x%x\r\n", endpoint, claster_id, attr_id);
+
+    }
+
+
 }
 
 void app_reporting_init() {
@@ -211,11 +246,11 @@ void app_reporting_init() {
 
 void report_handler(void) {
 
-    if(zb_isDeviceJoinedNwk()) {
+    if (zb_isDeviceJoinedNwk()) {
 
         if (g_appCtx.timerStopReportEvt) return;
 
-        if(zcl_reportingEntryActiveNumGet()) {
+        if (zcl_reportingEntryActiveNumGet()) {
 
 
             app_reportNoMinLimit();
