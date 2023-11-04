@@ -6,6 +6,7 @@
 #include "app_endpoint_cfg.h"
 #include "app_dev_config.h"
 #include "device.h"
+#include "app_reporting.h"
 #include "nartis_100.h"
 
 #define PASSWORD        "111"
@@ -993,10 +994,13 @@ static void get_list_data() {
 
                                     uint16_t volts = reverse32(p_list->value) / 10;
 
+
                                     zcl_getAttrVal(APP_ENDPOINT_1, ZCL_CLUSTER_MS_ELECTRICAL_MEASUREMENT, ZCL_ATTRID_RMS_VOLTAGE, &attr_len, (uint8_t*)&attr_data);
                                     uint16_t last_volts = fromPtoInteger(attr_len, attr_data);
 
                                     if (volts != last_volts) {
+                                        app_forcedReport(APP_ENDPOINT_1, ZCL_CLUSTER_MS_ELECTRICAL_MEASUREMENT, ZCL_ATTRID_AC_VOLTAGE_MULTIPLIER);
+                                        app_forcedReport(APP_ENDPOINT_1, ZCL_CLUSTER_MS_ELECTRICAL_MEASUREMENT, ZCL_ATTRID_AC_VOLTAGE_DIVISOR);
                                         zcl_setAttrVal(APP_ENDPOINT_1, ZCL_CLUSTER_MS_ELECTRICAL_MEASUREMENT, ZCL_ATTRID_RMS_VOLTAGE, (uint8_t*)&volts);
                                     }
 
@@ -1038,7 +1042,7 @@ static void get_list_data() {
 
 static void get_resbat_data() {
 
-#if UART_PRINTF_MODE
+#if UART_PRINTF_MODE && (DEBUG_DEVICE_DATA || DEBUG_PACKAGE)
     printf("\r\nCommand get resource of battery\r\n");
 #endif
 
