@@ -1,9 +1,9 @@
 #include "tl_common.h"
 #include "zcl_include.h"
 
-#include "app_endpoint_cfg.h"
 #include "app_temperature.h"
-#include "app_cfg.h"
+#include "app_endpoint_cfg.h"
+
 #define DIRECT_MODE_INPUT   one_wire_mode_input
 #define DIRECT_MODE_OUTPUT  one_wire_mode_output
 #define DIRECT_WRITE_HIGH() one_wire_gpio_write(1)
@@ -133,7 +133,7 @@ static float ds18b20_get_temp() {
 void ds18b20_init() {
     drv_gpio_input_en(GPIO_TEMP, true);
     drv_gpio_output_en(GPIO_TEMP, true);
-    drv_gpio_up_down_resistor(GPIO_TEMP, PM_PIN_PULLUP_10K);
+    drv_gpio_up_down_resistor(GPIO_TEMP, PM_PIN_PULLUP_1M/*PM_PIN_PULLUP_10K*/);
     drv_gpio_irq_dis(GPIO_TEMP);
 
     DIRECT_WRITE_HIGH();
