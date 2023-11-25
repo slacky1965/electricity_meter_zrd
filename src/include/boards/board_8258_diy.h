@@ -56,7 +56,7 @@ extern "C" {
 /************************* Configure Temperature ***********************************/
 #define GPIO_TEMP               GPIO_PC3
 #define PC3_FUNC                AS_GPIO
-#define PULL_WAKEUP_SRC_PC3     PM_PIN_PULLUP_1M
+//#define PULL_WAKEUP_SRC_PC3     PM_PIN_PULLUP_1M
 
 /* Disable C linkage for C++ Compilers: */
 #if defined(__cplusplus)
