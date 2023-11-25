@@ -13,12 +13,15 @@
 
 # Внимание!!! Плата пришла и протестированна!!! Есть ошибка в схеме!!!
 
-	Не подведено питание в датчику температуры. Решается обычной перемычкой из МГТФ. Все остальное работает.
+Не подведено питание в датчику температуры. 
 	
 <img src="https://raw.githubusercontent.com/slacky1965/electricity_meter_zrd/main/doc/images/ds18b20_wo_vcc.jpg"/>
+
+Решается обычной перемычкой из МГТФ. 
 	
 <img src="https://raw.githubusercontent.com/slacky1965/electricity_meter_zrd/main/doc/images/board/board_top_wire.jpg"/>
 	
+Все остальное работает.
 	
 # Но! Схема исправлена. Плата обновлена. Но не заказана и не протестирована :))
 
