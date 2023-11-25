@@ -233,7 +233,7 @@ zcl_tempAttr_t g_zcl_tempAttrs = {
 const zclAttrInfo_t temp_attrTbl[] = {
         {ZCL_ATTRID_DEV_TEMP_CURR_TEMP,     ZCL_DATA_TYPE_INT16,    ACCESS_CONTROL_READ | ACCESS_CONTROL_REPORTABLE,    (uint8_t*)&g_zcl_tempAttrs.temperature},
         {ZCL_ATTRID_DEV_TEMP_ALARM_MASK,    ZCL_DATA_TYPE_BITMAP8,  ACCESS_CONTROL_READ | ACCESS_CONTROL_WRITE,         (uint8_t*)&g_zcl_tempAttrs.alarm_mask},
-        {ZCL_ATTRID_DEV_TEMP_HIGH_THRE,     ZCL_DATA_TYPE_INT16,    ACCESS_CONTROL_READ | ACCESS_CONTROL_WRITE,         (uint8_t*)&g_zcl_tempAttrs.high_threshold},
+        {ZCL_ATTRID_DEV_TEMP_HIGH_THRES,    ZCL_DATA_TYPE_INT16,    ACCESS_CONTROL_READ | ACCESS_CONTROL_WRITE,         (uint8_t*)&g_zcl_tempAttrs.high_threshold},
 
         { ZCL_ATTRID_GLOBAL_CLUSTER_REVISION,   ZCL_DATA_TYPE_UINT16,   ACCESS_CONTROL_READ,                            (uint8_t*)&zcl_attr_global_clusterRevision},
 };
