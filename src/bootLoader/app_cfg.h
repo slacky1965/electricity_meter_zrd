@@ -81,16 +81,17 @@ extern "C" {
 #define BOARD_8278_DONGLE				7
 #define BOARD_B91_EVK					8
 #define BOARD_B91_DONGLE				9
+#define BOARD_8258_DIY                  10
 
 /* Board define */
-#if defined(MCU_CORE_826x)
+#if defined(MCU_CORE_826xx)
 	#define BOARD						BOARD_826x_DONGLE
 	#define CLOCK_SYS_CLOCK_HZ  		32000000
 #elif defined(MCU_CORE_8258)
 #if (CHIP_TYPE == TLSR_8258_1M)
 	#define FLASH_CAP_SIZE_1M			1
 #endif
-	#define BOARD						BOARD_8258_DONGLE
+	#define BOARD						BOARD_8258_DIY //BOARD_8258_DONGLE //
 	#define CLOCK_SYS_CLOCK_HZ  		48000000
 #elif defined(MCU_CORE_8278)
 	#define FLASH_CAP_SIZE_1M		  	1
@@ -123,6 +124,8 @@ extern "C" {
 	#include "board_b91_evk.h"
 #elif (BOARD == BOARD_B91_DONGLE)
 	#include "board_b91_dongle.h"
+#elif (BOARD == BOARD_8258_DIY)
+    #include "board_8258_diy.h"
 #endif
 
 
