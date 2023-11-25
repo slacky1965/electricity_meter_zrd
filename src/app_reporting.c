@@ -13,6 +13,7 @@
 app_reporting_t app_reporting[ZCL_REPORTING_TABLE_NUM];
 
 extern void reportAttr(reportCfgInfo_t *pEntry);
+void report_divisor_multiplier(reportCfgInfo_t *pEntry);
 
 /**********************************************************************
  * Custom reporting application
@@ -56,6 +57,7 @@ static int32_t app_reportMinAttrTimerCb(void *arg) {
     }
 
     if (pEntry->minInterval == pEntry->maxInterval) {
+        report_divisor_multiplier(pEntry);
         reportAttr(pEntry);
         app_reporting->time_posted = clock_time();
 #if UART_PRINTF_MODE && DEBUG_REPORTING
@@ -74,6 +76,7 @@ static int32_t app_reportMinAttrTimerCb(void *arg) {
             ((zcl_analogDataType(pAttrEntry->type) && app_reportableChangeValueChk(pAttrEntry->type,
             pAttrEntry->data, pEntry->prevData, pEntry->reportableChange)))) {
 
+        report_divisor_multiplier(pEntry);
         reportAttr(pEntry);
         app_reporting->time_posted = clock_time();
 #if UART_PRINTF_MODE && DEBUG_REPORTING
@@ -93,11 +96,12 @@ static int32_t app_reportMaxAttrTimerCb(void *arg) {
         if (app_reporting->timerReportMinEvt) {
             TL_ZB_TIMER_CANCEL(&app_reporting->timerReportMinEvt);
         }
+        report_divisor_multiplier(pEntry);
+        reportAttr(pEntry);
 #if UART_PRINTF_MODE && DEBUG_REPORTING
         printf("Report Max_Interval has been sent. endPoint: %d, clusterID: 0x%x, attrID: 0x%x, minInterval: %d, maxInterval: %d\r\n",
                 pEntry->endPoint, pEntry->clusterID, pEntry->attrID, pEntry->minInterval, pEntry->maxInterval);
 #endif
-        reportAttr(pEntry);
     }
 
     return 0;
@@ -170,6 +174,8 @@ static void app_reportNoMinLimit(void) {
 
                     if (zb_bindingTblSearched(pEntry->clusterID, pEntry->endPoint)) {
 
+                        report_divisor_multiplier(pEntry);
+
                         reportAttr(pEntry);
 
                         app_reporting[i].time_posted = clock_time();
@@ -183,9 +189,9 @@ static void app_reportNoMinLimit(void) {
 
                         if (pEntry->maxInterval != 0) {
                             app_reporting[i].timerReportMaxEvt = TL_ZB_TIMER_SCHEDULE(app_reportMaxAttrTimerCb, &app_reporting[i], pEntry->maxInterval*1000);
-    #if UART_PRINTF_MODE && DEBUG_REPORTING
+#if UART_PRINTF_MODE && DEBUG_REPORTING
                             printf("Start maxTimer. endPoint: %d, clusterID: 0x%x, attrID: 0x%x, min: %d, max: %d\r\n", pEntry->endPoint, pEntry->clusterID, pEntry->attrID, pEntry->minInterval, pEntry->maxInterval);
-    #endif
+#endif
                         }
                     }
                 }
@@ -197,6 +203,43 @@ static void app_reportNoMinLimit(void) {
 /**********************************************************************
  *  Global function
  */
+
+void report_divisor_multiplier(reportCfgInfo_t *pEntry) {
+
+    //force report for multiplier and divisor
+
+    if (pEntry->clusterID == ZCL_CLUSTER_SE_METERING) {
+        switch (pEntry->attrID) {
+            case ZCL_ATTRID_CURRENT_TIER_1_SUMMATION_DELIVERD:
+            case ZCL_ATTRID_CURRENT_TIER_2_SUMMATION_DELIVERD:
+            case ZCL_ATTRID_CURRENT_TIER_3_SUMMATION_DELIVERD:
+            case ZCL_ATTRID_CURRENT_TIER_4_SUMMATION_DELIVERD:
+                app_forcedReport(APP_ENDPOINT_1, ZCL_CLUSTER_SE_METERING, ZCL_ATTRID_MULTIPLIER);
+                app_forcedReport(APP_ENDPOINT_1, ZCL_CLUSTER_SE_METERING, ZCL_ATTRID_DIVISOR);
+                break;
+            default:
+                break;
+        }
+    } else if (pEntry->clusterID == ZCL_CLUSTER_MS_ELECTRICAL_MEASUREMENT) {
+        switch (pEntry->attrID) {
+            case ZCL_ATTRID_LINE_CURRENT:
+                app_forcedReport(APP_ENDPOINT_1, ZCL_CLUSTER_MS_ELECTRICAL_MEASUREMENT, ZCL_ATTRID_AC_CURRENT_MULTIPLIER);
+                app_forcedReport(APP_ENDPOINT_1, ZCL_CLUSTER_MS_ELECTRICAL_MEASUREMENT, ZCL_ATTRID_AC_CURRENT_DIVISOR);
+                break;
+            case ZCL_ATTRID_RMS_VOLTAGE:
+                app_forcedReport(APP_ENDPOINT_1, ZCL_CLUSTER_MS_ELECTRICAL_MEASUREMENT, ZCL_ATTRID_AC_VOLTAGE_MULTIPLIER);
+                app_forcedReport(APP_ENDPOINT_1, ZCL_CLUSTER_MS_ELECTRICAL_MEASUREMENT, ZCL_ATTRID_AC_VOLTAGE_DIVISOR);
+                break;
+            case ZCL_ATTRID_APPARENT_POWER:
+                app_forcedReport(APP_ENDPOINT_1, ZCL_CLUSTER_MS_ELECTRICAL_MEASUREMENT, ZCL_ATTRID_AC_POWER_MULTIPLIER);
+                app_forcedReport(APP_ENDPOINT_1, ZCL_CLUSTER_MS_ELECTRICAL_MEASUREMENT, ZCL_ATTRID_AC_POWER_DIVISOR);
+                break;
+            default:
+                break;
+        }
+    }
+}
+
 
 void app_forcedReport(uint8_t endpoint, uint16_t claster_id, uint16_t attr_id) {
 
@@ -217,8 +260,9 @@ void app_forcedReport(uint8_t endpoint, uint16_t claster_id, uint16_t attr_id) {
         zcl_sendReportCmd(endpoint, &dstEpInfo,  TRUE, ZCL_FRAME_SERVER_CLIENT_DIR,
                 claster_id, pAttrEntry->id, pAttrEntry->type, pAttrEntry->data);
 
+#if UART_PRINTF_MODE && DEBUG_REPORTING
         printf("forceReportCb. endpoint: 0x%x, claster_id: 0x%x, attr_id: 0x%x\r\n", endpoint, claster_id, attr_id);
-
+#endif
     }
 
 

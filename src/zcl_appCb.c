@@ -283,9 +283,37 @@ static void app_zclCfgReportCmd(uint8_t endPoint, uint16_t clusterId, zclCfgRepo
                 if (app_reporting[ii].pEntry->endPoint == endPoint &&
                     app_reporting[ii].pEntry->clusterID == clusterId &&
                     app_reporting[ii].pEntry->attrID == pCfgReportCmd->attrList[i].attrID) {
+                    if (pCfgReportCmd->attrList[i].attrID == ZCL_ATTRID_MULTIPLIER ||
+                        pCfgReportCmd->attrList[i].attrID == ZCL_ATTRID_DIVISOR ||
+                        pCfgReportCmd->attrList[i].attrID == ZCL_ATTRID_AC_VOLTAGE_MULTIPLIER ||
+                        pCfgReportCmd->attrList[i].attrID == ZCL_ATTRID_AC_VOLTAGE_DIVISOR ||
+                        pCfgReportCmd->attrList[i].attrID == ZCL_ATTRID_AC_CURRENT_MULTIPLIER ||
+                        pCfgReportCmd->attrList[i].attrID == ZCL_ATTRID_AC_CURRENT_DIVISOR ||
+                        pCfgReportCmd->attrList[i].attrID == ZCL_ATTRID_AC_POWER_MULTIPLIER ||
+                        pCfgReportCmd->attrList[i].attrID == ZCL_ATTRID_AC_POWER_DIVISOR) {
 #if UART_PRINTF_MODE && DEBUG_REPORTING
-                    printf("reportCfg: idx: %d, endPoint: 0x%x, clusterId: 0x%x, attrId: 0x%x\r\n", ii, endPoint, clusterId, pCfgReportCmd->attrList[i].attrID);
+                        printf("The report in cluster 0x%x of attribute 0x%x cannot be changed\r\n",
+                                clusterId, pCfgReportCmd->attrList[i].attrID);
 #endif
+                        app_reporting[ii].pEntry->maxInterval = 0;
+                        app_reporting[ii].pEntry->minInterval = 0;
+                        memset(app_reporting[ii].pEntry->reportableChange, 0, sizeof(app_reporting[ii].pEntry->reportableChange));
+                    } else {
+#if UART_PRINTF_MODE && DEBUG_REPORTING
+                    printf("reportCfg: idx: %d, endPoint: 0x%x, clusterId: 0x%x, attrId: 0x%x\r\n",
+                            ii, endPoint, clusterId, pCfgReportCmd->attrList[i].attrID);
+                    printf("New minInterval: %d, new maxInterval: %d, new reportableChange: 0x",
+                            app_reporting[ii].pEntry->minInterval, app_reporting[ii].pEntry->maxInterval);
+                    for (uint8_t i = 0; i < REPORTABLE_CHANGE_MAX_ANALOG_SIZE; i++) {
+                        if (app_reporting[ii].pEntry->reportableChange[i] < 0x10) {
+                            printf("0%x", app_reporting[ii].pEntry->reportableChange[i]);
+                        } else {
+                            printf("%x", app_reporting[ii].pEntry->reportableChange[i]);
+                        }
+                    }
+                    printf("\r\n");
+#endif
+                    }
                     if (app_reporting[ii].timerReportMinEvt) {
                         TL_ZB_TIMER_CANCEL(&app_reporting[ii].timerReportMinEvt);
                     }
@@ -510,14 +538,14 @@ static int32_t checkRespTimeCb(void *arg) {
     if (device_online) {
         if (!resp_time) {
             device_online = false;
-#if UART_PRINTF_MODE && DEBUG_LEVEL
+#if UART_PRINTF_MODE// && DEBUG_LEVEL
             printf("No service!\r\n");
 #endif
         }
     } else {
         if (resp_time) {
             device_online = true;
-#if UART_PRINTF_MODE && DEBUG_LEVEL
+#if UART_PRINTF_MODE// && DEBUG_LEVEL
             printf("Device online\r\n");
 #endif
         }
