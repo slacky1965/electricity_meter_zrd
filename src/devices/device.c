@@ -166,6 +166,7 @@ int32_t measure_meterCb(void *arg) {
     if (dev_config.device_model && measure_meter) {
         if (measure_meter()) {
             period = dev_config.measurement_period * 1000;
+//            for test
 //            period = 15 * 1000;
         } else {
             period = FAULT_MEASUREMENT_PERIOD * 1000;
@@ -230,7 +231,7 @@ void print_error(pkt_error_t err_no) {
             printf("Package type not type 3\r\n");
             break;
         case PKT_ERR_SEGMENTATION:
-            printf("Segmentation not support\r\n");
+            printf("Segmentation not complete\r\n");
             break;
         default:
             printf("Unknown error\r\n");
