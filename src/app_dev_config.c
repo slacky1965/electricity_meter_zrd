@@ -3,6 +3,7 @@
 #include "zcl_include.h"
 
 #include "app_dev_config.h"
+#include "device.h"
 
 #define ID_CONFIG   0x0FED141A
 #define TOP_MASK    0xFFFFFFFF
@@ -34,6 +35,7 @@ static uint16_t checksum(const uint8_t *src_buffer, uint8_t len) {
 static void init_default_config() {
     memset(&dev_config, 0, sizeof(dev_config_t));
     dev_config.id = ID_CONFIG;
+    dev_config.measurement_period = DEFAULT_MEASUREMENT_PERIOD;
     write_config();
 }
 
