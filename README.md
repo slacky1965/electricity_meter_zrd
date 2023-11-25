@@ -94,6 +94,13 @@ Not finished! In the process!
 
 <img src="https://raw.githubusercontent.com/slacky1965/electricity_meter_zrd/main/doc/images/prototype.jpg"/>
 
+Плата
+
+<img src="https://raw.githubusercontent.com/slacky1965/electricity_meter_zrd/main/doc/images/board/board_top_real.jpg"/>
+
+<img src="https://raw.githubusercontent.com/slacky1965/electricity_meter_zrd/main/doc/images/board/board_bottom_real.jpg"/>
+
+
 ---
 
 ## <a id="title1">Компиляция</a>
