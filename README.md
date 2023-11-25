@@ -79,11 +79,11 @@
 
 <img src="https://raw.githubusercontent.com/slacky1965/electricity_meter_zrd/main/doc/images/Schematic_Electricity_Meter_zrd.jpg"/>
 
-Плата разведена, но не заказана и не протестирована.
+Новая плата разведена, но не заказана и не протестирована.
 
-<img src="https://raw.githubusercontent.com/slacky1965/electricity_meter_zrd/main/doc/images/board/board_top.jpg"/>
+<img src="https://raw.githubusercontent.com/slacky1965/electricity_meter_zrd/main/doc/images/board/new_board_top.jpg"/>
 
-<img src="https://raw.githubusercontent.com/slacky1965/electricity_meter_zrd/main/doc/images/board/board_bottom.jpg"/>
+<img src="https://raw.githubusercontent.com/slacky1965/electricity_meter_zrd/main/doc/images/board/new_board_bottom.jpg"/>
 
 Вот под такую вилку из Леруа Мерлен
 
