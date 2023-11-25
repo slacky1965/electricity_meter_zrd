@@ -520,6 +520,8 @@ static void send_notification() {
     memset(pkt_buff, 0, sizeof(package_t));
 
     set_header();
+
+    // I don't know how true
     raw_package.header.control = ((((meter.rrr << 5) + (meter.sss << 1)) | 0x10)) & 0xFE;
 //    raw_package.header.control = ((((meter.rrr << 5) + (meter.sss << 1)) | 0x10) + 2) & 0xFE;
 
@@ -999,8 +1001,6 @@ static void get_list_data() {
                                     uint16_t last_volts = fromPtoInteger(attr_len, attr_data);
 
                                     if (volts != last_volts) {
-                                        app_forcedReport(APP_ENDPOINT_1, ZCL_CLUSTER_MS_ELECTRICAL_MEASUREMENT, ZCL_ATTRID_AC_VOLTAGE_MULTIPLIER);
-                                        app_forcedReport(APP_ENDPOINT_1, ZCL_CLUSTER_MS_ELECTRICAL_MEASUREMENT, ZCL_ATTRID_AC_VOLTAGE_DIVISOR);
                                         zcl_setAttrVal(APP_ENDPOINT_1, ZCL_CLUSTER_MS_ELECTRICAL_MEASUREMENT, ZCL_ATTRID_RMS_VOLTAGE, (uint8_t*)&volts);
                                     }
 
