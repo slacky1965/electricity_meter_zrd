@@ -4,7 +4,7 @@
 
 **Включает в себя схему опротопорта и модуль от E-Byte E180-Z5812SP, который работает, как Zigbee-роутер**
 
-Not finished! In the process!
+# Not finished! In the process! Описание временное, проект в разработке ...
 
 [Repository electricity_meter_zrd](https://github.com/slacky1965/electricity_meter_zrd)  
 [Схема устройства](https://raw.githubusercontent.com/slacky1965/electricity_meter_zrd/main/doc/images/Schematic_Electricity_Meter_zrd.jpg)
