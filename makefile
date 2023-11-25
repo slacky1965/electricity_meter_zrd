@@ -136,19 +136,22 @@ sizedummy \
 all: pre-build main-build
 
 flash: $(BIN_FILE)
-	@python3 $(TOOLS_PATH)/TlsrPgm.py -b921600 -p$(DOWNLOAD_PORT) -t50 -a2550 -m -w we 0x8000 $(BIN_FILE)
+	@python3 $(TOOLS_PATH)/TlsrPgm.py -p$(DOWNLOAD_PORT) -z11 -a-100 -s -m we 0x8000 $(BIN_FILE)
+	
 	
 erase-flash:
-	@python3 $(TOOLS_PATH)/TlsrPgm.py -b921600 -p$(DOWNLOAD_PORT) -t50 -a2550 ea
+	@python3 $(TOOLS_PATH)/TlsrPgm.py -p$(DOWNLOAD_PORT) -z11 -a-100 -s ea
 
 flash-bootloader:
-	@python3 $(TOOLS_PATH)/TlsrPgm.py -b921600 -p$(DOWNLOAD_PORT) -t50 -a2550 -m -w we 0 $(BOOTLOADER)
+	@python3 $(TOOLS_PATH)/TlsrPgm.py -p$(DOWNLOAD_PORT) -z11 -a-100 -s -m we 0 $(BOOTLOADER)
+
 reset:
-	@python3 $(TOOLS_PATH)/TlsrPgm.py -p$(DOWNLOAD_PORT) -t50 -a2550 -m -w i
+	@python3 $(TOOLS_PATH)/TlsrPgm.py -p$(DOWNLOAD_PORT) -z11 -a-100 -s -t50 -a2550 -m -w i
 
 # Main-build Target
-#main-build: clean $(ELF_FILE) secondary-outputs
 main-build: clean $(ELF_FILE) secondary-outputs
+
+#main-build: clean-project $(ELF_FILE) secondary-outputs
 
 # Tool invocations
 $(ELF_FILE): $(OBJS) $(USER_OBJS)
