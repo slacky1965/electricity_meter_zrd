@@ -37,14 +37,16 @@ uint8_t set_device_model(device_model_t model) {
     uint16_t power_multiplier = 1, power_divisor = 1;
     uint8_t name[DEVICE_NAME_LEN] = {0};
 
-    uint64_t tariff = 0;
-    uint16_t power = 0;
-    uint16_t volts = 0;
-    uint16_t current = 0;
+    uint64_t tariff = 0; //xffffffffffff;
+    uint16_t power = 0; //xffff;
+    uint16_t volts = 0; //xffff;
+    uint16_t current = 0; //xffff;
     uint8_t sn[] = "11111111";
     uint8_t serial_number[SE_ATTR_SN_SIZE] = {0};
     uint8_t dr[] = "xx.xx.xxxx";
     uint8_t date_release[DATA_MAX_LEN+2] = {0};
+
+    measure_meter = NULL;
 
     fault_measure_flag = false;
 
@@ -61,15 +63,14 @@ uint8_t set_device_model(device_model_t model) {
             }
             break;
         }
-        case DEVICE_KASKAD_11: {
+//        case DEVICE_KASKAD_11: {
 //                measure_meter = measure_meter_kaskad_11;
-            measure_meter = NULL;
 //            baudrate = 2400;
 //            if (set_zcl_str(device_model[DEVICE_KASKAD_11], name, DEVICE_NAME_LEN)) {
 //                zcl_setAttrVal(APP_ENDPOINT_1, ZCL_CLUSTER_SE_METERING, ZCL_ATTRID_CUSTOM_DEVICE_MODEL, (uint8_t*)&name);
 //            }
-            break;
-        }
+//            break;
+//        }
         case DEVICE_MERCURY_206: {
             measure_meter = measure_meter_mercury_206;
             baudrate = 9600;
@@ -105,13 +106,13 @@ uint8_t set_device_model(device_model_t model) {
             voltage_divisor = 100;
             current_divisor = 1000;
             power_divisor = 1000;
+
             if (set_zcl_str(device_model[DEVICE_NARTIS_100], name, DEVICE_NAME_LEN)) {
                 zcl_setAttrVal(APP_ENDPOINT_1, ZCL_CLUSTER_SE_METERING, ZCL_ATTRID_CUSTOM_DEVICE_MODEL, (uint8_t*)&name);
             }
             break;
         }
         default:
-            measure_meter = NULL;
             if (set_zcl_str(device_model[DEVICE_UNDEFINED], name, DEVICE_NAME_LEN)) {
                 zcl_setAttrVal(APP_ENDPOINT_1, ZCL_CLUSTER_SE_METERING, ZCL_ATTRID_CUSTOM_DEVICE_MODEL, (uint8_t*)&name);
             }
@@ -162,6 +163,7 @@ uint8_t set_device_model(device_model_t model) {
 int32_t measure_meterCb(void *arg) {
 
     int32_t period = DEFAULT_MEASUREMENT_PERIOD * 1000;
+
 
     if (dev_config.device_model && measure_meter) {
         if (measure_meter()) {
