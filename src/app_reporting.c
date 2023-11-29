@@ -244,6 +244,7 @@ void report_divisor_multiplier(reportCfgInfo_t *pEntry) {
 void app_forcedReport(uint8_t endpoint, uint16_t claster_id, uint16_t attr_id) {
 
     if (zb_isDeviceJoinedNwk()) {
+
         epInfo_t dstEpInfo;
         TL_SETSTRUCTCONTENT(dstEpInfo, 0);
 
@@ -255,8 +256,14 @@ void app_forcedReport(uint8_t endpoint, uint16_t claster_id, uint16_t attr_id) {
         dstEpInfo.dstEp = endpoint;
         dstEpInfo.dstAddr.shortAddr = 0xfffc;
 #endif
-        zclAttrInfo_t *pAttrEntry;
-        pAttrEntry = zcl_findAttribute(endpoint, claster_id, attr_id);
+        zclAttrInfo_t *pAttrEntry = zcl_findAttribute(endpoint, claster_id, attr_id);
+
+        if (!pAttrEntry) {
+            //should not happen.
+            ZB_EXCEPTION_POST(SYS_EXCEPTTION_ZB_ZCL_ENTRY);
+            return;
+        }
+
         zcl_sendReportCmd(endpoint, &dstEpInfo,  TRUE, ZCL_FRAME_SERVER_CLIENT_DIR,
                 claster_id, pAttrEntry->id, pAttrEntry->type, pAttrEntry->data);
 
