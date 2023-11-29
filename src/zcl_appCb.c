@@ -78,6 +78,8 @@ static void app_zclDfltRspCmd(zclDefaultRspCmd_t *pDftRspCmd);
 static ev_timer_event_t *identifyTimerEvt = NULL;
 #endif
 
+uint8_t count_no_service = 0;
+
 
 /**********************************************************************
  * FUNCTIONS
@@ -510,7 +512,7 @@ status_t app_identifyCb(zclIncomingAddrInfo_t *pAddrInfo, uint8_t cmdId, void *c
  */
 status_t app_timeCb(zclIncomingAddrInfo_t *pAddrInfo, uint8_t cmdId, void *cmdPayload) {
 
-    printf("app_timeCb. cmd: 0x%x\r\n", cmdId);
+    //printf("app_timeCb. cmd: 0x%x\r\n", cmdId);
 
     return ZCL_STA_SUCCESS;
 }
@@ -537,14 +539,19 @@ static int32_t checkRespTimeCb(void *arg) {
 
     if (device_online) {
         if (!resp_time) {
-            device_online = false;
+            if (count_no_service++ == 3) {
+                device_online = false;
 #if UART_PRINTF_MODE// && DEBUG_LEVEL
-            printf("No service!\r\n");
+                printf("No service!\r\n");
 #endif
+            }
+        } else {
+            count_no_service = 0;
         }
     } else {
         if (resp_time) {
             device_online = true;
+            count_no_service = 0;
 #if UART_PRINTF_MODE// && DEBUG_LEVEL
             printf("Device online\r\n");
 #endif
