@@ -27,6 +27,7 @@ const uint16_t app_inClusterList[] = {
     ZCL_CLUSTER_GEN_POLL_CONTROL,
 #endif
     ZCL_CLUSTER_SE_METERING,
+    ZCL_CLUSTER_MS_ELECTRICAL_MEASUREMENT,
     ZCL_CLUSTER_GEN_DEVICE_TEMP_CONFIG,
 };
 
@@ -55,7 +56,6 @@ const uint16_t app_outClusterList[] = {
 #endif
     ZCL_CLUSTER_GEN_TIME,
     ZCL_CLUSTER_SE_METERING,
-    ZCL_CLUSTER_MS_ELECTRICAL_MEASUREMENT,
 };
 
 /**
