@@ -56,15 +56,15 @@ typedef struct {
     uint32_t device_address;
     uint8_t  device_name[1+DEVICE_NAME_LEN];
     uint8_t  measurement_period;
-    uint32_t current;
-    uint32_t current_multiplier;
-    uint32_t current_divisor;
-    uint32_t voltage;
-    uint32_t voltage_multiplier;
-    uint32_t voltage_divisor;
-    uint32_t power;
-    uint32_t power_multiplier;
-    uint32_t power_divisor;
+//    uint32_t current;
+//    uint32_t current_multiplier;
+//    uint32_t current_divisor;
+//    uint32_t voltage;
+//    uint32_t voltage_multiplier;
+//    uint32_t voltage_divisor;
+//    uint32_t power;
+//    uint32_t power_multiplier;
+//    uint32_t power_divisor;
 } zcl_seAttr_t;
 
 typedef struct {
