@@ -252,7 +252,7 @@
 
 Видим, что в ячейке `Device model preset` выставлен счетчик `No Device`, т.е. никакой счетчик не выбран, считывание данных не происходит. Выбираем нужный счетчик из предложенных. По умолчанию период опроса счетчика - 1 минута. Если нужно больше (максимальное значение 255 минут), меняем настройку `Device measurement preset`.
 
-## <a id="electricity_meters">Электросчетчики</a>
+## <a id="electricity_meters">Электросчетчики, поддерживаемые устройством</a>
 
 ### <a id="kaskad-1-mt">Однофазный многотарифный счетчик КАСКАД-1-МТ</a>
 
@@ -294,7 +294,7 @@
 
 ### <a id="mercury-206">Однофазный многотарифный счетчик Меркурий-206</a>
 
-<img src="https://raw.githubusercontent.com/slacky1965/electricity_meter_zrd/main/doc/electricity_meters/mercury_206/mercury-206.jpg">
+<img src="https://raw.githubusercontent.com/slacky1965/electricity_meter_zrd/main/doc/electricity_meters/mercury/mercury-206.jpg">
 
 Счетчик общается по [протоколу](https://www.incotexcom.ru/files/em/docs/mercury-protocol-obmena-1.pdf).
 
@@ -316,7 +316,7 @@
 
 ### <a id="energomera-ce102m">Однофазный многотарифный счетчик Энергомера-СЕ102М</a>
 
-<img src="https://raw.githubusercontent.com/slacky1965/electricity_meter_zrd/main/doc/electricity_meters/energomera_ce102m/102m_r5_front.jpg">
+<img src="https://raw.githubusercontent.com/slacky1965/electricity_meter_zrd/main/doc/electricity_meters/energomera/102m_r5_front.jpg">
 
 Протокол обмена на этот счетчик размещен на сайте Энергомеры, в [руководстве по эксплуатации](http://www.energomera.ru/documentations/product/ce102m_re.pdf)
 
@@ -354,6 +354,26 @@
 
 
 Если счетчик выбран и устройство примагничено к окошку оптопорта счетчика, то в `exposes` web-интерфейса `zigbee2mqtt` получим примерно такую картинку.
+
+### <a id="mercury-206">Однофазный многотарифный счетчик Меркурий-206</a>
+
+<img src="https://raw.githubusercontent.com/slacky1965/electricity_meter_zrd/main/doc/electricity_meters/nartis/nartis100.jpg">
+
+Счетчик общается по протоколу СПОДЭС.
+
+В настоящий момент устройство может прочитать из счетчика:
+
+	4 тарифа (в kWh)
+	силу тока (в A)
+	напряжение сети (в V)
+	мощность (в W)
+	оставшийся ресурс батарии прибора (косвенно вычисляется, команды такой нет, в %)
+	полный серийный номер прибора (например 21021839)
+	дату изготовления прибора (например 21.10.2021)
+
+У этого счетчика нет команды запроса ресурса батареи. Поэтому оставшийся ресурс вычисляется между текущей датой прибора, датой производства.
+
+---
 
 <img src="https://raw.githubusercontent.com/slacky1965/electricity_meter_zrd/main/doc/images/z2m_nartis100.jpg">
 
