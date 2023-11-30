@@ -256,9 +256,9 @@
 
 **Однофазный многотарифный счетчик КАСКАД-1-МТ**
 
-<img src="https://raw.githubusercontent.com/slacky1965/electricity_meter_ble/main/doc/electricity_meters/kaskad_1_mt/kaskad_1_mt.jpg" alt="KASKAD-1-MT">
+<img src="https://raw.githubusercontent.com/slacky1965/electricity_meter_ble/main/doc/electricity_meters/kaskad/kaskad_1_mt.jpg">
 
-Счетчик общается по протоколу [МИРТЕК](https://github.com/slacky1965/electricity_meter_zrd/raw/main/doc/electricity_meters/kaskad_1_mt/Star_104_304_1.20.doc).
+Счетчик общается по протоколу [МИРТЕК](https://github.com/slacky1965/electricity_meter_zrd/raw/main/doc/electricity_meters/kaskad/Star_104_304_1.20.doc).
 
 В настоящий момент устройство может прочитать из счетчика:
 
@@ -276,9 +276,9 @@
 
 **Однофазный многотарифный счетчик КАСКАД-11-C1**
 
-<img src="https://raw.githubusercontent.com/slacky1965/electricity_meter_zrd/main/doc/electricity_meters/kaskad_11_c1/kaskad_11_c1.jpg" alt="KASKAD-11-C1">
+<img src="https://raw.githubusercontent.com/slacky1965/electricity_meter_zrd/main/doc/electricity_meters/kaskad/kaskad_11_c1.jpg">
 
-Счетчик общается по своему [протоколу](https://github.com/slacky1965/electricity_meter_zrd/raw/main/doc/electricity_meters/kaskad_11_c1/2023.01.12-KASKAD_11.doc).
+Счетчик общается по своему [протоколу](https://github.com/slacky1965/electricity_meter_zrd/raw/main/doc/electricity_meters/kaskad/2023.01.12-KASKAD_11.doc).
 
 В настоящий момент устройство может прочитать из счетчика:
 
@@ -298,7 +298,7 @@
 
 **Однофазный многотарифный счетчик Меркурий-206**
 
-<img src="https://raw.githubusercontent.com/slacky1965/electricity_meter_zrd/main/doc/electricity_meters/mercury_206/mercury-206.jpg" alt="Mercury-206">
+<img src="https://raw.githubusercontent.com/slacky1965/electricity_meter_zrd/main/doc/electricity_meters/mercury_206/mercury-206.jpg">
 
 Счетчик общается по [протоколу](https://www.incotexcom.ru/files/em/docs/mercury-protocol-obmena-1.pdf).
 
@@ -322,7 +322,7 @@
 
 **Однофазный многотарифный счетчик Энергомера-СЕ102М**
 
-<img src="https://raw.githubusercontent.com/slacky1965/electricity_meter_zrd/main/doc/electricity_meters/energomera_ce102m/102m_r5_front.jpg" alt="Energomera CE102M">
+<img src="https://raw.githubusercontent.com/slacky1965/electricity_meter_zrd/main/doc/electricity_meters/energomera_ce102m/102m_r5_front.jpg">
 
 Протокол обмена на этот счетчик размещен на сайте Энергомеры, в [руководстве по эксплуатации](http://www.energomera.ru/documentations/product/ce102m_re.pdf)
 
@@ -338,8 +338,42 @@
 
 Для этого счетчика серийный номер в web-интерфейсе `zigbee2mqtt` вводить не нужно.
 
+### <a id="neva-mt124">Настройка счетчика Нева-МТ124</a>
+
+**Однофазный многотарифный счетчик Нева-МТ124**
+
+<img src="https://raw.githubusercontent.com/slacky1965/electricity_meter_zrd/main/doc/electricity_meters/neva/neva_mt124.jpg">
+
+Протокол обмена описан в `ГОСТ Р МЭК 61107-2001`. В ГОСТе нужно читать только то, что касается режима С. Практически все тоже самое, что в протоколе обмена счетчика `Энергомера-СЕ102М`, за небольшим исключением. Вычисление контрольной суммы отличается от рекомендуемого стандартом и осуществляется как "исключающее ИЛИ". Скорость для начала обмена данными через оптопорт - 300b. После первой команды запроса на соединение, счетчик переходит на скорость 9600b.
+
+В настоящий момент устройство может прочитать из счетчика:
+
+	4 тарифа (в kWh)
+	мощность (в W)
+	оставшийся ресурс батарии прибора (вычисляется по напряжению батарейки, команды такой нет, в %)
+	полный серийный номер прибора (например 3171112520109)
+	сила тока (не поддерживается)
+	напряжение сети (не поддерживается)
+	дата изготовления прибора у этого счетчика не предусмотрена.
+
+Для этого счетчика серийный номер в web-интерфейсе `zigbee2mqtt` вводить не нужно.
+
+### <a id="Nartis-100">Настройка счетчика Нартис-100</a>
+
+**Однофазный многотарифный счетчик Нартис-100**
 
 
+Если счетчик выбран и устройство примагничено к окошку оптопорта счетчика, то в `exposes` web-интерфейса `zigbee2mqtt` получим примерно такую картинку.
+
+<img src="https://raw.githubusercontent.com/slacky1965/electricity_meter_zrd/main/doc/images/z2m_nartis100.jpg">
+
+Если данные не считываются, есть несколько причин.
+
+	Выбран не тот счетчик.
+	Не введен адрес счетчика, где он требуется.
+	Не совмещены светодиод и фототранзистор на устройстве и счетчике. Рекомендуется немного подвигать устройство.
+	
+	
 
 Продолжение следует ...
 
