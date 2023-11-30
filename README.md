@@ -364,7 +364,7 @@
 
 ---
 
-### <a id="Nartis-100">Однофазный многотарифный счетчик Нартис-100</a>
+### <a id="nartis-100">Однофазный многотарифный счетчик Нартис-100</a>
 
 <img src="https://raw.githubusercontent.com/slacky1965/electricity_meter_zrd/main/doc/electricity_meters/nartis/nartis100.jpg">
 
