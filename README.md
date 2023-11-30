@@ -33,6 +33,7 @@
 * [Принцип работы](#firmware)
 * [Настройка](#settings)
 * [Приборы учета](#electricity_meters)
+* [Home Assistant](#home_assistant)
 
 ---
 
@@ -103,6 +104,12 @@
 <img src="https://raw.githubusercontent.com/slacky1965/electricity_meter_zrd/main/doc/images/board/new_board_top.jpg"/>
 
 <img src="https://raw.githubusercontent.com/slacky1965/electricity_meter_zrd/main/doc/images/board/new_board_bottom.jpg"/>
+
+На гребенку выведены следующие пины модуля
+
+* SWS, GND - для заливки в модуль прошивки
+* RST, TX-DBG - на всякий случай, вдруг кому-то пригодится.
+
 
 **Готовое устройство**
 
@@ -241,6 +248,14 @@
 ---
 	
 ## <a id="settings">Настройка</a>
+
+Открываем на редактирование файл `configuration.yaml` от zigbee2mqtt. И добавляем в конец файла
+
+		external_converters:
+			- electricity_meter.js
+		  
+
+Файл `electricity_meter.js` копируем из [папки проекта](https://raw.githubusercontent.com/slacky1965/electricity_meter_zrd/main/zigbee2mqtt/convertor/electricity_meter.js) туда же, где лежит `configuration.yaml` от zigbee2mqtt. Не забываем разрешить подключение новых устройств - `permit_join: true`. Перегружаем zigbee2mqtt. Проверяем его лог, что он запустился и нормально работает.
 
 Первоначальная настройка происходит через web-интерфейс zigbee2mqtt. Для начала нужно убедиться, что устройство в сети. 
 
