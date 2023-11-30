@@ -271,8 +271,6 @@
 
 ## <a id="electricity_meters">Электросчетчики, поддерживаемые устройством</a>
 
----
-
 ### <a id="kaskad-1-mt">Однофазный многотарифный счетчик КАСКАД-1-МТ</a>
 
 <img src="https://raw.githubusercontent.com/slacky1965/electricity_meter_zrd/main/doc/electricity_meters/kaskad/kaskad_1_mt.jpg">
