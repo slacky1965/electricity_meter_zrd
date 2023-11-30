@@ -25,10 +25,18 @@
 	
 # Но! Схема исправлена. Плата обновлена. Но не заказана и не протестирована :))
 
+---
+
+* [Описание](#description)
+* [Железо](#hardware)
+* [Компиляция](#compilation)  
+* [Загрузка прошивки](#firmware_download)
+* [Принцип работы](#firmware)
+* [Настройка](#settings)  
 
 ---
 
-**Описание**
+## <a id="description">Описание</a>
 
 * Рассчитано на взаимодействие через оптопорт с однофазными многотарифными электросчетчиками:
 
@@ -58,26 +66,38 @@
 
 ---
 
-* [Компиляция](#title1)  
-* [Прошивка](#title2)
-* [Принцип работы](#title3)
-* [Настройка](#title4)  
+## <a id="hardware">Железо</a>
 
----
-
-
-
-Проверялось на этом.
-
-<img src="https://raw.githubusercontent.com/slacky1965/electricity_meter_zrd/main/doc/images/tlsr8258_dongle.jpg"/>
-
-Будет сделано на этом.
+В проекте используется модуль от компании E-BYTE на чипе TLSR8258F512ET32 - E180-Z5812SP.
 
 <img src="https://raw.githubusercontent.com/slacky1965/electricity_meter_zrd/main/doc/images/E180-Z5812SP.jpg"/>
 
-Схема.
+Испытывалось все на вот таком dongle от Telink
+
+<img src="https://raw.githubusercontent.com/slacky1965/electricity_meter_zrd/main/doc/images/telink_tlsr8258_dongle.jpg"/>
+
+<img src="https://raw.githubusercontent.com/slacky1965/electricity_meter_zrd/main/doc/images/prototype.jpg"/>
+
+
+**Корпус**
+
+В виде корпуса используется [вилка на 220в](https://leroymerlin.ru/product/vilka-uglovaya-s-zazemleniem-16-a-cvet-belyy-81930756/), купленная в Леруа Мерлен.
+
+<img src="https://raw.githubusercontent.com/slacky1965/electricity_meter_zrd/main/doc/images/box/box1.jpg"/>
+
+<img src="https://raw.githubusercontent.com/slacky1965/electricity_meter_zrd/main/doc/images/box/box2jpg"/>
+
+<img src="https://raw.githubusercontent.com/slacky1965/electricity_meter_zrd/main/doc/images/box/box3jpg"/>
+
+<img src="https://raw.githubusercontent.com/slacky1965/electricity_meter_zrd/main/doc/images/box/box4jpg"/>
+
+<img src="https://raw.githubusercontent.com/slacky1965/electricity_meter_zrd/main/doc/images/box/box5jpg"/>
+
+**Схема**
 
 <img src="https://raw.githubusercontent.com/slacky1965/electricity_meter_zrd/main/doc/images/Schematic_Electricity_Meter_zrd.jpg"/>
+
+**Плата**
 
 Новая плата разведена, но не заказана и не протестирована.
 
@@ -85,28 +105,15 @@
 
 <img src="https://raw.githubusercontent.com/slacky1965/electricity_meter_zrd/main/doc/images/board/new_board_bottom.jpg"/>
 
-Вот под такую вилку из Леруа Мерлен
-
-<img src="https://raw.githubusercontent.com/slacky1965/electricity_meter_zrd/main/doc/images/box/box1.jpg"/>
-
-<img src="https://raw.githubusercontent.com/slacky1965/electricity_meter_zrd/main/doc/images/box/box4.jpg"/>
-
-<img src="https://raw.githubusercontent.com/slacky1965/electricity_meter_zrd/main/doc/images/box/81930756_03.jpg"/>
-
-Полигон :))
-
-<img src="https://raw.githubusercontent.com/slacky1965/electricity_meter_zrd/main/doc/images/prototype.jpg"/>
-
-Плата
+**Готовое устройство**
 
 <img src="https://raw.githubusercontent.com/slacky1965/electricity_meter_zrd/main/doc/images/board/board_top_real.jpg"/>
 
 <img src="https://raw.githubusercontent.com/slacky1965/electricity_meter_zrd/main/doc/images/board/board_bottom_real.jpg"/>
 
-
 ---
 
-## <a id="title1">Компиляция</a>
+## <a id="compilation">Компиляция</a>
 
 [Скачиваем проект](https://github.com/slacky1965/electricity_meter_zrd)  
 Если скачали архивом, разворачиваем в какой-нибудь временной директории. Далее запускаем Eclipse. В левом верхнем углу нажимаем File, в развернувшемся меню выбираем Import
@@ -132,7 +139,7 @@
 
 <img src="https://raw.githubusercontent.com/slacky1965/electricity_meter_zrd/main/doc/images/eclipse/eclipse8.jpg"/>
 
-Итак, компиляцию начинаем с `bootloader`. Собираем и прошиваем ([как и чем шить чуть ниже](#title2)). Если модуль пустой, то после прошивки `bootloader'a` модуль просто начнет моргать светодиодом. Это нормально.  
+Итак, компиляцию начинаем с `bootloader`. Собираем и прошиваем ([как и чем шить чуть ниже](#firmware_download)). Если модуль пустой, то после прошивки `bootloader'a` модуль просто начнет моргать светодиодом. Это нормально.  
 
 <img src="https://raw.githubusercontent.com/slacky1965/electricity_meter_zrd/main/doc/images/eclipse/eclipse4.jpg"/>
 
@@ -146,7 +153,7 @@
 
 <img src="https://raw.githubusercontent.com/slacky1965/electricity_meter_zrd/main/doc/images/make.jpg"/>
 
-## <a id="title2">Прошивка</a>
+## <a id="firmware_download">Загрузка прошивки</a>
 
 Вопрос - как залить прошивку в модуль. Есть несколько вариантов. Самый простой, это приобрести у Telink их фирменный программатор.
 
@@ -162,10 +169,10 @@
 Все, у нас есть недорогой программатор, который может загружать прошивки через SWS в модули от Telink'a. Пин D4 (SWM) программатора нужно соединить с пином SWS программируемого модуля, не забыть объединить земли и подкинуть питание на оба модуля.  
 Сама программа-прошивальщик лежит [тут](https://github.com/pvvx/TLSRPGM)
 
-## <a id="title3">Принцип работы</a>
+## <a id="firmware">Принцип работы</a>
 
 Устройство является роутером, питается от сети ~200 вольт и никогда не спит.  
-По умолчанию считывание показаний с электросчетчика происходит один раз в минуту. Изменить в большую сторону можно через интерфейс zigbee2mqtt во вкладке Exposes ([подробней о настройках чуть ниже](#title4)).
+По умолчанию считывание показаний с электросчетчика происходит один раз в минуту. Изменить в большую сторону можно через интерфейс zigbee2mqtt во вкладке Exposes ([подробней о настройках чуть ниже](#settings)).
 
 **Reporting**
 
@@ -183,7 +190,7 @@
 * Сила тока (1)
 * Мощность (1)
 
-Настроить периоды отправки отчетов, если не устроят по умолчанию, можно в интерфейсе zigbee2mqtt во вкладке reporting([подробней о настройках чуть ниже](#title4)).
+Настроить периоды отправки отчетов, если не устроят по умолчанию, можно в интерфейсе zigbee2mqtt во вкладке reporting([подробней о настройках чуть ниже](#settings)).
 
 ***Скрытые отчеты***
 
@@ -194,7 +201,7 @@
 
 Настроить периоды отправки "скрытых" отчетов нельзя. Они отпраляются принудительно перед одноименным значением. Например, изменилось напряжение сети. Перед отправкой отчета со значением напражения сети принудительно высылаются два отчета - множитель и делитель напряжения сети. И т.д. Связано с тем, что правильное значение высчитывается в конверторе и множитель и делитель должны быть уже определены до получения значения. В обычном варианте иногда отчеты по множителю или делителю приходили позже значения. В данной схеме с принудительными отчетами множитель и делитель всегда приходят раньше значения.
 
-**Сетодиодная индикация режимов модуля**
+**Светодиодная индикация режимов модуля**
 
 Красный светодиод сигнализирует о присутствии питания на модуле.  
 Зеленый светодиод служит для информирования о режимах работы модуля.
@@ -220,7 +227,7 @@
 		0x7A000 NV_2
 		0x80000 End Flash
 
-Так, как обновление OTA не используется, то прошивка может занимать оба пространства `Firmware` и `OTA Image`, что в сумме составляет 0x62000 (401408) байтов.
+Так, как обновление OTA не используется, то прошивка может занимать оба пространства `Firmware` и `OTA Image`, что в сумме составляет 0x62000 (401408) байт.
 
 `bootloader` ничего не умеет, кроме, как запускать прошивку с адреса 0x8000.
 
@@ -228,7 +235,7 @@
 
 В электросчетчиках используются разные протоколы обмена. Дополнительную информацию смотрите в разделе по конкретному электросчетчику (пока не написано).
 	
-## <a id="title4">Настройка</a>
+## <a id="settings">Настройка</a>
 
 Продолжение следует ...
 
