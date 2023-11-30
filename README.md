@@ -85,13 +85,13 @@
 
 <img src="https://raw.githubusercontent.com/slacky1965/electricity_meter_zrd/main/doc/images/box/box1.jpg"/>
 
-<img src="https://raw.githubusercontent.com/slacky1965/electricity_meter_zrd/main/doc/images/box/box2jpg"/>
+<img src="https://raw.githubusercontent.com/slacky1965/electricity_meter_zrd/main/doc/images/box/box2.jpg"/>
 
-<img src="https://raw.githubusercontent.com/slacky1965/electricity_meter_zrd/main/doc/images/box/box3jpg"/>
+<img src="https://raw.githubusercontent.com/slacky1965/electricity_meter_zrd/main/doc/images/box/box3.jpg"/>
 
-<img src="https://raw.githubusercontent.com/slacky1965/electricity_meter_zrd/main/doc/images/box/box4jpg"/>
+<img src="https://raw.githubusercontent.com/slacky1965/electricity_meter_zrd/main/doc/images/box/box4.jpg"/>
 
-<img src="https://raw.githubusercontent.com/slacky1965/electricity_meter_zrd/main/doc/images/box/box5jpg"/>
+<img src="https://raw.githubusercontent.com/slacky1965/electricity_meter_zrd/main/doc/images/box/box5.jpg"/>
 
 **Схема**
 
