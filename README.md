@@ -79,6 +79,23 @@
 
 <img src="https://raw.githubusercontent.com/slacky1965/electricity_meter_zrd/main/doc/images/prototype.jpg"/>
 
+**Схема**
+
+<img src="https://raw.githubusercontent.com/slacky1965/electricity_meter_zrd/main/doc/images/Schematic_Electricity_Meter_zrd.jpg"/>
+
+**Плата**
+
+Новая плата разведена, но не заказана и не протестирована.
+
+<img src="https://raw.githubusercontent.com/slacky1965/electricity_meter_zrd/main/doc/images/board/new_board_top.jpg"/>
+
+<img src="https://raw.githubusercontent.com/slacky1965/electricity_meter_zrd/main/doc/images/board/new_board_bottom.jpg"/>
+
+На гребенку выведены следующие пины модуля
+
+* SWS, GND - для заливки в модуль прошивки
+* RST, TX-DBG - на всякий случай, вдруг кому-то пригодится.
+
 **Корпус**
 
 В виде корпуса используется [вилка на 220в](https://leroymerlin.ru/product/vilka-uglovaya-s-zazemleniem-16-a-cvet-belyy-81930756/), купленная в Леруа Мерлен.
@@ -102,24 +119,6 @@
 <img src="https://raw.githubusercontent.com/slacky1965/electricity_meter_zrd/main/doc/images/box/box9.jpg"/>
 
 <img src="https://raw.githubusercontent.com/slacky1965/electricity_meter_zrd/main/doc/images/box/box10.jpg"/>
-
-**Схема**
-
-<img src="https://raw.githubusercontent.com/slacky1965/electricity_meter_zrd/main/doc/images/Schematic_Electricity_Meter_zrd.jpg"/>
-
-**Плата**
-
-Новая плата разведена, но не заказана и не протестирована.
-
-<img src="https://raw.githubusercontent.com/slacky1965/electricity_meter_zrd/main/doc/images/board/new_board_top.jpg"/>
-
-<img src="https://raw.githubusercontent.com/slacky1965/electricity_meter_zrd/main/doc/images/board/new_board_bottom.jpg"/>
-
-На гребенку выведены следующие пины модуля
-
-* SWS, GND - для заливки в модуль прошивки
-* RST, TX-DBG - на всякий случай, вдруг кому-то пригодится.
-
 
 **Готовое устройство**
 
