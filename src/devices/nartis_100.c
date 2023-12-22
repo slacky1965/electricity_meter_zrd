@@ -910,8 +910,8 @@ static void get_list_data() {
 
                 uint64_t tariff = (reverse32(tariff_A_p->value) + reverse32(tariff_A_m->value)) & 0xffffffffffff;
 
-                zcl_getAttrVal(APP_ENDPOINT_1, ZCL_CLUSTER_SE_METERING, ZCL_ATTRID_CURRENT_TIER_1_SUMMATION_DELIVERD, &attr_len, (uint8_t*)&attr_data);
-                uint64_t last_tariff = fromPtoInteger(attr_len, attr_data);
+//                zcl_getAttrVal(APP_ENDPOINT_1, ZCL_CLUSTER_SE_METERING, ZCL_ATTRID_CURRENT_TIER_1_SUMMATION_DELIVERD, &attr_len, (uint8_t*)&attr_data);
+//                uint64_t last_tariff = fromPtoInteger(attr_len, attr_data);
 //
 //                if (tariff > last_tariff) {
                     zcl_setAttrVal(APP_ENDPOINT_1, ZCL_CLUSTER_SE_METERING, ZCL_ATTRID_CURRENT_TIER_1_SUMMATION_DELIVERD, (uint8_t*)&tariff);
@@ -961,9 +961,8 @@ static void get_list_data() {
 
                             tariff = (reverse32(tariff_A_p->value) + reverse32(tariff_A_m->value)) & 0xffffffffffff;
 
-                            zcl_getAttrVal(APP_ENDPOINT_1, ZCL_CLUSTER_SE_METERING, ZCL_ATTRID_CURRENT_TIER_4_SUMMATION_DELIVERD, &attr_len, (uint8_t*)&attr_data);
-                            last_tariff = fromPtoInteger(attr_len, attr_data);
-                            printf("last_tariff4: %d\r\n", last_tariff);
+//                            zcl_getAttrVal(APP_ENDPOINT_1, ZCL_CLUSTER_SE_METERING, ZCL_ATTRID_CURRENT_TIER_4_SUMMATION_DELIVERD, &attr_len, (uint8_t*)&attr_data);
+//                            last_tariff = fromPtoInteger(attr_len, attr_data);
 //
 //                            if (tariff > last_tariff) {
                                 zcl_setAttrVal(APP_ENDPOINT_1, ZCL_CLUSTER_SE_METERING, ZCL_ATTRID_CURRENT_TIER_4_SUMMATION_DELIVERD, (uint8_t*)&tariff);
