@@ -72,7 +72,7 @@
  * During OTA upgrade, the upgraded device will check the rules of the following three fields.
  * Refer to ZCL OTA specification for details.
  */
-#define MANUFACTURER_CODE_TELINK    0x1141//Telink ID
+#define MANUFACTURER_CODE_TELINK    0x6565 //0x1141//Telink ID
 #define	IMAGE_TYPE					((CHIP_TYPE << 8) | IMAGE_TYPE_APP)
 #define FILE_VERSION                ((APP_RELEASE << 24) | (APP_BUILD << 16) | (STACK_RELEASE << 8) | STACK_BUILD)
 
