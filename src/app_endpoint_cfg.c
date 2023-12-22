@@ -76,8 +76,8 @@ const af_simple_descriptor_t app_simpleDesc =
     0,                                      /* Reserved */
     APP_IN_CLUSTER_NUM,                     /* Application input cluster count */
     APP_OUT_CLUSTER_NUM,                    /* Application output cluster count */
-    (uint16_t *)app_inClusterList,               /* Application input cluster list */
-    (uint16_t *)app_outClusterList,              /* Application output cluster list */
+    (uint16_t *)app_inClusterList,          /* Application input cluster list */
+    (uint16_t *)app_outClusterList,         /* Application output cluster list */
 };
 
 /* Basic */
