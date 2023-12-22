@@ -44,8 +44,8 @@ typedef enum _pkt_error_t {
     PKT_ERR_SEGMENTATION,
 } pkt_error_t;
 
-uint16_t attr_len;
-uint8_t attr_data[8];
+extern uint16_t attr_len;
+extern uint8_t attr_data[8];
 extern uint8_t new_start;
 extern pkt_error_t pkt_error_no;
 extern measure_meter_f measure_meter;
