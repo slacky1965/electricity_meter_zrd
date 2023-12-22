@@ -63,14 +63,14 @@ uint8_t set_device_model(device_model_t model) {
             }
             break;
         }
-//        case DEVICE_KASKAD_11: {
-//                measure_meter = measure_meter_kaskad_11;
-//            baudrate = 2400;
-//            if (set_zcl_str(device_model[DEVICE_KASKAD_11], name, DEVICE_NAME_LEN)) {
-//                zcl_setAttrVal(APP_ENDPOINT_1, ZCL_CLUSTER_SE_METERING, ZCL_ATTRID_CUSTOM_DEVICE_MODEL, (uint8_t*)&name);
-//            }
-//            break;
-//        }
+        case DEVICE_KASKAD_11: {
+            measure_meter = measure_meter_kaskad_11;
+            baudrate = 2400;
+            if (set_zcl_str(device_model[DEVICE_KASKAD_11], name, DEVICE_NAME_LEN)) {
+                zcl_setAttrVal(APP_ENDPOINT_1, ZCL_CLUSTER_SE_METERING, ZCL_ATTRID_CUSTOM_DEVICE_MODEL, (uint8_t*)&name);
+            }
+            break;
+        }
         case DEVICE_MERCURY_206: {
             measure_meter = measure_meter_mercury_206;
             baudrate = 9600;
@@ -182,9 +182,10 @@ int32_t fault_measure_meterCb(void *arg) {
 
     if (fault_measure_flag) {
 #if UART_PRINTF_MODE
-        printf("Fault get data from device. Restart!!!\r\n");
+        printf("Fault get data from device. Reload electricity!!!\r\n");
 #endif
-        zb_resetDevice();
+//        zb_resetDevice();
+        set_device_model(dev_config.device_model);
     }
 
     timerFaultMeasurementEvt = NULL;
