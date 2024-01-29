@@ -48,7 +48,7 @@ extern "C" {
  * max 24 symbols
  */
 
-#define ZCL_BASIC_MFG_NAME     {3,'D','I','Y'}
+#define ZCL_BASIC_MFG_NAME     {10,'S','l','a','c','k','y','-','D','I','Y'}
 #define ZCL_BASIC_MODEL_ID     {21,'E','l','e','c','t','r','i','c','i','t','y','_','m','e','t','e','r','_','B','8','5'}
 
 
