@@ -13,7 +13,8 @@ int32_t delayedMcuResetCb(void *arg) {
 int32_t delayedFactoryResetCb(void *arg) {
 
     //printf("factory reset\r\n");
-    zb_factoryReset();
+    zb_resetDevice2FN();
+//    zb_factoryReset();
 //    zb_resetDevice();
     return -1;
 }
