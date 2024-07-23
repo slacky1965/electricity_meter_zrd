@@ -64,6 +64,8 @@ void button_handler() {
             TL_ZB_TIMER_SCHEDULE(delayedMcuResetCb, NULL, TIMEOUT_1SEC);
         } else { /* short pressed < 5 sec. */
             light_blink_start(1, 30, 30);
+
+            app_all_forceReporting();
             // for test
             //app_forcedReport(APP_ENDPOINT_1, ZCL_CLUSTER_GEN_DEVICE_TEMP_CONFIG, ZCL_ATTRID_DEV_TEMP_CURR_TEMP);
         }
