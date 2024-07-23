@@ -96,6 +96,8 @@
 * SWS, GND - для заливки в модуль прошивки
 * RST, TX-DBG - на всякий случай, вдруг кому-то пригодится.
 
+[Ссылка на проект в easyeda](https://oshwlab.com/slacky/electricity_meter_zrd_v3)
+
 **Корпус**
 
 В виде корпуса используется [вилка на 220в](https://leroymerlin.ru/product/vilka-uglovaya-s-zazemleniem-16-a-cvet-belyy-81930756/), купленная в Леруа Мерлен.
