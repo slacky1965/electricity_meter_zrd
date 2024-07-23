@@ -60,8 +60,8 @@ extern "C" {
 /* Debug mode config */
 #define	UART_PRINTF_MODE				ON
 #define DEBUG_CONFIG                    OFF
-#define DEBUG_DEVICE_DATA               ON
-#define DEBUG_PACKAGE                   OFF
+#define DEBUG_DEVICE_DATA               OFF
+#define DEBUG_PACKAGE                   ON
 #define DEBUG_REPORTING                 OFF
 #define DEBUG_TEMPERATURE               OFF
 #define DEBUG_OTA                       OFF
@@ -91,6 +91,7 @@ extern "C" {
 #define BOARD_B91_DONGLE                9
 #define BOARD_8258_DIY                  10
 #define BOARD_TB_04                     11
+#define BOARD_8258_DIY_ZI               12
 
 /* Board define */
 #if defined(MCU_CORE_826x)
@@ -116,7 +117,7 @@ extern "C" {
      */
     #define OTA_ADDRESS                 0x77000
 #endif
-    #define BOARD                       BOARD_8258_DIY //BOARD_8258_DONGLE //
+    #define BOARD                       BOARD_8258_DIY //BOARD_8258_DIY_ZI //BOARD_8258_DONGLE
     #define CLOCK_SYS_CLOCK_HZ          48000000
     /********************* For 512K Flash only (bootloader mode) ********************************/
     /* Flash map:
@@ -168,6 +169,8 @@ extern "C" {
     #include "board_8258_diy.h"
 #elif (BOARD == BOARD_TB_04)
     #include "board_TB-04.h"
+#elif (BOARD == BOARD_8258_DIY_ZI)
+    #include "board_8258_diy_zi.h"
 #endif
 
 
