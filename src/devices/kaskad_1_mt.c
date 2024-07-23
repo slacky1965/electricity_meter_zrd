@@ -181,7 +181,7 @@ static uint8_t send_command(command_t command) {
     }
 
     sleep_ms(100);
-//    app_uart_rx_on();
+//    app_uart_rx_on(9600);
 
 #if UART_PRINTF_MODE && DEBUG_PACKAGE
     if (len == 0) {
