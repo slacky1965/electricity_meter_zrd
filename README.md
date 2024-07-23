@@ -4,25 +4,7 @@
 
 **Включает в себя схему оптопорта и модуль от E-Byte E180-Z5812SP, который работает, как Zigbee-роутер**
 
-# Not finished! In the process! Описание временное, проект в разработке ...
-
 [Repository electricity_meter_zrd](https://github.com/slacky1965/electricity_meter_zrd)  
-
----
-
-# Внимание!!! Плата пришла и протестированна!!! Есть ошибка в схеме!!!
-
-Не подведено питание в датчику температуры. 
-	
-<img src="https://raw.githubusercontent.com/slacky1965/electricity_meter_zrd/main/doc/images/ds18b20_wo_vcc.jpg"/>
-
-Решается обычной перемычкой из МГТФ. 
-	
-<img src="https://raw.githubusercontent.com/slacky1965/electricity_meter_zrd/main/doc/images/board/board_top_wire.jpg"/>
-	
-Все остальное работает.
-	
-# Но! Схема исправлена. Плата обновлена. Но не заказана и не протестирована :))
 
 ---
 
@@ -82,22 +64,24 @@
 
 **Схема**
 
-<img src="https://raw.githubusercontent.com/slacky1965/electricity_meter_zrd/main/doc/images/Schematic_Electricity_Meter_zrd.jpg"/>
+Electricity Meter состоит из двух частей. Основной, на которой расположены оптопорт, usb разъем и питание. И модуль zigbee с датчиком температуры. Так сделано для универсальности. К оптопорту можно подключить практически что угодно (модуль на дургом чипе, UART-USB преобразователь и т.д.).
+
+<img src="https://raw.githubusercontent.com/slacky1965/electricity_meter_zrd/main/doc/images/schematic_electericity_meter_zrd_3d_box_common.jpg"/>
+
+<img src="https://raw.githubusercontent.com/slacky1965/electricity_meter_zrd/main/doc/images/schematic_electricity_meter_zrd_3d_box_zigbee.jpg"/>
 
 **Плата**
 
-Новая плата разведена, но не заказана и не протестирована.
+<img src="https://raw.githubusercontent.com/slacky1965/electricity_meter_zrd/main/doc/images/board/board_3d_box_common.jpg"/>
 
-<img src="https://raw.githubusercontent.com/slacky1965/electricity_meter_zrd/main/doc/images/board/new_board_top.jpg"/>
-
-<img src="https://raw.githubusercontent.com/slacky1965/electricity_meter_zrd/main/doc/images/board/new_board_bottom.jpg"/>
+<img src="https://raw.githubusercontent.com/slacky1965/electricity_meter_zrd/main/doc/images/board/board_3d_box_zigbee.jpg"/>
 
 На гребенку выведены следующие пины модуля
 
 * SWS, GND - для заливки в модуль прошивки
 * RST, TX-DBG - на всякий случай, вдруг кому-то пригодится.
 
-[Ссылка на проект в easyeda](https://oshwlab.com/slacky/electricity_meter_zrd_v3)
+Ссылка на проект в easyeda (пока нет)
 
 **Корпус**
 
