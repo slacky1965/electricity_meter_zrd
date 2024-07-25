@@ -6,7 +6,7 @@
 
 # Not finished! In the process! Описание временное, проект в разработке ...
 
-[Repository electricity_meter_zrd](https://github.com/slacky1965/electricity_meter_zrd)  
+[Repository electricity_meter_zrd](https://github.com/slacky1965/electricity_meter_zrd/tree/version1)  
 
 ---
 
@@ -14,11 +14,11 @@
 
 Не подведено питание в датчику температуры. 
 	
-<img src="https://raw.githubusercontent.com/slacky1965/electricity_meter_zrd/main/doc/images/ds18b20_wo_vcc.jpg"/>
+<img src="https://raw.githubusercontent.com/slacky1965/electricity_meter_zrd/version1/doc/images/ds18b20_wo_vcc.jpg"/>
 
 Решается обычной перемычкой из МГТФ. 
 	
-<img src="https://raw.githubusercontent.com/slacky1965/electricity_meter_zrd/main/doc/images/board/board_top_wire.jpg"/>
+<img src="https://raw.githubusercontent.com/slacky1965/electricity_meter_zrd/version1/doc/images/board/board_top_wire.jpg"/>
 	
 Все остальное работает.
 	
@@ -71,25 +71,25 @@
 
 В проекте используется модуль от компании E-BYTE на чипе TLSR8258F512ET32 - E180-Z5812SP.
 
-<img src="https://raw.githubusercontent.com/slacky1965/electricity_meter_zrd/main/doc/images/E180-Z5812SP.jpg"/>
+<img src="https://raw.githubusercontent.com/slacky1965/electricity_meter_zrd/version1/doc/images/E180-Z5812SP.jpg"/>
 
 Испытывалось все на вот таком dongle от Telink
 
-<img src="https://raw.githubusercontent.com/slacky1965/electricity_meter_zrd/main/doc/images/telink_tlsr8258_dongle.jpg"/>
+<img src="https://raw.githubusercontent.com/slacky1965/electricity_meter_zrd/version1/doc/images/telink_tlsr8258_dongle.jpg"/>
 
-<img src="https://raw.githubusercontent.com/slacky1965/electricity_meter_zrd/main/doc/images/prototype.jpg"/>
+<img src="https://raw.githubusercontent.com/slacky1965/electricity_meter_zrd/version1/doc/images/prototype.jpg"/>
 
 **Схема**
 
-<img src="https://raw.githubusercontent.com/slacky1965/electricity_meter_zrd/main/doc/images/Schematic_Electricity_Meter_zrd.jpg"/>
+<img src="https://raw.githubusercontent.com/slacky1965/electricity_meter_zrd/version1/doc/images/Schematic_Electricity_Meter_zrd.jpg"/>
 
 **Плата**
 
 Новая плата разведена, но не заказана и не протестирована.
 
-<img src="https://raw.githubusercontent.com/slacky1965/electricity_meter_zrd/main/doc/images/board/new_board_top.jpg"/>
+<img src="https://raw.githubusercontent.com/slacky1965/electricity_meter_zrd/version1/doc/images/board/new_board_top.jpg"/>
 
-<img src="https://raw.githubusercontent.com/slacky1965/electricity_meter_zrd/main/doc/images/board/new_board_bottom.jpg"/>
+<img src="https://raw.githubusercontent.com/slacky1965/electricity_meter_zrd/version1/doc/images/board/new_board_bottom.jpg"/>
 
 На гребенку выведены следующие пины модуля
 
@@ -102,39 +102,39 @@
 
 В виде корпуса используется [вилка на 220в](https://leroymerlin.ru/product/vilka-uglovaya-s-zazemleniem-16-a-cvet-belyy-81930756/), купленная в Леруа Мерлен.
 
-<img src="https://raw.githubusercontent.com/slacky1965/electricity_meter_zrd/main/doc/images/box/box1.jpg"/>
+<img src="https://raw.githubusercontent.com/slacky1965/electricity_meter_zrd/version1/doc/images/box/box1.jpg"/>
 
-<img src="https://raw.githubusercontent.com/slacky1965/electricity_meter_zrd/main/doc/images/box/box2.jpg"/>
+<img src="https://raw.githubusercontent.com/slacky1965/electricity_meter_zrd/version1/doc/images/box/box2.jpg"/>
 
-<img src="https://raw.githubusercontent.com/slacky1965/electricity_meter_zrd/main/doc/images/box/box3.jpg"/>
+<img src="https://raw.githubusercontent.com/slacky1965/electricity_meter_zrd/version1/doc/images/box/box3.jpg"/>
 
-<img src="https://raw.githubusercontent.com/slacky1965/electricity_meter_zrd/main/doc/images/box/box4.jpg"/>
+<img src="https://raw.githubusercontent.com/slacky1965/electricity_meter_zrd/version1/doc/images/box/box4.jpg"/>
 
-<img src="https://raw.githubusercontent.com/slacky1965/electricity_meter_zrd/main/doc/images/box/box5.jpg"/>
+<img src="https://raw.githubusercontent.com/slacky1965/electricity_meter_zrd/version1/doc/images/box/box5.jpg"/>
 
-<img src="https://raw.githubusercontent.com/slacky1965/electricity_meter_zrd/main/doc/images/box/box6.jpg"/>
+<img src="https://raw.githubusercontent.com/slacky1965/electricity_meter_zrd/version1/doc/images/box/box6.jpg"/>
 
-<img src="https://raw.githubusercontent.com/slacky1965/electricity_meter_zrd/main/doc/images/box/box7.jpg"/>
+<img src="https://raw.githubusercontent.com/slacky1965/electricity_meter_zrd/version1/doc/images/box/box7.jpg"/>
 
-<img src="https://raw.githubusercontent.com/slacky1965/electricity_meter_zrd/main/doc/images/box/box8.jpg"/>
+<img src="https://raw.githubusercontent.com/slacky1965/electricity_meter_zrd/version1/doc/images/box/box8.jpg"/>
 
-<img src="https://raw.githubusercontent.com/slacky1965/electricity_meter_zrd/main/doc/images/box/box9.jpg"/>
+<img src="https://raw.githubusercontent.com/slacky1965/electricity_meter_zrd/version1/doc/images/box/box9.jpg"/>
 
-<img src="https://raw.githubusercontent.com/slacky1965/electricity_meter_zrd/main/doc/images/box/box10.jpg"/>
+<img src="https://raw.githubusercontent.com/slacky1965/electricity_meter_zrd/version1/doc/images/box/box10.jpg"/>
 
 **Готовое устройство**
 
-<img src="https://raw.githubusercontent.com/slacky1965/electricity_meter_zrd/main/doc/images/board/board_top_real.jpg"/>
+<img src="https://raw.githubusercontent.com/slacky1965/electricity_meter_zrd/version1/doc/images/board/board_top_real.jpg"/>
 
-<img src="https://raw.githubusercontent.com/slacky1965/electricity_meter_zrd/main/doc/images/board/board_bottom_real.jpg"/>
+<img src="https://raw.githubusercontent.com/slacky1965/electricity_meter_zrd/version1/doc/images/board/board_bottom_real.jpg"/>
 
-<img src="https://raw.githubusercontent.com/slacky1965/electricity_meter_zrd/main/doc/images/device1.jpg"/>
+<img src="https://raw.githubusercontent.com/slacky1965/electricity_meter_zrd/version1/doc/images/device1.jpg"/>
 
-<img src="https://raw.githubusercontent.com/slacky1965/electricity_meter_zrd/main/doc/images/device2.jpg"/>
+<img src="https://raw.githubusercontent.com/slacky1965/electricity_meter_zrd/version1/doc/images/device2.jpg"/>
 
-<img src="https://raw.githubusercontent.com/slacky1965/electricity_meter_zrd/main/doc/images/device3.jpg"/>
+<img src="https://raw.githubusercontent.com/slacky1965/electricity_meter_zrd/version1/doc/images/device3.jpg"/>
 
-<img src="https://raw.githubusercontent.com/slacky1965/electricity_meter_zrd/main/doc/images/device4.jpg"/>
+<img src="https://raw.githubusercontent.com/slacky1965/electricity_meter_zrd/version1/doc/images/device4.jpg"/>
 
 ---
 
@@ -143,11 +143,11 @@
 [Скачиваем проект](https://github.com/slacky1965/electricity_meter_zrd)  
 Если скачали архивом, разворачиваем в какой-нибудь временной директории. Далее запускаем Eclipse. В левом верхнем углу нажимаем File, в развернувшемся меню выбираем Import
 
-<img src="https://raw.githubusercontent.com/slacky1965/electricity_meter_zrd/main/doc/images/eclipse/eclipse1.jpg"/>
+<img src="https://raw.githubusercontent.com/slacky1965/electricity_meter_zrd/version1/doc/images/eclipse/eclipse1.jpg"/>
 
 Далее выбираем `Existing Project into Workspace` и жмем `Next`.
 
-<img src="https://raw.githubusercontent.com/slacky1965/electricity_meter_zrd/main/doc/images/eclipse/eclipse2.jpg"/>
+<img src="https://raw.githubusercontent.com/slacky1965/electricity_meter_zrd/version1/doc/images/eclipse/eclipse2.jpg"/>
 
 В открывшемся окне по очереди выбираем 
 
@@ -156,27 +156,27 @@
 3. Ставим галочку на `Copy projects into workspace`
 4. Жмем `Finish`
 
-<img src="https://raw.githubusercontent.com/slacky1965/electricity_meter_zrd/main/doc/images/eclipse/eclipse3.jpg"/>
+<img src="https://raw.githubusercontent.com/slacky1965/electricity_meter_zrd/version1/doc/images/eclipse/eclipse3.jpg"/>
 
 Все, проект у нас в Эклипсе. 
 
 Далее нужен компилятор и кое-какие утилиты. Компилятор можно скачать у [Telink'a](https://wiki.telink-semi.cn/wiki/IDE-and-Tools/IDE-for-TLSR8-Chips/). Установщик поставит IDE (правленый Эклипс) и компилятор с утилитами. Но мне такой венегрет не нравится, поэтому я пользуюсь обычным Эклипсом и makefile. Так же компилятор есть у [Ai-Thinker](https://github.com/Ai-Thinker-Open/Telink_825X_SDK). Там есть под Windows и под Linux. Так же советую скачать [git bash for windows](https://git-scm.com/download/win). Это позволит писать makefiles, которые будут прекрасно работать и под Windows и под Linux практически без редактирования. Еще понадобится Python, но я думаю, это не проблема. Не забудьте отредактировать в makefile и bootloader.makefile пути к компилятору, если он у вас лежит в другом месте.
 
-<img src="https://raw.githubusercontent.com/slacky1965/electricity_meter_zrd/main/doc/images/eclipse/eclipse8.jpg"/>
+<img src="https://raw.githubusercontent.com/slacky1965/electricity_meter_zrd/version1/doc/images/eclipse/eclipse8.jpg"/>
 
 Итак, компиляцию начинаем с `bootloader`. Собираем и прошиваем ([как и чем шить чуть ниже](#firmware_download)). Если модуль пустой, то после прошивки `bootloader'a` модуль просто начнет моргать светодиодом. Это нормально.  
 
-<img src="https://raw.githubusercontent.com/slacky1965/electricity_meter_zrd/main/doc/images/eclipse/eclipse4.jpg"/>
+<img src="https://raw.githubusercontent.com/slacky1965/electricity_meter_zrd/version1/doc/images/eclipse/eclipse4.jpg"/>
 
 Далее компилируем уже саму прошивку и прошиваем.
 
-<img src="https://raw.githubusercontent.com/slacky1965/electricity_meter_zrd/main/doc/images/eclipse/eclipse6.jpg"/>
+<img src="https://raw.githubusercontent.com/slacky1965/electricity_meter_zrd/version1/doc/images/eclipse/eclipse6.jpg"/>
 
 Если все прошло без ошибок, то модуль запустится и начнет работу.
 
 И последнее - проект сделан таким образом, что его можно вообще собрать без IDE, обычнам make в командной строке.
 
-<img src="https://raw.githubusercontent.com/slacky1965/electricity_meter_zrd/main/doc/images/make.jpg"/>
+<img src="https://raw.githubusercontent.com/slacky1965/electricity_meter_zrd/version1/doc/images/make.jpg"/>
 
 ---
 
@@ -184,14 +184,14 @@
 
 Вопрос - как залить прошивку в модуль. Есть несколько вариантов. Самый простой, это приобрести у Telink их фирменный программатор.
 
-<img src="https://raw.githubusercontent.com/slacky1965/electricity_meter_zrd/main/doc/images/telink_pgm.jpg"/>
+<img src="https://raw.githubusercontent.com/slacky1965/electricity_meter_zrd/version1/doc/images/telink_pgm.jpg"/>
 
 Но он неоправдано дорого стоит. Есть другой, более бюджетный вариант. Заказываем модуль TB-04 или [TB-03](http://www.ai-thinker.com/pro_view-89.html) от Ai-Thinker. Почему-то у самого производителя TB-04 не числится. Но на aliexpress их полно. В них применен TLSR8253. Паяем перемычку согласно фото.
 
-<img src="https://raw.githubusercontent.com/slacky1965/electricity_meter_zrd/main/doc/images/TB-03F-KIT-PGM.gif"/>
-<img src="https://raw.githubusercontent.com/slacky1965/electricity_meter_zrd/main/doc/images/TB-04-KIT-wire.jpg"/>
+<img src="https://raw.githubusercontent.com/slacky1965/electricity_meter_zrd/version1/doc/images/TB-03F-KIT-PGM.gif"/>
+<img src="https://raw.githubusercontent.com/slacky1965/electricity_meter_zrd/version1/doc/images/TB-04-KIT-wire.jpg"/>
 
-И заливаем прошивку [вот отсюда](https://github.com/pvvx/TLSRPGM/tree/main/sources/UART2SWire/tb-0x-pgm)
+И заливаем прошивку [вот отсюда](https://github.com/pvvx/TLSRPGM/tree/version1/sources/UART2SWire/tb-0x-pgm)
 
 Все, у нас есть недорогой программатор, который может загружать прошивки через SWS в модули от Telink'a. Пин D4 (SWM) программатора нужно соединить с пином SWS программируемого модуля, не забыть объединить земли и подкинуть питание на оба модуля.  
 Сама программа-прошивальщик лежит [тут](https://github.com/pvvx/TLSRPGM)
@@ -274,15 +274,15 @@
 			- electricity_meter.js
 		  
 
-Файл `electricity_meter.js` копируем из [папки проекта](https://raw.githubusercontent.com/slacky1965/electricity_meter_zrd/main/zigbee2mqtt/convertor/electricity_meter.js) туда же, где лежит `configuration.yaml` от zigbee2mqtt. Не забываем разрешить подключение новых устройств - `permit_join: true`. Перегружаем zigbee2mqtt. Проверяем его лог, что он запустился и нормально работает.
+Файл `electricity_meter.js` копируем из [папки проекта](https://raw.githubusercontent.com/slacky1965/electricity_meter_zrd/version1/zigbee2mqtt/convertor/electricity_meter.js) туда же, где лежит `configuration.yaml` от zigbee2mqtt. Не забываем разрешить подключение новых устройств - `permit_join: true`. Перегружаем zigbee2mqtt. Проверяем его лог, что он запустился и нормально работает.
 
 Первоначальная настройка происходит через web-интерфейс zigbee2mqtt. Для начала нужно убедиться, что устройство в сети. 
 
-<img src="https://raw.githubusercontent.com/slacky1965/electricity_meter_zrd/main/doc/images/z2m_device.jpg"/>
+<img src="https://raw.githubusercontent.com/slacky1965/electricity_meter_zrd/version1/doc/images/z2m_device.jpg"/>
 
 Если во вкладке `devices` его нет, нужно нажать кнопку на устройстве 5 раз. Итак убедились, что устройство в сети, можно переходить к настройкам. Переходим к вкладке `exposes` устройства.
 
-<img src="https://raw.githubusercontent.com/slacky1965/electricity_meter_zrd/main/doc/images/z2m_exposes.jpg"/>
+<img src="https://raw.githubusercontent.com/slacky1965/electricity_meter_zrd/version1/doc/images/z2m_exposes.jpg"/>
 
 Видим, что в ячейке `Device model preset` выставлен счетчик `No Device`, т.е. никакой счетчик не выбран, считывание данных не происходит. Выбираем нужный счетчик из предложенных. По умолчанию период опроса счетчика - 1 минута. Если нужно больше (максимальное значение 255 минут), меняем настройку `Device measurement preset`.
 
@@ -292,9 +292,9 @@
 
 ### <a id="kaskad-1-mt">Однофазный многотарифный счетчик КАСКАД-1-МТ</a>
 
-<img src="https://raw.githubusercontent.com/slacky1965/electricity_meter_zrd/main/doc/electricity_meters/kaskad/kaskad_1_mt.jpg">
+<img src="https://raw.githubusercontent.com/slacky1965/electricity_meter_zrd/version1/doc/electricity_meters/kaskad/kaskad_1_mt.jpg">
 
-Счетчик общается по протоколу [МИРТЕК](https://github.com/slacky1965/electricity_meter_zrd/raw/main/doc/electricity_meters/kaskad/Star_104_304_1.20.doc).
+Счетчик общается по протоколу [МИРТЕК](https://github.com/slacky1965/electricity_meter_zrd/raw/version1/doc/electricity_meters/kaskad/Star_104_304_1.20.doc).
 
 В настоящий момент устройство может прочитать из счетчика:
 
@@ -312,9 +312,9 @@
 
 ### <a id="kaskad-11">Однофазный многотарифный счетчик КАСКАД-11-C1</a>
 
-<img src="https://raw.githubusercontent.com/slacky1965/electricity_meter_zrd/main/doc/electricity_meters/kaskad/kaskad_11_c1.jpg">
+<img src="https://raw.githubusercontent.com/slacky1965/electricity_meter_zrd/version1/doc/electricity_meters/kaskad/kaskad_11_c1.jpg">
 
-Счетчик общается по своему [протоколу](https://github.com/slacky1965/electricity_meter_zrd/raw/main/doc/electricity_meters/kaskad/2023.01.12-KASKAD_11.doc).
+Счетчик общается по своему [протоколу](https://github.com/slacky1965/electricity_meter_zrd/raw/version1/doc/electricity_meters/kaskad/2023.01.12-KASKAD_11.doc).
 
 В настоящий момент устройство может прочитать из счетчика:
 
@@ -334,7 +334,7 @@
 
 ### <a id="mercury-206">Однофазный многотарифный счетчик Меркурий-206</a>
 
-<img src="https://raw.githubusercontent.com/slacky1965/electricity_meter_zrd/main/doc/electricity_meters/mercury/mercury-206.jpg">
+<img src="https://raw.githubusercontent.com/slacky1965/electricity_meter_zrd/version1/doc/electricity_meters/mercury/mercury-206.jpg">
 
 Счетчик общается по [протоколу](https://www.incotexcom.ru/files/em/docs/mercury-protocol-obmena-1.pdf).
 
@@ -358,7 +358,7 @@
 
 ### <a id="energomera-ce102m">Однофазный многотарифный счетчик Энергомера-СЕ102М</a>
 
-<img src="https://raw.githubusercontent.com/slacky1965/electricity_meter_zrd/main/doc/electricity_meters/energomera/102m_r5_front.jpg">
+<img src="https://raw.githubusercontent.com/slacky1965/electricity_meter_zrd/version1/doc/electricity_meters/energomera/102m_r5_front.jpg">
 
 Протокол обмена на этот счетчик размещен на сайте Энергомеры, в [руководстве по эксплуатации](http://www.energomera.ru/documentations/product/ce102m_re.pdf)
 
@@ -378,7 +378,7 @@
 
 ### <a id="neva-mt124">Однофазный многотарифный счетчик Нева-МТ124</a>
 
-<img src="https://raw.githubusercontent.com/slacky1965/electricity_meter_zrd/main/doc/electricity_meters/neva/neva_mt124.jpg">
+<img src="https://raw.githubusercontent.com/slacky1965/electricity_meter_zrd/version1/doc/electricity_meters/neva/neva_mt124.jpg">
 
 Протокол обмена описан в `ГОСТ Р МЭК 61107-2001`. В ГОСТе нужно читать только то, что касается режима С. Практически все тоже самое, что в протоколе обмена счетчика `Энергомера-СЕ102М`, за небольшим исключением. Вычисление контрольной суммы отличается от рекомендуемого стандартом и осуществляется как "исключающее ИЛИ". Скорость для начала обмена данными через оптопорт - 300b. После первой команды запроса на соединение, счетчик переходит на скорость 9600b.
 
@@ -398,7 +398,7 @@
 
 ### <a id="nartis-100">Однофазный многотарифный счетчик Нартис-100</a>
 
-<img src="https://raw.githubusercontent.com/slacky1965/electricity_meter_zrd/main/doc/electricity_meters/nartis/nartis100.jpg">
+<img src="https://raw.githubusercontent.com/slacky1965/electricity_meter_zrd/version1/doc/electricity_meters/nartis/nartis100.jpg">
 
 Счетчик общается по протоколу СПОДЭС.
 
@@ -418,7 +418,7 @@
 
 Если счетчик выбран и устройство примагничено к окошку оптопорта счетчика, то в `exposes` web-интерфейса `zigbee2mqtt` получим примерно такую картинку.
 
-<img src="https://raw.githubusercontent.com/slacky1965/electricity_meter_zrd/main/doc/images/z2m_nartis100.jpg">
+<img src="https://raw.githubusercontent.com/slacky1965/electricity_meter_zrd/version1/doc/images/z2m_nartis100.jpg">
 
 Если данные не считываются, есть несколько причин.
 
@@ -432,5 +432,5 @@
 
 В результате вы получите примерно вот такую картинку.
 
-<img src="https://raw.githubusercontent.com/slacky1965/electricity_meter_zrd/main/doc/images/ha.jpg">
+<img src="https://raw.githubusercontent.com/slacky1965/electricity_meter_zrd/version1/doc/images/ha.jpg">
 
