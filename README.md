@@ -4,25 +4,9 @@
 
 **Включает в себя схему оптопорта и модуль от E-Byte E180-Z5812SP, который работает, как Zigbee-роутер**
 
-# Not finished! In the process! Описание временное, проект в разработке ...
+[Repository electricity_meter_zrd](https://github.com/slacky1965/electricity_meter_zrd)
 
-[Repository electricity_meter_zrd](https://github.com/slacky1965/electricity_meter_zrd)  
-
----
-
-# Внимание!!! Плата пришла и протестированна!!! Есть ошибка в схеме!!!
-
-Не подведено питание в датчику температуры. 
-	
-<img src="https://raw.githubusercontent.com/slacky1965/electricity_meter_zrd/main/doc/images/ds18b20_wo_vcc.jpg"/>
-
-Решается обычной перемычкой из МГТФ. 
-	
-<img src="https://raw.githubusercontent.com/slacky1965/electricity_meter_zrd/main/doc/images/board/board_top_wire.jpg"/>
-	
-Все остальное работает.
-	
-# Но! Схема исправлена. Плата обновлена. Но не заказана и не протестирована :))
+[Версия 1 устройства хранится в отдельной ветке](https://github.com/slacky1965/electricity_meter_zrd/tree/version1)
 
 ---
 
@@ -64,6 +48,7 @@
 * Первоначальная настройка происходит через web-интерфейс zigbee2mqtt.
 * Сбросить устройство до заводских значений (zigbee) - нажать кнопку 5 раз.
 * Сделать restart модуля - зажать кнопку более чем на 5 секунд.
+* Однократное короткое нажатие на кнопку - принудительный репорт всех значений.
 
 ---
 
@@ -81,60 +66,37 @@
 
 **Схема**
 
-<img src="https://raw.githubusercontent.com/slacky1965/electricity_meter_zrd/main/doc/images/Schematic_Electricity_Meter_zrd.jpg"/>
+Electricity Meter состоит из двух частей. Основной, на которой расположены оптопорт, usb разъем и питание. И модуль zigbee с датчиком температуры. Так сделано для универсальности. К оптопорту можно подключить практически что угодно (модуль на другом чипе, UART-USB преобразователь и т.д.).
+
+<img src="https://raw.githubusercontent.com/slacky1965/electricity_meter_zrd/main/doc/images/schematic_electericity_meter_zrd_3d_box_common.jpg"/>
+
+<img src="https://raw.githubusercontent.com/slacky1965/electricity_meter_zrd/main/doc/images/schematic_electricity_meter_zrd_3d_box_zigbee.jpg"/>
 
 **Плата**
 
-Новая плата разведена, но не заказана и не протестирована.
+<img src="https://raw.githubusercontent.com/slacky1965/electricity_meter_zrd/main/doc/images/board/board_3d_box_common.jpg"/>
 
-<img src="https://raw.githubusercontent.com/slacky1965/electricity_meter_zrd/main/doc/images/board/new_board_top.jpg"/>
-
-<img src="https://raw.githubusercontent.com/slacky1965/electricity_meter_zrd/main/doc/images/board/new_board_bottom.jpg"/>
+<img src="https://raw.githubusercontent.com/slacky1965/electricity_meter_zrd/main/doc/images/board/board_3d_box_zigbee.jpg"/>
 
 На гребенку выведены следующие пины модуля
 
 * SWS, GND - для заливки в модуль прошивки
 * RST, TX-DBG - на всякий случай, вдруг кому-то пригодится.
 
-[Ссылка на проект в easyeda](https://oshwlab.com/slacky/electricity_meter_zrd_v3)
+Ссылка на проект в easyeda (пока нет)
 
 **Корпус**
 
-В виде корпуса используется [вилка на 220в](https://leroymerlin.ru/product/vilka-uglovaya-s-zazemleniem-16-a-cvet-belyy-81930756/), купленная в Леруа Мерлен.
+Корпус напечатан на 3D принтере.
 
-<img src="https://raw.githubusercontent.com/slacky1965/electricity_meter_zrd/main/doc/images/box/box1.jpg"/>
+<img src="https://raw.githubusercontent.com/slacky1965/electricity_meter_zrd/main/doc/images/box/main_and_cover.png"/>
 
-<img src="https://raw.githubusercontent.com/slacky1965/electricity_meter_zrd/main/doc/images/box/box2.jpg"/>
-
-<img src="https://raw.githubusercontent.com/slacky1965/electricity_meter_zrd/main/doc/images/box/box3.jpg"/>
-
-<img src="https://raw.githubusercontent.com/slacky1965/electricity_meter_zrd/main/doc/images/box/box4.jpg"/>
-
-<img src="https://raw.githubusercontent.com/slacky1965/electricity_meter_zrd/main/doc/images/box/box5.jpg"/>
-
-<img src="https://raw.githubusercontent.com/slacky1965/electricity_meter_zrd/main/doc/images/box/box6.jpg"/>
-
-<img src="https://raw.githubusercontent.com/slacky1965/electricity_meter_zrd/main/doc/images/box/box7.jpg"/>
-
-<img src="https://raw.githubusercontent.com/slacky1965/electricity_meter_zrd/main/doc/images/box/box8.jpg"/>
-
-<img src="https://raw.githubusercontent.com/slacky1965/electricity_meter_zrd/main/doc/images/box/box9.jpg"/>
-
-<img src="https://raw.githubusercontent.com/slacky1965/electricity_meter_zrd/main/doc/images/box/box10.jpg"/>
 
 **Готовое устройство**
 
-<img src="https://raw.githubusercontent.com/slacky1965/electricity_meter_zrd/main/doc/images/board/board_top_real.jpg"/>
+<img src="https://raw.githubusercontent.com/slacky1965/electricity_meter_zrd/main/doc/images/device_3d_box.jpg"/>
 
-<img src="https://raw.githubusercontent.com/slacky1965/electricity_meter_zrd/main/doc/images/board/board_bottom_real.jpg"/>
-
-<img src="https://raw.githubusercontent.com/slacky1965/electricity_meter_zrd/main/doc/images/device1.jpg"/>
-
-<img src="https://raw.githubusercontent.com/slacky1965/electricity_meter_zrd/main/doc/images/device2.jpg"/>
-
-<img src="https://raw.githubusercontent.com/slacky1965/electricity_meter_zrd/main/doc/images/device3.jpg"/>
-
-<img src="https://raw.githubusercontent.com/slacky1965/electricity_meter_zrd/main/doc/images/device4.jpg"/>
+<img src="https://raw.githubusercontent.com/slacky1965/electricity_meter_zrd/main/doc/images/device_3d_box.png"/>
 
 ---
 
@@ -242,7 +204,7 @@
 	
 **Память модуля, прошивка (firmware) и где хранится конфиг**
 
-В данном проекте обновление OTA не используется. Связано это с тем, что при конфигурации с OTA на TLSR8258F512 отведено под прошивку только 0x34000 байт. И даже, если применить модуль TLST8258F1 с 1мБ - это все равно не сильно исправляет ситуацию, в нем отведено место под прошивку 0x40000. К чему все это. Размер прошивки с 4 счетчиками подошел к своему пределу, что-то около 200000 байт. Если предположить, что счетчики будут добавляться, то мы в самом ближайшем будущем столкнемся с тем, что прошивка превысит размер выделенного под нее пространстсва. Раздельная компиляция для конкретного счетчика мне не понравилась, там вылезли свои глюки. Потому было принято решение остановиться на схеме с использованием `bootloader'a`. При таком решении и отключенном обновлением OTA, размер прошивки может достигать более 400 кБ, что достаточно много. Карту памяти можно посмотреть тут - tl_zigbee_sdk/proj/drivers/drv_nv.h.
+В данном проекте обновление OTA не используется. Связано это с тем, что при конфигурации с OTA на TLSR8258F512 отведено под прошивку только 0x34000 байт. И даже, если применить модуль TLST8258F1 с 1мБ - это все равно не сильно исправляет ситуацию, в нем отведено место под прошивку 0x40000. К чему все это. Размер прошивки с 6 счетчиками подошел к своему пределу, что-то около 200000 байт. Если предположить, что счетчики будут добавляться, то мы в самом ближайшем будущем столкнемся с тем, что прошивка превысит размер выделенного под нее пространстсва. Раздельная компиляция для конкретного счетчика мне не понравилась, там вылезли свои глюки. Потому было принято решение остановиться на схеме с использованием `bootloader'a`. При таком решении и отключенном обновлением OTA, размер прошивки может достигать более 400 кБ, что достаточно много. Карту памяти можно посмотреть тут - tl_zigbee_sdk/proj/drivers/drv_nv.h.
 
 Согласно спецификации на чип TLSR8258F512ET32 при использовании `bootloader'a` память распределена следующим образом
 
@@ -260,7 +222,7 @@
 
 `bootloader` ничего не умеет, кроме, как запускать прошивку с адреса 0x8000.
 
-В конфиге сохраняютстя только настройки модуля. Конфиг записывается в NV_2 (куда-то в область с 0x7a000 по 0x7c000). Используется модуль NV_MODULE_APP с номером NV_ITEM_APP_USER_CFG (для понимания смотрите app_cfg.h и sdk/proj/drivers/drv_nv.h)
+В конфиге сохраняютстя только настройки модуля. Конфиг записывается в NV_2 (куда-то в область с 0x7a000 по 0x7c000). Используется модуль NV_MODULE_APP с номером NV_ITEM_APP_USER_CFG (для понимания смотрите app_cfg.h и tl_zigbee_sdk/proj/drivers/drv_nv.h)
 
 В электросчетчиках используются разные протоколы обмена. Дополнительную информацию смотрите в разделе по конкретному [электросчетчику](#electricity_meters).
 
@@ -425,7 +387,10 @@
 * Выбран не тот счетчик.
 * Не введен адрес счетчика, где он требуется.
 * Не совмещены светодиод и фототранзистор на устройстве и счетчике. Рекомендуется немного подвигать устройство.
-	
+* Правильное позиционирование Electricity Meter на счетчике - USB разъемом вниз
+
+<img src="https://raw.githubusercontent.com/slacky1965/electricity_meter_zrd/main/doc/images/device_3d_box1.jpg">
+
 ---
 
 ## <a id="home_assistant">Home Assistant</a>
