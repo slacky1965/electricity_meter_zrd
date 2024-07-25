@@ -4,7 +4,9 @@
 
 **Включает в себя схему оптопорта и модуль от E-Byte E180-Z5812SP, который работает, как Zigbee-роутер**
 
-[Repository electricity_meter_zrd](https://github.com/slacky1965/electricity_meter_zrd)  
+[Repository electricity_meter_zrd](https://github.com/slacky1965/electricity_meter_zrd)
+
+[Версия 1 устройства хранится в отдельной ветке](https://github.com/slacky1965/electricity_meter_zrd/tree/version1)
 
 ---
 
