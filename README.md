@@ -83,13 +83,18 @@ Electricity Meter состоит из двух частей. Основной, �
 * SWS, GND - для заливки в модуль прошивки
 * RST, TX-DBG - на всякий случай, вдруг кому-то пригодится.
 
-Ссылка на проект в easyeda (пока нет)
+Ссылки на проект в easyeda
+[Общая часть](https://oshwlab.com/slacky/electericity_meter_zrd_3d_box_common_copy)
+[Zigbee](https://oshwlab.com/slacky/electricity_meter_zrd_3d_box_zigbee)
 
 **Корпус**
 
 Корпус напечатан на 3D принтере.
 
 <img src="https://raw.githubusercontent.com/slacky1965/electricity_meter_zrd/main/doc/images/box/main_and_cover.png"/>
+
+[STL файл основания](https://raw.githubusercontent.com/slacky1965/electricity_meter_zrd/main/doc/ElectricityMeter_Main1_short.STL)
+[STL крышки](https://raw.githubusercontent.com/slacky1965/electricity_meter_zrd/main/doc/ElectricityMeter_Cover_New.STL)
 
 
 **Готовое устройство**
