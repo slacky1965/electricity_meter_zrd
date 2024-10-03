@@ -140,7 +140,7 @@ const fzLocal = {
         const result = {};
         if (msg.data.hasOwnProperty('currentTier1SummDelivered')) {
             const data = msg.data['currentTier1SummDelivered'];
-            result.Tariff1 = (parseInt(data[0]) << 32) + parseInt(data[1])/energy_divisor*energy_multiplier;
+            result.Tariff1 = parseInt(data)/energy_divisor*energy_multiplier;
 		}
         return result;
     },
@@ -152,7 +152,7 @@ const fzLocal = {
         const result = {};
         if (msg.data.hasOwnProperty('currentTier2SummDelivered')) {
             const data = msg.data['currentTier2SummDelivered'];
-            result.Tariff2 = (parseInt(data[0]) << 32) + parseInt(data[1])/energy_divisor*energy_multiplier;
+            result.Tariff2 = parseInt(data)/energy_divisor*energy_multiplier;
 		}
         return result;
     },
@@ -164,7 +164,7 @@ const fzLocal = {
         const result = {};
         if (msg.data.hasOwnProperty('currentTier3SummDelivered')) {
             const data = msg.data['currentTier3SummDelivered'];
-            result.Tariff3 = (parseInt(data[0]) << 32) + parseInt(data[1])/energy_divisor*energy_multiplier;
+            result.Tariff3 = parseInt(data)/energy_divisor*energy_multiplier;
 		}
         return result;
     },
@@ -176,7 +176,7 @@ const fzLocal = {
         const result = {};
         if (msg.data.hasOwnProperty('currentTier4SummDelivered')) {
             const data = msg.data['currentTier4SummDelivered'];
-            result.Tariff4 = (parseInt(data[0]) << 32) + parseInt(data[1])/energy_divisor*energy_multiplier;
+            result.Tariff4 = parseInt(data)/energy_divisor*energy_multiplier;
 		}
         return result;
     },
