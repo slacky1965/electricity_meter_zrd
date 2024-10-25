@@ -148,6 +148,7 @@ void user_app_init(void)
 void app_task(void) {
 
     button_handler();
+    tamper_handler();
 
     if(BDB_STATE_GET() == BDB_STATE_IDLE){
 
@@ -227,6 +228,10 @@ void user_init(bool isRetention)
     bdb_defaultReportingCfg(APP_ENDPOINT_1, HA_PROFILE_ID, ZCL_CLUSTER_SE_METERING, ZCL_ATTRID_CURRENT_TIER_3_SUMMATION_DELIVERD,
             0, 300, (uint8_t *)&reportableChange);
     bdb_defaultReportingCfg(APP_ENDPOINT_1, HA_PROFILE_ID, ZCL_CLUSTER_SE_METERING, ZCL_ATTRID_CURRENT_TIER_4_SUMMATION_DELIVERD,
+            0, 300, (uint8_t *)&reportableChange);
+    bdb_defaultReportingCfg(APP_ENDPOINT_1, HA_PROFILE_ID, ZCL_CLUSTER_SE_METERING, ZCL_ATTRID_CURRENT_SUMMATION_DELIVERD,
+            0, 300, (uint8_t *)&reportableChange);
+    bdb_defaultReportingCfg(APP_ENDPOINT_1, HA_PROFILE_ID, ZCL_CLUSTER_SE_METERING, ZCL_ATTRID_STATUS,
             0, 300, (uint8_t *)&reportableChange);
     bdb_defaultReportingCfg(APP_ENDPOINT_1, HA_PROFILE_ID, ZCL_CLUSTER_SE_METERING, ZCL_ATTRID_MULTIPLIER,
             0, 0, (uint8_t *)&reportableChange);

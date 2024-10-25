@@ -379,6 +379,9 @@ static void get_tariffs_data() {
         printf("tariff4: %d\r\n", tariff);
 #endif
 
+        tariff = tariffs_response->tariff_1 + tariffs_response->tariff_2 + tariffs_response->tariff_3 + tariffs_response->tariff_4;
+        zcl_setAttrVal(APP_ENDPOINT_1, ZCL_CLUSTER_SE_METERING, ZCL_ATTRID_CURRENT_SUMMATION_DELIVERD, (uint8_t*)&tariff);
+
     }
 }
 

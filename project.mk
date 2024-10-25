@@ -16,6 +16,7 @@ $(OUT_PATH)/$(SRC_PATH)/app_reporting.o \
 $(OUT_PATH)/$(SRC_PATH)/app_utility.o \
 $(OUT_PATH)/$(SRC_PATH)/app_led.o \
 $(OUT_PATH)/$(SRC_PATH)/app_button.o \
+$(OUT_PATH)/$(SRC_PATH)/app_tamper.o \
 $(OUT_PATH)/$(SRC_PATH)/devices/device.o \
 $(OUT_PATH)/$(SRC_PATH)/devices/kaskad_1_mt.o \
 $(OUT_PATH)/$(SRC_PATH)/devices/kaskad_11.o \
