@@ -29,6 +29,11 @@ static const uint8_t cmd5[] = {SOH, 0x52, 0x31, STX, 0x36, 0x30, 0x30, 0x35, 0x3
 
 static const uint8_t* command_array[] = {cmd0, cmd1, cmd2, cmd3, cmd4, cmd5};
 
+static neva_124_type_t neva_124_type = HEBA_124_UNKNOWN;
+static const uint8_t neva_124_type_ar[HEBA_124_MAX][10] = {{"124.0000"},
+                                                       {"124.6102"},
+                                                       {"124.7109"}};
+
 static uint8_t checksum(const uint8_t *src_buffer, uint8_t len) {
     uint8_t crc = 0;
 
@@ -345,12 +350,29 @@ static pkt_error_t response_meter(command_t command) {
 
 static uint8_t open_session() {
 
+    uint8_t *p_str;
+    uint32_t type = 0;
+
 #if UART_PRINTF_MODE && (DEBUG_DEVICE_DATA || DEBUG_PACKAGE)
     printf("\r\nCommand open of channel\r\n");
 #endif
 
     if (send_command(cmd_open_channel)) {
         if (response_meter(cmd_open_channel) == PKT_OK) {
+
+            p_str = package_buff;
+            while(*p_str != '.' && *p_str != 0x0d && *p_str != 0) {
+                p_str++;
+            }
+
+            if (*p_str == '.') {
+                p_str++;
+
+                type = fromPtoInteger(4, p_str);
+            }
+
+            printf("type: %d\r\n", type);
+
             return true;
         }
     }
