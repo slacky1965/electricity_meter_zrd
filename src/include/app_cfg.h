@@ -60,7 +60,7 @@ extern "C" {
 /* Debug mode config */
 #define UART_PRINTF_MODE                ON
 #define DEBUG_CONFIG                    OFF
-#define DEBUG_DEVICE_DATA               OFF
+#define DEBUG_DEVICE_DATA               ON
 #define DEBUG_PACKAGE                   ON
 #define DEBUG_TAMPER                    ON
 #define DEBUG_REPORTING                 OFF
