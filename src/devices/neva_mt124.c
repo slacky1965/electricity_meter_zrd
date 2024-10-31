@@ -8,31 +8,62 @@
 #include "device.h"
 #include "neva_mt124.h"
 
-#define ACK         0x06
-#define SOH         0x01
-#define STX         0x02
-#define ETX         0x03
+#define ACK             0x06
+#define SOH             0x01
+#define STX             0x02
+#define ETX             0x03
+
+#define BAUDRATE_300    300
+#define BAUDRATE_9600   9600
 
 #define MAX_VBAT_MV 3100                        /* 3100 mV - > battery = 100%         */
 #define MIN_VBAT_MV BATTERY_SAFETY_THRESHOLD    /* 2200 mV - > battery = 0%           */
+
+static uint32_t baudrate = BAUDRATE_300;
 
 static uint8_t package_buff[PKT_BUFF_MAX_LEN];
 static uint32_t divisor = 1;
 static uint16_t multiplier = 1;
 
-static const uint8_t cmd0[] = {0x2F, 0x3F, 0x21, 0x0D, 0x0A, 0x00};                                                                  /* open channel */
-static const uint8_t cmd1[] = {ACK, 0x30, 0x35, 0x31, 0x0D, 0x0A, 0x00};                                                             /* changing baudrate */
-static const uint8_t cmd2[] = {SOH, 0x52, 0x31, STX, 0x30, 0x46, 0x30, 0x38, 0x38, 0x30, 0x46, 0x46, 0x28, 0x53, 0x29, ETX, 0x46, 0x00};   /* tariffs  */
-static const uint8_t cmd3[] = {SOH, 0x52, 0x31, STX, 0x31, 0x30, 0x30, 0x37, 0x30, 0x30, 0x46, 0x46, 0x28, 0x29, ETX, 0x65, 0x00};   /* power    */
-static const uint8_t cmd4[] = {SOH, 0x52, 0x31, STX, 0x36, 0x30, 0x30, 0x31, 0x30, 0x30, 0x46, 0x46, 0x28, 0x29, ETX, 0x64, 0x00};   /* serial number */
-static const uint8_t cmd5[] = {SOH, 0x52, 0x31, STX, 0x36, 0x30, 0x30, 0x35, 0x30, 0x30, 0x46, 0x46, 0x28, 0x29, ETX, 0x60, 0x00};   /* sensors */
-
-static const uint8_t* command_array[] = {cmd0, cmd1, cmd2, cmd3, cmd4, cmd5};
+/*
+ *  cmd_open_channel = 0,
+    cmd_ack_start,
+    cmd_password_6102,
+    cmd_password_7109,
+    cmd_serial_number,
+    cmd_sensors_data,
+    cmd_tariffs_6102,
+    cmd_tariffs_7109,
+    cmd_power_data,
+    cmd_volts_data,
+    cmd_amps_data,
+    cmd_close_channel,
+    cmd_max
+ *
+ */
+static const uint8_t command_array[cmd_max][32] = {
+        {0x2F, 0x3F, 0x21, 0x0D, 0x0A, 0x00},                                                                   /* open channel      */
+        {ACK, 0x30, 0x35, 0x31, 0x0D, 0x0A, 0x00},                                                              /* changing baudrate */
+        {SOH, 0x50, 0x31, STX, 0x28, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x29, ETX, 0x61, 0x00},    /* password_6102     */
+        {SOH, 0x50, 0x31, STX, 0x28, 0x29, ETX,  0x61, 00},                                                     /* password_7109     */
+        {SOH, 0x52, 0x31, STX, 0x36, 0x30, 0x30, 0x31, 0x30, 0x30, 0x46, 0x46, 0x28, 0x29, ETX, 0x64, 0x00},    /* serial number     */
+        {SOH, 0x52, 0x31, STX, 0x36, 0x30, 0x30, 0x35, 0x30, 0x30, 0x46, 0x46, 0x28, 0x29, ETX, 0x60, 0x00},    /* sensors           */
+        {SOH, 0x52, 0x31, STX, 0x30, 0x46, 0x30, 0x38, 0x38, 0x30, 0x46, 0x46, 0x28, 0x29, ETX, 0x15, 0x00},    /* tariff_6102       */
+        {SOH, 0x52, 0x31, STX, 0x30, 0x46, 0x30, 0x38, 0x38, 0x30, 0x46, 0x46, 0x28, 0x53, 0x29, ETX, 0x46, 0x00},/* tariffs_7109    */
+        {SOH, 0x52, 0x31, STX, 0x31, 0x30, 0x30, 0x37, 0x30, 0x30, 0x46, 0x46, 0x28, 0x29, ETX, 0x65, 0x00},    /* power             */
+        {SOH, 0x52, 0x31, STX, 0x30, 0x43, 0x30, 0x37, 0x30, 0x30, 0x46, 0x46, 0x28, 0x29, ETX, 0x17, 0x00},    /* voltage           */
+        {SOH, 0x52, 0x31, STX, 0x30, 0x42, 0x30, 0x37, 0x30, 0x30, 0x46, 0x46, 0x28, 0x29, ETX, 0x16, 0x00},    /* amperes           */
+        {SOH, 0x42, 0x30, ETX, 0x71, 0x00},                                                                     /* close channel     */
+        };
 
 static neva_124_type_t neva_124_type = HEBA_124_UNKNOWN;
-static const uint8_t neva_124_type_ar[HEBA_124_MAX][10] = {{"124.0000"},
-                                                       {"124.6102"},
-                                                       {"124.7109"}};
+
+static uint8_t date_release[DATA_MAX_LEN+2] = {0};
+static uint8_t serial_number[SE_ATTR_SN_SIZE] = {0};
+
+static uint8_t get_password_6102();
+static uint8_t get_password_7109();
+
 
 static uint8_t checksum(const uint8_t *src_buffer, uint8_t len) {
     uint8_t crc = 0;
@@ -217,7 +248,7 @@ static size_t send_command(command_t command) {
     size_t len, size = sizeof_str(command_array[command]);
     uint8_t ch;
 
-//    app_uart_rx_off();
+    app_uart_rx_off();
     flush_buff_uart();
 
 
@@ -244,8 +275,14 @@ static size_t send_command(command_t command) {
     }
 
 
-    sleep_ms(200);
-//    app_uart_rx_on();
+    if (baudrate == BAUDRATE_300) {
+        sleep_ms(200);
+    } else {
+        sleep_ms(30);
+    }
+    app_uart_rx_on(baudrate);
+    sleep_ms(100);
+
 
 #if UART_PRINTF_MODE && DEBUG_PACKAGE
     if (len == 0) {
@@ -298,6 +335,12 @@ static pkt_error_t response_meter(command_t command) {
             } else {
                 pkt_error_no = PKT_ERR_RESPONSE;
             }
+        } else if (command == cmd_password_6102) {
+            if (package_buff[0] == ACK) {
+                pkt_error_no = PKT_OK;
+            } else {
+                pkt_error_no = PKT_ERR_RESPONSE;
+            }
         } else {
             uint8_t crc = checksum(package_buff, load_size);
             if (crc == package_buff[load_size-1]) {
@@ -307,11 +350,21 @@ static pkt_error_t response_meter(command_t command) {
                     } else {
                         pkt_error_no = PKT_ERR_RESPONSE;
                     }
-                } else if (command == cmd_tariffs_data ||
-                           command == cmd_power_data ||
-                           command == cmd_sensors_data ||
-                           command == cmd_serial_number) {
+                } else if (command == cmd_tariffs_6102  ||
+                           command == cmd_tariffs_7109  ||
+                           command == cmd_power_data    ||
+                           command == cmd_volts_data    ||
+                           command == cmd_amps_data     ||
+                           command == cmd_sensors_data  ||
+                           command == cmd_serial_number ||
+                           command == cmd_password_7109) {
                     if (package_buff[0] == STX) {
+                        pkt_error_no = PKT_OK;
+                    } else {
+                        pkt_error_no = PKT_ERR_RESPONSE;
+                    }
+                } else if(command == cmd_password_6102) {
+                    if (package_buff[0] == ACK) {
                         pkt_error_no = PKT_OK;
                     } else {
                         pkt_error_no = PKT_ERR_RESPONSE;
@@ -324,7 +377,7 @@ static pkt_error_t response_meter(command_t command) {
             }
 
         }
-        if (command != cmd_open_channel) {
+        if (command != cmd_open_channel && command != cmd_password_6102) {
             uint8_t crc = checksum(package_buff, load_size);
             if (crc == package_buff[load_size-1]) {
                 pkt_error_no = PKT_OK;
@@ -367,11 +420,23 @@ static uint8_t open_session() {
 
             if (*p_str == '.') {
                 p_str++;
-
-                type = fromPtoInteger(4, p_str);
+                type =  (*p_str++ - 0x30)*1000;
+                type += (*p_str++ - 0x30)*100;
+                type += (*p_str++ - 0x30)*10;
+                type += *p_str - 0x30;
             }
 
-            printf("type: %d\r\n", type);
+            switch (type) {
+                case TYPE_6102:
+                    neva_124_type = HEBA_124_6102;
+                    break;
+                case TYPE_7109:
+                    neva_124_type = HEBA_124_7109;
+                    break;
+                default:
+                    neva_124_type = HEBA_124_UNKNOWN;
+                    break;
+            }
 
             return true;
         }
@@ -387,9 +452,22 @@ static uint8_t ack_start() {
 #endif
 
     if (send_command(cmd_ack_start)) {
-        app_uart_init(9600);
+        baudrate = BAUDRATE_9600;
+        app_uart_init(baudrate);
         sleep_ms(200);
         if (response_meter(cmd_ack_start) == PKT_OK) {
+            uint8_t ret;
+            switch (neva_124_type) {
+                case HEBA_124_6102:
+                    ret = get_password_6102();
+                    break;
+                case HEBA_124_7109:
+                    ret = get_password_7109();
+                    break;
+                default:
+                    neva_124_type = HEBA_124_UNKNOWN;
+                    break;
+            }
             return true;
         }
     }
@@ -397,14 +475,14 @@ static uint8_t ack_start() {
     return false;
 }
 
-static uint8_t get_sensors_data() {
+static uint8_t get_password_6102() {
 
 #if UART_PRINTF_MODE && (DEBUG_DEVICE_DATA || DEBUG_PACKAGE)
-    printf("\r\nCommand get sensors\r\n");
+    printf("\r\nCommand get_password_6102\r\n");
 #endif
 
-    if (send_command(cmd_sensors_data)) {
-        if (response_meter(cmd_sensors_data) == PKT_OK) {
+    if (send_command(cmd_password_6102)) {
+        if (response_meter(cmd_password_6102) == PKT_OK) {
             return true;
         }
     }
@@ -412,16 +490,44 @@ static uint8_t get_sensors_data() {
     return false;
 }
 
-static void get_tariffs_data() {
+static uint8_t get_password_7109() {
+
+#if UART_PRINTF_MODE && (DEBUG_DEVICE_DATA || DEBUG_PACKAGE)
+    printf("\r\nCommand get_password_7109\r\n");
+#endif
+
+    if (send_command(cmd_password_7109)) {
+        if (response_meter(cmd_password_7109) == PKT_OK) {
+            return true;
+        }
+    }
+
+    return false;
+}
+
+static void close_session() {
+
+#if UART_PRINTF_MODE && (DEBUG_DEVICE_DATA || DEBUG_PACKAGE)
+    printf("\r\nCommand close_session\r\n");
+#endif
+
+    send_command(cmd_close_channel);
+
+}
+
+
+static void get_tariffs_7109() {
 
 #if UART_PRINTF_MODE && (DEBUG_DEVICE_DATA || DEBUG_PACKAGE)
     printf("\r\nCommand get tariffs\r\n");
 #endif
 
+    uint64_t tariff_summ = 0;
+
 //    uint8_t buff[] = "0F0880FF([231006:232957]01242.39,00401.98,01234.99,05678.88)";
 
-    if (send_command(cmd_tariffs_data)) {
-        if (response_meter(cmd_tariffs_data) == PKT_OK) {
+    if (send_command(cmd_tariffs_7109)) {
+        if (response_meter(cmd_tariffs_7109) == PKT_OK) {
             uint8_t *p_str = package_buff;
 //            uint8_t *p_str = buff;
 
@@ -430,61 +536,201 @@ static void get_tariffs_data() {
             }
             if (*(p_str++) == ']') {
                 uint64_t tariff = number_from_tariffs(&p_str) & 0xffffffffffff;
-                uint64_t last_tariff;
+//                uint64_t last_tariff;
 
                 if (p_str) {
                     uint32_t energy_divisor = divisor;
 
                     zcl_setAttrVal(APP_ENDPOINT_1, ZCL_CLUSTER_SE_METERING, ZCL_ATTRID_DIVISOR, (uint8_t*)&energy_divisor);
 
-                    zcl_getAttrVal(APP_ENDPOINT_1, ZCL_CLUSTER_SE_METERING, ZCL_ATTRID_CURRENT_TIER_1_SUMMATION_DELIVERD, &attr_len, (uint8_t*)&attr_data);
-                    last_tariff = fromPtoInteger(attr_len, attr_data);
+//                    zcl_getAttrVal(APP_ENDPOINT_1, ZCL_CLUSTER_SE_METERING, ZCL_ATTRID_CURRENT_TIER_1_SUMMATION_DELIVERD, &attr_len, (uint8_t*)&attr_data);
+//                    last_tariff = fromPtoInteger(attr_len, attr_data);
 
-                    if (tariff > last_tariff) {
+                    tariff_summ += tariff;
+//                    if (tariff > last_tariff) {
                         zcl_setAttrVal(APP_ENDPOINT_1, ZCL_CLUSTER_SE_METERING, ZCL_ATTRID_CURRENT_TIER_1_SUMMATION_DELIVERD, (uint8_t*)&tariff);
-                    }
+//                    }
 #if UART_PRINTF_MODE && DEBUG_DEVICE_DATA
                     printf("tariff1: %d\r\n", tariff);
 #endif
 
                     tariff = number_from_tariffs(&p_str) & 0xffffffffffff;
                     if (p_str) {
-                        zcl_getAttrVal(APP_ENDPOINT_1, ZCL_CLUSTER_SE_METERING, ZCL_ATTRID_CURRENT_TIER_2_SUMMATION_DELIVERD, &attr_len, (uint8_t*)&attr_data);
-                        last_tariff = fromPtoInteger(attr_len, attr_data);
+//                        zcl_getAttrVal(APP_ENDPOINT_1, ZCL_CLUSTER_SE_METERING, ZCL_ATTRID_CURRENT_TIER_2_SUMMATION_DELIVERD, &attr_len, (uint8_t*)&attr_data);
+//                        last_tariff = fromPtoInteger(attr_len, attr_data);
 
-                        if (tariff > last_tariff) {
+                        tariff_summ += tariff;
+//                        if (tariff > last_tariff) {
                             zcl_setAttrVal(APP_ENDPOINT_1, ZCL_CLUSTER_SE_METERING, ZCL_ATTRID_CURRENT_TIER_2_SUMMATION_DELIVERD, (uint8_t*)&tariff);
-                        }
+//                        }
 
 #if UART_PRINTF_MODE && DEBUG_DEVICE_DATA
                         printf("tariff2: %d\r\n", tariff);
 #endif
                         tariff = number_from_tariffs(&p_str) & 0xffffffffffff;
                         if (p_str) {
-                            zcl_getAttrVal(APP_ENDPOINT_1, ZCL_CLUSTER_SE_METERING, ZCL_ATTRID_CURRENT_TIER_3_SUMMATION_DELIVERD, &attr_len, (uint8_t*)&attr_data);
-                            last_tariff = fromPtoInteger(attr_len, attr_data);
+//                            zcl_getAttrVal(APP_ENDPOINT_1, ZCL_CLUSTER_SE_METERING, ZCL_ATTRID_CURRENT_TIER_3_SUMMATION_DELIVERD, &attr_len, (uint8_t*)&attr_data);
+//                            last_tariff = fromPtoInteger(attr_len, attr_data);
 
-                            if (tariff > last_tariff) {
+                            tariff_summ += tariff;
+//                            if (tariff > last_tariff) {
                                 zcl_setAttrVal(APP_ENDPOINT_1, ZCL_CLUSTER_SE_METERING, ZCL_ATTRID_CURRENT_TIER_3_SUMMATION_DELIVERD, (uint8_t*)&tariff);
-                            }
+//                            }
 #if UART_PRINTF_MODE && DEBUG_DEVICE_DATA
                             printf("tariff3: %d\r\n", tariff);
 #endif
                             tariff = number_from_tariffs(&p_str) & 0xffffffffffff;
                             if (p_str) {
-                                zcl_getAttrVal(APP_ENDPOINT_1, ZCL_CLUSTER_SE_METERING, ZCL_ATTRID_CURRENT_TIER_4_SUMMATION_DELIVERD, &attr_len, (uint8_t*)&attr_data);
-                                last_tariff = fromPtoInteger(attr_len, attr_data);
+//                                zcl_getAttrVal(APP_ENDPOINT_1, ZCL_CLUSTER_SE_METERING, ZCL_ATTRID_CURRENT_TIER_4_SUMMATION_DELIVERD, &attr_len, (uint8_t*)&attr_data);
+//                                last_tariff = fromPtoInteger(attr_len, attr_data);
 
-                                if (tariff > last_tariff) {
+                                tariff_summ += tariff;
+//                                if (tariff > last_tariff) {
                                     zcl_setAttrVal(APP_ENDPOINT_1, ZCL_CLUSTER_SE_METERING, ZCL_ATTRID_CURRENT_TIER_4_SUMMATION_DELIVERD, (uint8_t*)&tariff);
-                                }
+//                                }
 #if UART_PRINTF_MODE && DEBUG_DEVICE_DATA
                                 printf("tariff4: %d\r\n", tariff);
 #endif
+
+                                zcl_setAttrVal(APP_ENDPOINT_1, ZCL_CLUSTER_SE_METERING, ZCL_ATTRID_CURRENT_SUMMATION_DELIVERD, (uint8_t*)&tariff_summ);
+#if UART_PRINTF_MODE && DEBUG_DEVICE_DATA
+                                printf("tariff_summ: %d\r\n", tariff_summ);
+#endif
+}
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+
+static void get_tariffs_6102() {
+
+#if UART_PRINTF_MODE && (DEBUG_DEVICE_DATA || DEBUG_PACKAGE)
+    printf("\r\nCommand get tariffs\r\n");
+#endif
+
+//    uint8_t buff[] = "0F0880FF(008030.59,002236.84,002575.35,003218.40,000000.00)"
+
+    if (send_command(cmd_tariffs_6102)) {
+        if (response_meter(cmd_tariffs_6102) == PKT_OK) {
+            uint8_t *p_str = package_buff;
+
+            while(*p_str != '(' && *p_str != 0) {
+                p_str++;
+            }
+            if (*(p_str++) == '(') {
+                uint64_t tariff_summ = number_from_tariffs(&p_str) & 0xffffffffffff;
+                uint64_t tariff;// = number_from_tariffs(&p_str) & 0xffffffffffff;
+
+                if (p_str) {
+                    uint32_t energy_divisor = divisor;
+
+                    zcl_setAttrVal(APP_ENDPOINT_1, ZCL_CLUSTER_SE_METERING, ZCL_ATTRID_DIVISOR, (uint8_t*)&energy_divisor);
+
+                    zcl_setAttrVal(APP_ENDPOINT_1, ZCL_CLUSTER_SE_METERING, ZCL_ATTRID_CURRENT_SUMMATION_DELIVERD, (uint8_t*)&tariff_summ);
+#if UART_PRINTF_MODE && DEBUG_DEVICE_DATA
+                    printf("tariff_summ: %d\r\n", tariff_summ);
+#endif
+
+                    tariff = number_from_tariffs(&p_str) & 0xffffffffffff;
+                    if (p_str) {
+                        zcl_setAttrVal(APP_ENDPOINT_1, ZCL_CLUSTER_SE_METERING, ZCL_ATTRID_CURRENT_TIER_1_SUMMATION_DELIVERD, (uint8_t*)&tariff);
+
+#if UART_PRINTF_MODE && DEBUG_DEVICE_DATA
+                        printf("tariff1: %d\r\n", tariff);
+#endif
+                        tariff = number_from_tariffs(&p_str) & 0xffffffffffff;
+                        if (p_str) {
+                            zcl_setAttrVal(APP_ENDPOINT_1, ZCL_CLUSTER_SE_METERING, ZCL_ATTRID_CURRENT_TIER_2_SUMMATION_DELIVERD, (uint8_t*)&tariff);
+#if UART_PRINTF_MODE && DEBUG_DEVICE_DATA
+                            printf("tariff2: %d\r\n", tariff);
+#endif
+                            tariff = number_from_tariffs(&p_str) & 0xffffffffffff;
+                            if (p_str) {
+                                zcl_setAttrVal(APP_ENDPOINT_1, ZCL_CLUSTER_SE_METERING, ZCL_ATTRID_CURRENT_TIER_3_SUMMATION_DELIVERD, (uint8_t*)&tariff);
+#if UART_PRINTF_MODE && DEBUG_DEVICE_DATA
+                                printf("tariff3: %d\r\n", tariff);
+#endif
+                                tariff = number_from_tariffs(&p_str) & 0xffffffffffff;
+                                if (p_str) {
+                                    zcl_setAttrVal(APP_ENDPOINT_1, ZCL_CLUSTER_SE_METERING, ZCL_ATTRID_CURRENT_TIER_4_SUMMATION_DELIVERD, (uint8_t*)&tariff);
+#if UART_PRINTF_MODE && DEBUG_DEVICE_DATA
+                                    printf("tariff4: %d\r\n", tariff);
+#endif
+                                }
                             }
                         }
                     }
                 }
+            }
+        }
+    }
+}
+
+static void get_voltage_data() {
+
+#if UART_PRINTF_MODE && (DEBUG_DEVICE_DATA || DEBUG_PACKAGE)
+    printf("\r\nCommand get voltage\r\n");
+#endif
+
+    if (send_command(cmd_volts_data)) {
+        if (response_meter(cmd_volts_data) == PKT_OK) {
+            uint8_t *p_str = package_buff;
+            uint16_t volts = number_from_brackets(&p_str);
+            if (p_str) {
+
+                uint16_t voltage_divisor = divisor & 0xffff;
+
+                zcl_setAttrVal(APP_ENDPOINT_1, ZCL_CLUSTER_MS_ELECTRICAL_MEASUREMENT, ZCL_ATTRID_AC_VOLTAGE_DIVISOR, (uint8_t*)&voltage_divisor);
+
+//                zcl_getAttrVal(APP_ENDPOINT_1, ZCL_CLUSTER_MS_ELECTRICAL_MEASUREMENT, ZCL_ATTRID_RMS_VOLTAGE, &attr_len, (uint8_t*)&attr_data);
+//                uint16_t last_volts = fromPtoInteger(attr_len, attr_data);
+
+//                if (volts != last_volts) {
+                    zcl_setAttrVal(APP_ENDPOINT_1, ZCL_CLUSTER_MS_ELECTRICAL_MEASUREMENT, ZCL_ATTRID_RMS_VOLTAGE, (uint8_t*)&volts);
+//                }
+#if UART_PRINTF_MODE && DEBUG_DEVICE_DATA
+                printf("voltage: %d\r\n", volts);
+#endif
+            }
+        }
+    }
+}
+
+static void get_amps_data() {
+
+#if UART_PRINTF_MODE && (DEBUG_DEVICE_DATA || DEBUG_PACKAGE)
+    printf("\r\nCommand get current\r\n");
+#endif
+
+//    static uint16_t count = 0;
+//    uint8_t buff[] = "CURRE(9.472)\0";
+
+    if (send_command(cmd_amps_data)) {
+        if (response_meter(cmd_amps_data) == PKT_OK) {
+            uint8_t *p_str = package_buff;
+//            uint8_t *p_str = buff;
+            uint16_t amps = number_from_brackets(&p_str);
+            if (p_str) {
+
+                uint16_t current_divisor = divisor & 0xffff;
+
+//                amps -= count++;
+
+                zcl_setAttrVal(APP_ENDPOINT_1, ZCL_CLUSTER_MS_ELECTRICAL_MEASUREMENT, ZCL_ATTRID_AC_CURRENT_DIVISOR, (uint8_t*)&current_divisor);
+
+//                zcl_getAttrVal(APP_ENDPOINT_1, ZCL_CLUSTER_MS_ELECTRICAL_MEASUREMENT, ZCL_ATTRID_LINE_CURRENT, &attr_len, (uint8_t*)&attr_data);
+//                uint16_t last_amps = fromPtoInteger(attr_len, attr_data);
+
+//                if (amps != last_amps) {
+                    zcl_setAttrVal(APP_ENDPOINT_1, ZCL_CLUSTER_MS_ELECTRICAL_MEASUREMENT, ZCL_ATTRID_LINE_CURRENT, (uint8_t*)&amps);
+//                }
+#if UART_PRINTF_MODE && DEBUG_DEVICE_DATA
+                printf("amps: %d\r\n", amps);
+#endif
             }
         }
     }
@@ -557,7 +803,6 @@ static void get_serial_number_data() {
             p_str = package_buff;
             sn = str_from_brackets(p_str);
             if (sn) {
-                uint8_t serial_number[SE_ATTR_SN_SIZE] = {0};
                 if (set_zcl_str(sn, serial_number, SE_ATTR_SN_SIZE)) {
                     zcl_setAttrVal(APP_ENDPOINT_1, ZCL_CLUSTER_SE_METERING, ZCL_ATTRID_METER_SERIAL_NUMBER, (uint8_t*)&serial_number);
 #if UART_PRINTF_MODE && DEBUG_DEVICE_DATA
@@ -573,7 +818,6 @@ static void get_serial_number_data() {
 
 static void get_date_release_data() {
     uint8_t dr[] = "Not supported";
-    uint8_t date_release[DATA_MAX_LEN+2] = {0};
 
 #if UART_PRINTF_MODE && (DEBUG_DEVICE_DATA || DEBUG_PACKAGE)
     printf("\r\nCommand get date release\r\n");
@@ -631,51 +875,81 @@ static void get_resbat_data() {
 
 }
 
-
-static void get_data() {
+static void get_data_6102() {
     if (new_start) {
-        get_serial_number_data();
-        get_date_release_data();
         new_start = false;
     }
+
+    if (serial_number[0] == 0) {
+        get_serial_number_data();
+    }
+    if (date_release[0] == 0) {
+        get_date_release_data();
+    }
+
+//    get_resbat_data(); // status not support
+    get_tariffs_6102();
+    get_power_data();
+    get_amps_data();
+    get_voltage_data();
+}
+
+
+static void get_data_7109() {
+    if (new_start) {
+        new_start = false;
+    }
+
+    if (serial_number[0] == 0) {
+        get_serial_number_data();
+    }
+    if (date_release[0] == 0) {
+        get_date_release_data();
+    }
+
     get_resbat_data();
-    get_tariffs_data();
+    get_tariffs_7109();
     get_power_data();
 }
 
 
 uint8_t measure_meter_neva_mt124() {
 
-    app_uart_init(300);
+    baudrate = BAUDRATE_300;
+
+    app_uart_init(baudrate);
 
     uint8_t ret = open_session();
 
     if (ret) {
         ret = ack_start();
         if (ret) {
-            get_data();
-            fault_measure_flag = false;
-        } else {
-            fault_measure_flag = true;
-            if (!timerFaultMeasurementEvt) {
-                timerFaultMeasurementEvt = TL_ZB_TIMER_SCHEDULE(fault_measure_meterCb, NULL, /*TIMEOUT_30SEC*/TIMEOUT_10MIN);
+            switch(neva_124_type) {
+                case HEBA_124_6102:
+                    get_data_6102();
+                    break;
+                case HEBA_124_7109:
+                    get_data_7109();
+                    break;
+                default:
+#if UART_PRINTF_MODE
+                    printf("This version of HEBA-124 is not supported\r\n");
+#endif
+                    break;
             }
+            fault_measure_flag = false;
         }
+        close_session();
     } else {
-        app_uart_init(9600);
-        ret = get_sensors_data();
-        if (ret) {
-            get_data();
-            fault_measure_flag = false;
-        } else {
-            fault_measure_flag = true;
-            if (!timerFaultMeasurementEvt) {
-                timerFaultMeasurementEvt = TL_ZB_TIMER_SCHEDULE(fault_measure_meterCb, NULL, /*TIMEOUT_30SEC*/TIMEOUT_10MIN);
-            }
+        baudrate = BAUDRATE_9600;
+        app_uart_init(baudrate);
+        close_session();
+        fault_measure_flag = true;
+        if (!timerFaultMeasurementEvt) {
+            timerFaultMeasurementEvt = TL_ZB_TIMER_SCHEDULE(fault_measure_meterCb, NULL, /*TIMEOUT_30SEC*/TIMEOUT_10MIN);
         }
     }
 
     return ret;
 }
-
 

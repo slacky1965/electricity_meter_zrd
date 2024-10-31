@@ -5,7 +5,7 @@
 #define UART_BUFF_SIZE 512              /* size ring buffer  */
 #define UART_BUFF_MASK UART_BUFF_SIZE-1 /* mask ring buffer  */
 
-#define app_uart_rx_on  app_uart_init
+#define app_uart_rx_on(a)  app_uart_init(a)
 
 
 typedef struct {
