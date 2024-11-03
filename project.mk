@@ -24,6 +24,7 @@ $(OUT_PATH)/$(SRC_PATH)/devices/mercury_206.o \
 $(OUT_PATH)/$(SRC_PATH)/devices/energomera_ce102m.o \
 $(OUT_PATH)/$(SRC_PATH)/devices/neva_mt124.o \
 $(OUT_PATH)/$(SRC_PATH)/devices/nartis_100.o \
+$(OUT_PATH)/$(SRC_PATH)/devices/energomera_ce208by.o \
 $(OUT_PATH)/$(SRC_PATH)/app_main.o
 
 
