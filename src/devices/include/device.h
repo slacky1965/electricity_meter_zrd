@@ -21,6 +21,7 @@ typedef enum {
     DEVICE_KASKAD_11,
     DEVICE_MERCURY_206,
     DEVICE_ENERGOMERA_CE102M,
+    DEVICE_ENERGOMERA_CE208BY,
     DEVICE_NEVA_MT124,
     DEVICE_NARTIS_100,
     DEVICE_MAX,
@@ -64,6 +65,7 @@ uint8_t measure_meter_kaskad_1_mt();
 uint8_t measure_meter_kaskad_11();
 uint8_t measure_meter_mercury_206();
 uint8_t measure_meter_energomera_ce102m();
+uint8_t measure_meter_energomera_ce208by();
 uint8_t measure_meter_neva_mt124();
 void nartis100_init();
 uint8_t measure_meter_nartis_100();
