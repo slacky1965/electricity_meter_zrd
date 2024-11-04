@@ -102,8 +102,8 @@ uint8_t set_device_model(device_model_t model) {
             baudrate = 9600;
             energy_divisor = 10000;
             voltage_divisor = 100;
-            current_divisor = 100;
-            power_divisor = 100;
+            current_divisor = 1000;
+            power_divisor = 1000;
             if (set_zcl_str(device_model[DEVICE_ENERGOMERA_CE208BY], name, DEVICE_NAME_LEN)) {
                 zcl_setAttrVal(APP_ENDPOINT_1, ZCL_CLUSTER_SE_METERING, ZCL_ATTRID_CUSTOM_DEVICE_MODEL, (uint8_t*)&name);
             }
@@ -188,7 +188,7 @@ int32_t measure_meterCb(void *arg) {
         if (measure_meter()) {
             period = dev_config.measurement_period * 1000;
 //            for test
-            period = 15 * 1000;
+//            period = 15 * 1000;
         } else {
             period = FAULT_MEASUREMENT_PERIOD * 1000;
         }
