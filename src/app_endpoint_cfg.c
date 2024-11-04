@@ -222,13 +222,13 @@ const zclAttrInfo_t se_attrTbl[] = {
 
 zcl_msAttr_t g_zcl_msAttrs = {
     .type = 0x09,               // bit0: Active measurement (AC). bit3: Phase A measurement
-    .current = 0, //0xffff,
+    .current = 0xffff,
     .current_multiplier = 1,
     .current_divisor = 1,
-    .voltage = 0, //xffff,
+    .voltage = 0xffff,
     .voltage_multiplier = 1,
     .voltage_divisor = 1,
-    .power = 0, //0xffff,
+    .power = 0xffff,
     .power_multiplier = 1,
     .power_divisor = 1,
 };
