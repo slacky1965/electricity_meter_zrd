@@ -8,17 +8,24 @@
 #include "app_endpoint_cfg.h"
 #include "app_dev_config.h"
 
-#define START_STOP  0xc0
-#define STUFF_DB    0xdb
-#define STUFF_DC    0xdc
-#define STUFF_DD    0xdd
-#define GET_INFO    0x0006
+#define START_STOP      0xc0
+#define STUFF_DB        0xdb
+#define STUFF_DC        0xdc
+#define STUFF_DD        0xdd
+#define GET_DATA_SINGLE 0x0001
+#define GET_INFO        0x0006
 
+#define MAX_VBAT_MV 3100                        /* 3100 mV - > battery = 100%         */
+#define MIN_VBAT_MV BATTERY_SAFETY_THRESHOLD    /* 2200 mV - > battery = 0%           */
 
 static uint8_t package_buff[PKT_BUFF_MAX_LEN];
 
 static pkt_t pkt_in = {0, {0}};
 static pkt_t pkt_out = {0, {0}};
+
+static uint8_t date_release[DATA_MAX_LEN+2] = {0};
+static uint8_t serial_number[SE_ATTR_SN_SIZE] = {0};
+
 
 static const uint8_t crc8tab[] = {
         0x00, 0xb5, 0xdf, 0x6a, 0x0b, 0xbe, 0xd4, 0x61, 0x16, 0xa3, 0xc9, 0x7c, 0x1d, 0xa8, 0xc2, 0x77,
@@ -249,21 +256,47 @@ static pkt_error_t response_meter(command_t command) {
     return pkt_error_no;
 }
 
+int64_t dff2int(uint8_t * str, uint8_t *pos) {
+
+    int64_t value = 0;
+    uint8_t count = 0;
+
+    uint8_t *ptr = str;
+
+
+    do {
+        value |= (*ptr & 0x7f) << (count * 7);
+        if (*ptr & (1 << 7)) {
+            count++;
+        }
+    } while(*ptr++ & (1 << 7));
+
+    *pos = count;
+
+    return value;
+}
+
+static void set_command(uint16_t type, command_t command) {
+
+    pkt_out.pkt_len = 0;
+
+    pkt_out.pkt_data[pkt_out.pkt_len++] = START_STOP;
+    pkt_out.pkt_data[pkt_out.pkt_len++] = type & 0xFF;
+    pkt_out.pkt_data[pkt_out.pkt_len++] = (type >> 8) & 0xFF;
+    pkt_out.pkt_data[pkt_out.pkt_len++] = command;
+    pkt_out.pkt_data[pkt_out.pkt_len] = checksum(pkt_out.pkt_data, pkt_out.pkt_len+2);
+    pkt_out.pkt_len++;
+    pkt_out.pkt_data[pkt_out.pkt_len++] = START_STOP;
+
+}
+
 static uint8_t open_session() {
 
 #if UART_PRINTF_MODE && (DEBUG_DEVICE_DATA || DEBUG_PACKAGE)
     printf("\r\nCommand open of session\r\n");
 #endif
 
-    pkt_out.pkt_len = 0;
-
-    pkt_out.pkt_data[pkt_out.pkt_len++] = START_STOP;
-    pkt_out.pkt_data[pkt_out.pkt_len++] = GET_INFO & 0xFF;
-    pkt_out.pkt_data[pkt_out.pkt_len++] = (GET_INFO >> 8) & 0xFF;
-    pkt_out.pkt_data[pkt_out.pkt_len++] = cmd_open_channel;
-    pkt_out.pkt_data[pkt_out.pkt_len] = checksum(pkt_out.pkt_data, pkt_out.pkt_len+2);
-    pkt_out.pkt_len++;
-    pkt_out.pkt_data[pkt_out.pkt_len++] = START_STOP;
+    set_command(GET_INFO, cmd_open_channel);
 
     if (send_command(cmd_open_channel)) {
         if (response_meter(cmd_open_channel) == PKT_OK) {
@@ -280,6 +313,22 @@ static uint8_t open_session() {
 
             if (send_command(cmd_serial_number)) {
                 if (response_meter(cmd_serial_number) == PKT_OK) {
+
+                    if (serial_number[0] == 0) {
+                        uint8_t sn_str[SE_ATTR_SN_SIZE];
+                        uint8_t pos;
+                        uint32_t sn = dff2int(pkt_in.pkt_data+4, &pos);
+                        printf("sn pos: %d\r\n", pos);
+                        itoa(sn, sn_str);
+
+                        if (set_zcl_str(sn_str, serial_number, SE_ATTR_SN_SIZE)) {
+                            zcl_setAttrVal(APP_ENDPOINT_1, ZCL_CLUSTER_SE_METERING, ZCL_ATTRID_METER_SERIAL_NUMBER, (uint8_t*)&serial_number);
+#if UART_PRINTF_MODE && DEBUG_DEVICE_DATA
+                            printf("Serial Number: %s, len: %d\r\n", serial_number+1, *serial_number);
+#endif
+                        }
+                    }
+
                     return true;
                 }
             }
@@ -290,12 +339,208 @@ static uint8_t open_session() {
     return false;
 }
 
+static void get_date_release_data() {
+    uint8_t dr[] = "Not supported";
+
+#if UART_PRINTF_MODE && (DEBUG_DEVICE_DATA || DEBUG_PACKAGE)
+    printf("\r\nCommand get date release\r\n");
+#endif
+
+    if (set_zcl_str(dr, date_release, DATA_MAX_LEN+1)) {
+        zcl_setAttrVal(APP_ENDPOINT_1, ZCL_CLUSTER_SE_METERING, ZCL_ATTRID_CUSTOM_DATE_RELEASE, (uint8_t*)&date_release);
+#if UART_PRINTF_MODE && DEBUG_DEVICE_DATA
+        printf("Date of release: %s, len: %d\r\n", date_release+1, *date_release);
+#endif
+    }
+}
+
+static void get_resbat_data() {
+
+#if UART_PRINTF_MODE
+    printf("\r\nCommand get resource of battery\r\n");
+#endif
+
+    uint16_t battery_mv = 0;
+
+    set_command(GET_DATA_SINGLE, cmd_resource_battery);
+
+    if (send_command(cmd_resource_battery)) {
+        if (response_meter(cmd_resource_battery) == PKT_OK) {
+            uint8_t pos;
+            battery_mv= dff2int(pkt_in.pkt_data+4, &pos) * 10;
+            if (battery_mv < MIN_VBAT_MV) battery_mv = MIN_VBAT_MV;
+            uint8_t battery_level = (battery_mv - MIN_VBAT_MV) / ((MAX_VBAT_MV - MIN_VBAT_MV) / 100);
+            if (battery_level > 100) battery_level = 100;
+            zcl_setAttrVal(APP_ENDPOINT_1, ZCL_CLUSTER_SE_METERING, ZCL_ATTRID_REMAINING_BATTERY_LIFE, (uint8_t*)&battery_level);
+
+#if UART_PRINTF_MODE && DEBUG_DEVICE_DATA
+            printf("Resource battery: %d%%\r\n", battery_level);
+#endif
+        }
+    }
+}
+
+static void get_voltage_data() {
+
+#if UART_PRINTF_MODE && (DEBUG_DEVICE_DATA || DEBUG_PACKAGE)
+    printf("\r\nCommand get voltage\r\n");
+#endif
+
+    set_command(GET_DATA_SINGLE, cmd_volts_data);
+
+    if (send_command(cmd_volts_data)) {
+        if (response_meter(cmd_volts_data) == PKT_OK) {
+
+            uint8_t pos;
+            uint16_t volts = dff2int(pkt_in.pkt_data+4, &pos);
+
+            zcl_setAttrVal(APP_ENDPOINT_1, ZCL_CLUSTER_MS_ELECTRICAL_MEASUREMENT, ZCL_ATTRID_RMS_VOLTAGE, (uint8_t*)&volts);
+
+#if UART_PRINTF_MODE && DEBUG_DEVICE_DATA
+            printf("voltage: %d\r\n", volts);
+#endif
+        }
+    }
+}
+
+static void get_amps_data() {
+
+#if UART_PRINTF_MODE && (DEBUG_DEVICE_DATA || DEBUG_PACKAGE)
+    printf("\r\nCommand get current\r\n");
+#endif
+
+    set_command(GET_DATA_SINGLE, cmd_amps_data);
+
+    if (send_command(cmd_amps_data)) {
+        if (response_meter(cmd_amps_data) == PKT_OK) {
+
+            uint8_t pos;
+            uint16_t amps = dff2int(pkt_in.pkt_data+4, &pos);
+
+            zcl_setAttrVal(APP_ENDPOINT_1, ZCL_CLUSTER_MS_ELECTRICAL_MEASUREMENT, ZCL_ATTRID_LINE_CURRENT, (uint8_t*)&amps);
+#if UART_PRINTF_MODE && DEBUG_DEVICE_DATA
+            printf("amps: %d\r\n", amps);
+#endif
+        }
+    }
+}
+
+static void get_power_data() {
+
+#if UART_PRINTF_MODE && (DEBUG_DEVICE_DATA || DEBUG_PACKAGE)
+    printf("\r\nCommand get power\r\n");
+#endif
+
+    set_command(GET_DATA_SINGLE, cmd_power_data);
+
+    if (send_command(cmd_power_data)) {
+        if (response_meter(cmd_power_data) == PKT_OK) {
+
+            uint8_t pos;
+            uint32_t power = dff2int(pkt_in.pkt_data+4, &pos);
+
+            while (power > 0xffff) power /= 10;
+
+            uint16_t pwr = power & 0xffff;
+
+            zcl_setAttrVal(APP_ENDPOINT_1, ZCL_CLUSTER_MS_ELECTRICAL_MEASUREMENT, ZCL_ATTRID_APPARENT_POWER, (uint8_t*)&pwr);
+
+#if UART_PRINTF_MODE && DEBUG_DEVICE_DATA
+            printf("power: %d\r\n", power);
+#endif
+        }
+    }
+}
+
+static void get_tariffs_data() {
+
+#if UART_PRINTF_MODE && (DEBUG_DEVICE_DATA || DEBUG_PACKAGE)
+    printf("\r\nCommand get tariffs\r\n");
+#endif
+
+    pkt_out.pkt_len = 0;
+
+    pkt_out.pkt_data[pkt_out.pkt_len++] = START_STOP;
+    pkt_out.pkt_data[pkt_out.pkt_len++] = GET_DATA_SINGLE & 0xFF;
+    pkt_out.pkt_data[pkt_out.pkt_len++] = (GET_DATA_SINGLE >> 8) & 0xFF;
+    pkt_out.pkt_data[pkt_out.pkt_len++] = cmd_tariffs_data;
+    pkt_out.pkt_data[pkt_out.pkt_len++] = get_tariff_summ | get_tariff_1 | get_tariff_2 | get_tariff_3 | get_tariff_4;
+    pkt_out.pkt_data[pkt_out.pkt_len]   = checksum(pkt_out.pkt_data, pkt_out.pkt_len+2);
+    pkt_out.pkt_len++;
+    pkt_out.pkt_data[pkt_out.pkt_len++] = START_STOP;
+
+    if (send_command(cmd_tariffs_data)) {
+        if (response_meter(cmd_tariffs_data) == PKT_OK) {
+
+            uint8_t pos, tariff_pos;
+            uint64_t tariff = dff2int(pkt_in.pkt_data+4, &pos);
+
+#if UART_PRINTF_MODE && DEBUG_DEVICE_DATA
+            printf("tariff_summ: %d\r\n", tariff);
+#endif
+            zcl_setAttrVal(APP_ENDPOINT_1, ZCL_CLUSTER_SE_METERING, ZCL_ATTRID_CURRENT_SUMMATION_DELIVERD, (uint8_t*)&tariff);
+
+            tariff_pos = pos + 5;
+            tariff = dff2int(pkt_in.pkt_data+tariff_pos, &pos);
+
+#if UART_PRINTF_MODE && DEBUG_DEVICE_DATA
+            printf("tariff1: %d\r\n", tariff);
+#endif
+            zcl_setAttrVal(APP_ENDPOINT_1, ZCL_CLUSTER_SE_METERING, ZCL_ATTRID_CURRENT_TIER_1_SUMMATION_DELIVERD, (uint8_t*)&tariff);
+
+            tariff_pos += pos + 1;
+            tariff = dff2int(pkt_in.pkt_data+tariff_pos, &pos);
+
+#if UART_PRINTF_MODE && DEBUG_DEVICE_DATA
+            printf("tariff2: %d\r\n", tariff);
+#endif
+            zcl_setAttrVal(APP_ENDPOINT_1, ZCL_CLUSTER_SE_METERING, ZCL_ATTRID_CURRENT_TIER_2_SUMMATION_DELIVERD, (uint8_t*)&tariff);
+
+            tariff_pos += pos + 1;
+            tariff = dff2int(pkt_in.pkt_data+tariff_pos, &pos);
+
+#if UART_PRINTF_MODE && DEBUG_DEVICE_DATA
+            printf("tariff3: %d\r\n", tariff);
+#endif
+            zcl_setAttrVal(APP_ENDPOINT_1, ZCL_CLUSTER_SE_METERING, ZCL_ATTRID_CURRENT_TIER_3_SUMMATION_DELIVERD, (uint8_t*)&tariff);
+
+            tariff_pos += pos + 1;
+            tariff = dff2int(pkt_in.pkt_data+tariff_pos, &pos);
+
+#if UART_PRINTF_MODE && DEBUG_DEVICE_DATA
+            printf("tariff4: %d\r\n", tariff);
+#endif
+            zcl_setAttrVal(APP_ENDPOINT_1, ZCL_CLUSTER_SE_METERING, ZCL_ATTRID_CURRENT_TIER_4_SUMMATION_DELIVERD, (uint8_t*)&tariff);
+        }
+    }
+}
+
+
 
 uint8_t measure_meter_energomera_ce208by() {
 
     uint8_t ret = open_session();
 
-    printf("ret: %d\r\n", ret);
+    if (ret) {
+        if (new_start) new_start = false;
+
+        if (date_release[0] == 0) {
+            get_date_release_data();
+        }
+
+        get_resbat_data();
+        get_tariffs_data();
+        get_power_data();
+        get_amps_data();
+        get_voltage_data();
+
+        fault_measure_flag = false;
+    } else {
+        fault_measure_flag = true;
+        if (!timerFaultMeasurementEvt) {
+            timerFaultMeasurementEvt = TL_ZB_TIMER_SCHEDULE(fault_measure_meterCb, NULL, /*TIMEOUT_30SEC*/TIMEOUT_10MIN);
+        }
+    }
 
     return ret;
 }

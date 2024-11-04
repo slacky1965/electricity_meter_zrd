@@ -4,7 +4,7 @@
 typedef enum {
     cmd_open_channel         = 0x03,
     cmd_serial_number        = 0x04,
-    cmd_tariffs_data         = 0x05,
+    cmd_tariffs_data         = 0x01,
     cmd_resource_battery     = 0x20,
     cmd_volts_data           = 0x18,
     cmd_amps_data            = 0x16,

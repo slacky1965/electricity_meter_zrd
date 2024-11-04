@@ -97,6 +97,18 @@ uint8_t set_device_model(device_model_t model) {
             }
             break;
         }
+        case DEVICE_ENERGOMERA_CE208BY: {
+            measure_meter = measure_meter_energomera_ce208by;
+            baudrate = 9600;
+            energy_divisor = 10000;
+            voltage_divisor = 100;
+            current_divisor = 100;
+            power_divisor = 100;
+            if (set_zcl_str(device_model[DEVICE_ENERGOMERA_CE208BY], name, DEVICE_NAME_LEN)) {
+                zcl_setAttrVal(APP_ENDPOINT_1, ZCL_CLUSTER_SE_METERING, ZCL_ATTRID_CUSTOM_DEVICE_MODEL, (uint8_t*)&name);
+            }
+            break;
+        }
         case DEVICE_NEVA_MT124: {
             measure_meter = measure_meter_neva_mt124;
             baudrate = 300;
