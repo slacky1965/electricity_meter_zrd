@@ -60,7 +60,7 @@
  *  @brief  ZCL: maximum number for zcl reporting table
  *
  */
-#define ZCL_REPORTING_TABLE_NUM				    32
+#define ZCL_REPORTING_TABLE_NUM				    24
 
 /**
  *  @brief  ZCL: maximum number for zcl scene table
