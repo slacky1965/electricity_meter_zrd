@@ -7,6 +7,7 @@
 #include "app_dev_config.h"
 #include "app_temperature.h"
 #include "app_utility.h"
+#include "app_tamper.h"
 
 typedef struct{
     uint8_t keyType; /* CERTIFICATION_KEY or MASTER_KEY key for touch-link or distribute network

@@ -7,7 +7,7 @@
  * @date    2021
  *
  * @par     Copyright (c) 2021, Telink Semiconductor (Shanghai) Co., Ltd. ("TELINK")
- *			All rights reserved.
+ *          All rights reserved.
  *
  *          Licensed under the Apache License, Version 2.0 (the "License");
  *          you may not use this file except in compliance with the License.
@@ -58,25 +58,26 @@ extern "C" {
 #include "version_cfg.h"
 
 /* Debug mode config */
-#define	UART_PRINTF_MODE				ON
+#define UART_PRINTF_MODE                ON
 #define DEBUG_CONFIG                    OFF
-#define DEBUG_DEVICE_DATA               OFF
+#define DEBUG_DEVICE_DATA               ON
 #define DEBUG_PACKAGE                   ON
+#define DEBUG_TAMPER                    ON
 #define DEBUG_REPORTING                 OFF
 #define DEBUG_TEMPERATURE               OFF
 #define DEBUG_OTA                       OFF
 
-#define USB_PRINTF_MODE         		OFF
+#define USB_PRINTF_MODE                 OFF
 
 /* PM */
-#define PM_ENABLE						OFF
+#define PM_ENABLE                       OFF
 
 /* PA */
-#define PA_ENABLE						OFF
+#define PA_ENABLE                       OFF
 
 /* BDB */
-#define TOUCHLINK_SUPPORT				ON
-#define FIND_AND_BIND_SUPPORT			OFF
+#define TOUCHLINK_SUPPORT               ON
+#define FIND_AND_BIND_SUPPORT           OFF
 
 /* Board ID */
 #define BOARD_826x_EVK                  0
@@ -184,7 +185,7 @@ extern "C" {
  * we need to configure the detection IO port, and the IO must be connected to the target under test,
  * such as VCC.
  */
-#define VOLTAGE_DETECT_ENABLE						OFF
+#define VOLTAGE_DETECT_ENABLE                       OFF
 
 #if defined(MCU_CORE_826x)
     #define VOLTAGE_DETECT_ADC_PIN                  0
@@ -196,13 +197,13 @@ extern "C" {
 
 
 /* Watch dog module */
-#define MODULE_WATCHDOG_ENABLE						OFF
+#define MODULE_WATCHDOG_ENABLE                      OFF
 
 /* UART module */
-#define	MODULE_UART_ENABLE							OFF
+#define MODULE_UART_ENABLE                          OFF
 
 #if (ZBHCI_USB_PRINT || ZBHCI_USB_CDC || ZBHCI_USB_HID || ZBHCI_UART)
-	#define ZBHCI_EN								1
+    #define ZBHCI_EN                                1
 #endif
 
 /**********************************************************************
@@ -237,10 +238,10 @@ extern "C" {
  * EV configuration
  */
 typedef enum{
-	EV_POLL_ED_DETECT,
-	EV_POLL_HCI,
+    EV_POLL_ED_DETECT,
+    EV_POLL_HCI,
     EV_POLL_IDLE,
-	EV_POLL_MAX,
+    EV_POLL_MAX,
 }ev_poll_e;
 
 /* Disable C linkage for C++ Compilers: */

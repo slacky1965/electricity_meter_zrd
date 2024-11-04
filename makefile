@@ -141,6 +141,10 @@ flash: $(BIN_FILE)
 	
 erase-flash:
 	@python3 $(TOOLS_PATH)/TlsrPgm.py -p$(DOWNLOAD_PORT) -z11 -a-100 -s ea
+	
+erase-flash-fimware:
+	@python3 $(TOOLS_PATH)/TlsrPgm.py -p$(DOWNLOAD_PORT) -z11 -a-100 -s es 0x8000 0x78000
+	
 
 flash-bootloader:
 	@python3 $(TOOLS_PATH)/TlsrPgm.py -p$(DOWNLOAD_PORT) -z11 -a-100 -s -m we 0 $(BOOTLOADER)
@@ -149,9 +153,9 @@ reset:
 	@python3 $(TOOLS_PATH)/TlsrPgm.py -p$(DOWNLOAD_PORT) -z11 -a-100 -s -t50 -a2550 -m -w i
 
 # Main-build Target
-main-build: clean $(ELF_FILE) secondary-outputs
+#main-build: clean $(ELF_FILE) secondary-outputs
 
-#main-build: clean-project $(ELF_FILE) secondary-outputs
+main-build: clean-project $(ELF_FILE) secondary-outputs
 
 # Tool invocations
 $(ELF_FILE): $(OBJS) $(USER_OBJS)

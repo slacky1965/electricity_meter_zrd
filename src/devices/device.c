@@ -21,6 +21,7 @@ uint8_t device_model[DEVICE_MAX][32] = {
     {"KASKAD-11-C1"},
     {"MERCURY-206"},
     {"ENERGOMERA-CE102M"},
+    {"ENERGOMERA-CE208BY"},
     {"NEVA-MT124"},
     {"NARTIS-100"},
 };
@@ -64,6 +65,12 @@ uint8_t set_device_model(device_model_t model) {
             break;
         }
         case DEVICE_KASKAD_11: {
+            measure_meter = measure_meter_energomera_ce208by;
+            baudrate = 9600;
+            if (set_zcl_str(device_model[DEVICE_ENERGOMERA_CE208BY], name, DEVICE_NAME_LEN)) {
+                zcl_setAttrVal(APP_ENDPOINT_1, ZCL_CLUSTER_SE_METERING, ZCL_ATTRID_CUSTOM_DEVICE_MODEL, (uint8_t*)&name);
+            }
+            break;
             measure_meter = measure_meter_kaskad_11;
             baudrate = 2400;
             if (set_zcl_str(device_model[DEVICE_KASKAD_11], name, DEVICE_NAME_LEN)) {
@@ -86,6 +93,18 @@ uint8_t set_device_model(device_model_t model) {
             measure_meter = measure_meter_energomera_ce102m;
             baudrate = 9600;
             if (set_zcl_str(device_model[DEVICE_ENERGOMERA_CE102M], name, DEVICE_NAME_LEN)) {
+                zcl_setAttrVal(APP_ENDPOINT_1, ZCL_CLUSTER_SE_METERING, ZCL_ATTRID_CUSTOM_DEVICE_MODEL, (uint8_t*)&name);
+            }
+            break;
+        }
+        case DEVICE_ENERGOMERA_CE208BY: {
+            measure_meter = measure_meter_energomera_ce208by;
+            baudrate = 9600;
+            energy_divisor = 10000;
+            voltage_divisor = 100;
+            current_divisor = 1000;
+            power_divisor = 1000;
+            if (set_zcl_str(device_model[DEVICE_ENERGOMERA_CE208BY], name, DEVICE_NAME_LEN)) {
                 zcl_setAttrVal(APP_ENDPOINT_1, ZCL_CLUSTER_SE_METERING, ZCL_ATTRID_CUSTOM_DEVICE_MODEL, (uint8_t*)&name);
             }
             break;

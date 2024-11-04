@@ -8,6 +8,31 @@ typedef struct {
     uint32_t          time_posted;
 } app_reporting_t;
 
+typedef enum {
+    DEVICE_MODEL = 0,
+    CURR_TEMP,
+    SERIAL_NUMBER,
+    DATE_RELEASE,
+    MULTIPLIER,
+    DIVISOR,
+    CUR_SUMM_DELIVERD,
+    CUR_T1_SUMM_DELIVERD,
+    CUR_T2_SUMM_DELIVERD,
+    CUR_T3_SUMM_DELIVERD,
+    CUR_T4_SUMM_DELIVERD,
+    VOLTAGE_MULTIPLIER,
+    VOLTAGE_DIVISOR,
+    VOLTAGE,
+    POWER_MULTIPLIER,
+    POWER_DIVISOR,
+    POWER,
+    CURRENT_MULTIPLIER,
+    CURRENT_DIVISOR,
+    CURRENT,
+    BATTERY_LIFE,
+    ATTR_MAX
+} attr_name_t;
+
 extern app_reporting_t app_reporting[ZCL_REPORTING_TABLE_NUM];
 
 void app_forcedReport(uint8_t endpoint, uint16_t claster_id, uint16_t attr_id);
