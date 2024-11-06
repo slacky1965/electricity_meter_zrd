@@ -18,6 +18,35 @@ typedef enum _command_t {
     cmd_test_error           = 0x60
 } command_t;
 
+typedef enum {
+    BOARD_TYPE_UNKNOWN = 0,
+    BOADR_TYPE1,
+    BOADR_TYPE2,
+    BOADR_TYPE3,
+} board_type_t;
+
+typedef enum {
+    BOARD_ID_01 = 0x01,     // begin board id of type1  //
+    BOARD_ID_02 = 0x02,
+    BOARD_ID_03 = 0x03,
+    BOARD_ID_04 = 0x04,
+    BOARD_ID_0C = 0x0C,
+    BOARD_ID_0D = 0x0D,
+    BOARD_ID_11 = 0x11,
+    BOARD_ID_12 = 0x12,     // end board id of type1    //
+    BOARD_ID_07 = 0x07,     // begin board id of type2  //
+    BOARD_ID_08 = 0x08,
+    BOARD_ID_0A = 0x0A,
+    BOARD_ID_0B = 0x0B,     // end board id of type2    //
+    BOARD_ID_09 = 0x09,     // begin board id of type3  //
+    BOARD_ID_0E = 0x0E,
+    BOARD_ID_0F = 0x0F,
+    BOARD_ID_10 = 0x10,
+    BOARD_ID_20 = 0x20,
+    BOARD_ID_21 = 0x21,
+    BOARD_ID_22 = 0x22      // end board id of type3    //
+} board_id_t;
+
 typedef struct __attribute__((packed)) _package_header_t {
     uint8_t  data_len   :5;     /* 0-4 bits - data lenght                               */
     uint8_t  from_to    :1;     /* 1 request to the device, 0 response from the device  */
