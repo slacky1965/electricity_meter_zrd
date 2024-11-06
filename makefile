@@ -37,6 +37,7 @@ MAKE_INCLUDES := ./make
 TOOLS_PATH := ./tools
 VERSION_RELEASE := V$(shell awk -F " " '/APP_RELEASE/ {gsub("0x",""); printf "%.1f", $$3/10.0; exit}' $(SRC_PATH)/include/version_cfg.h)
 VERSION_BUILD := $(shell awk -F " " '/APP_BUILD/ {gsub("0x",""); printf "%02d", $$3; exit}' ./src/include/version_cfg.h)
+ZCL_VERSION_FILE := $(shell git log -1 --format=%cd --date=format:%Y%m%d -- src |  sed -e "'s/./\'&\',/g'" -e "'s/.$$//'")
 
 
 TL_Check = $(TOOLS_PATH)/tl_check_fw.py
@@ -79,6 +80,14 @@ GCC_FLAGS := \
 -fshort-wchar \
 -fms-extensions
 
+ifeq ($(strip $(ZCL_VERSION_FILE)),)
+GCC_FLAGS += \
+-DBUILD_DATE="{8,'2','0','2','3','1','1','1','7'}"
+else
+GCC_FLAGS += \
+-DBUILD_DATE="{8,$(ZCL_VERSION_FILE)}"
+endif
+  
 GCC_FLAGS += \
 $(DEVICE_TYPE) \
 $(MCU_TYPE)
