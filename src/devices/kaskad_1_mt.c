@@ -16,9 +16,10 @@
 #define STUFF_55    0x11
 #define STUFF_73    0x22
 
-static package_t request_pkt;
-static package_t response_pkt;
-static uint8_t   package_buff[PKT_BUFF_MAX_LEN];
+static package_t    request_pkt;
+static package_t    response_pkt;
+static uint8_t      package_buff[PKT_BUFF_MAX_LEN];
+static board_type_t board_type = BOARD_TYPE_UNKNOWN;
 
 static uint8_t checksum(const uint8_t *src_buffer, uint8_t len) {
   // skip 73 55 header (and 55 footer is beyond checksum anyway)
@@ -565,7 +566,32 @@ static void get_resbat_data() {
     }
 }
 
+static void get_info_data() {
 
+#if UART_PRINTF_MODE
+    printf("\r\nCommand get info\r\n");
+#endif
+
+    package_t *pkt = get_pkt_data(cmd_get_info);
+
+    if (pkt) {
+        printf("board id: %x\r\n", pkt->data[0]);
+    }
+}
+
+static void get_cfg_data() {
+
+#if UART_PRINTF_MODE
+    printf("\r\nCommand get configuration\r\n");
+#endif
+
+    package_t *pkt = get_pkt_data(cmd_read_configure);
+
+    if (pkt) {
+        pkt_read_cfg_t *cfg = (pkt_read_cfg_t*)pkt->data;
+        printf("cfg role: %x\r\n", cfg->role);
+    }
+}
 
 void pkt_test(command_t command) {
     package_t *pkt;
@@ -582,6 +608,8 @@ uint8_t measure_meter_kaskad_1_mt() {
     uint8_t ret = ping_start_data();        /* ping to device       */
 
     if (ret) {
+        get_info_data();
+        get_cfg_data();
         if (new_start) {               /* after reset          */
             get_serial_number_data();
             get_date_release_data();
