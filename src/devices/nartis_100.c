@@ -1068,6 +1068,8 @@ uint8_t measure_meter_nartis_100() {
 
     if (ret) {
         if (new_start) {                /* after reset                                  */
+            serial_number[0] = 0;
+            date_release[0] = 0;
 //            get_serial_number_data();
 //            get_date_release_data();
             new_start = false;
