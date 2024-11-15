@@ -45,6 +45,9 @@ static uint16_t release_year;
 static uint8_t present_month;
 static uint16_t present_year;
 
+static uint8_t serial_number[SE_ATTR_SN_SIZE+1] = {0};
+static uint8_t date_release[DATA_MAX_LEN+2] = {0};
+
 
 static request_t attr_descriptor_serial_number = {
         .class =     {0x00, 0x01},
@@ -748,7 +751,7 @@ static void get_serial_number_data() {
         if (unsigned32->type == 0x06) {
             uint32_t addr = reverse32(unsigned32->value);
 
-            uint8_t serial_number[SE_ATTR_SN_SIZE+1] = {0};
+//            uint8_t serial_number[SE_ATTR_SN_SIZE+1] = {0};
             uint8_t sn[SE_ATTR_SN_SIZE];
 
             itoa(addr, sn);
@@ -779,7 +782,7 @@ static void get_date_release_data() {
             release_year |= *ptr++;
             release_month = *ptr++;
             uint8_t  release_day = *ptr++;
-            uint8_t  date_release[DATA_MAX_LEN+2] = {0};
+//            uint8_t  date_release[DATA_MAX_LEN+2] = {0};
             uint8_t  dr[11] = {0};
             uint8_t  dr_len = 0;
 
@@ -888,6 +891,8 @@ static void get_list_data() {
     printf("\r\nCommand running to get list\r\n");
 #endif
 
+    uint64_t tariff_summ = 0;
+
     uint8_t *ptr = get_request_data(attr_descriptor_list);
 
     if (ptr) {
@@ -909,13 +914,10 @@ static void get_list_data() {
             if (tariff_A_p->type == TYPE_UNSIGNED_32 && tariff_A_m->type == TYPE_UNSIGNED_32) {
 
                 uint64_t tariff = (reverse32(tariff_A_p->value) + reverse32(tariff_A_m->value)) & 0xffffffffffff;
+                tariff_summ += tariff;
 
-//                zcl_getAttrVal(APP_ENDPOINT_1, ZCL_CLUSTER_SE_METERING, ZCL_ATTRID_CURRENT_TIER_1_SUMMATION_DELIVERD, &attr_len, (uint8_t*)&attr_data);
-//                uint64_t last_tariff = fromPtoInteger(attr_len, attr_data);
-//
-//                if (tariff > last_tariff) {
-                    zcl_setAttrVal(APP_ENDPOINT_1, ZCL_CLUSTER_SE_METERING, ZCL_ATTRID_CURRENT_TIER_1_SUMMATION_DELIVERD, (uint8_t*)&tariff);
-//                }
+                zcl_setAttrVal(APP_ENDPOINT_1, ZCL_CLUSTER_SE_METERING, ZCL_ATTRID_CURRENT_TIER_1_SUMMATION_DELIVERD, (uint8_t*)&tariff);
+
 #if UART_PRINTF_MODE && DEBUG_DEVICE_DATA
                 printf("tariff1: %d\r\n", tariff);
 #endif
@@ -926,13 +928,10 @@ static void get_list_data() {
                 if (tariff_A_p->type == TYPE_UNSIGNED_32 && tariff_A_m->type == TYPE_UNSIGNED_32) {
 
                     tariff = (reverse32(tariff_A_p->value) + reverse32(tariff_A_m->value)) & 0xffffffffffff;
+                    tariff_summ += tariff;
 
-//                    zcl_getAttrVal(APP_ENDPOINT_1, ZCL_CLUSTER_SE_METERING, ZCL_ATTRID_CURRENT_TIER_2_SUMMATION_DELIVERD, &attr_len, (uint8_t*)&attr_data);
-//                    last_tariff = fromPtoInteger(attr_len, attr_data);
-//
-//                    if (tariff > last_tariff) {
-                        zcl_setAttrVal(APP_ENDPOINT_1, ZCL_CLUSTER_SE_METERING, ZCL_ATTRID_CURRENT_TIER_2_SUMMATION_DELIVERD, (uint8_t*)&tariff);
-//                    }
+                    zcl_setAttrVal(APP_ENDPOINT_1, ZCL_CLUSTER_SE_METERING, ZCL_ATTRID_CURRENT_TIER_2_SUMMATION_DELIVERD, (uint8_t*)&tariff);
+
 #if UART_PRINTF_MODE && DEBUG_DEVICE_DATA
                     printf("tariff2: %d\r\n", tariff);
 #endif
@@ -943,13 +942,10 @@ static void get_list_data() {
                     if (tariff_A_p->type == TYPE_UNSIGNED_32 && tariff_A_m->type == TYPE_UNSIGNED_32) {
 
                         tariff = (reverse32(tariff_A_p->value) + reverse32(tariff_A_m->value)) & 0xffffffffffff;
+                        tariff_summ += tariff;
 
-//                        zcl_getAttrVal(APP_ENDPOINT_1, ZCL_CLUSTER_SE_METERING, ZCL_ATTRID_CURRENT_TIER_3_SUMMATION_DELIVERD, &attr_len, (uint8_t*)&attr_data);
-//                        last_tariff = fromPtoInteger(attr_len, attr_data);
-//
-//                        if (tariff > last_tariff) {
-                            zcl_setAttrVal(APP_ENDPOINT_1, ZCL_CLUSTER_SE_METERING, ZCL_ATTRID_CURRENT_TIER_3_SUMMATION_DELIVERD, (uint8_t*)&tariff);
-//                        }
+                        zcl_setAttrVal(APP_ENDPOINT_1, ZCL_CLUSTER_SE_METERING, ZCL_ATTRID_CURRENT_TIER_3_SUMMATION_DELIVERD, (uint8_t*)&tariff);
+
 #if UART_PRINTF_MODE && DEBUG_DEVICE_DATA
                         printf("tariff3: %d\r\n", tariff);
 #endif
@@ -960,15 +956,17 @@ static void get_list_data() {
                         if (tariff_A_p->type == TYPE_UNSIGNED_32 && tariff_A_m->type == TYPE_UNSIGNED_32) {
 
                             tariff = (reverse32(tariff_A_p->value) + reverse32(tariff_A_m->value)) & 0xffffffffffff;
+                            tariff_summ += tariff;
 
-//                            zcl_getAttrVal(APP_ENDPOINT_1, ZCL_CLUSTER_SE_METERING, ZCL_ATTRID_CURRENT_TIER_4_SUMMATION_DELIVERD, &attr_len, (uint8_t*)&attr_data);
-//                            last_tariff = fromPtoInteger(attr_len, attr_data);
-//
-//                            if (tariff > last_tariff) {
-                                zcl_setAttrVal(APP_ENDPOINT_1, ZCL_CLUSTER_SE_METERING, ZCL_ATTRID_CURRENT_TIER_4_SUMMATION_DELIVERD, (uint8_t*)&tariff);
-//                            }
+                            zcl_setAttrVal(APP_ENDPOINT_1, ZCL_CLUSTER_SE_METERING, ZCL_ATTRID_CURRENT_TIER_4_SUMMATION_DELIVERD, (uint8_t*)&tariff);
+
 #if UART_PRINTF_MODE && DEBUG_DEVICE_DATA
                             printf("tariff4: %d\r\n", tariff);
+#endif
+
+                            zcl_setAttrVal(APP_ENDPOINT_1, ZCL_CLUSTER_SE_METERING, ZCL_ATTRID_CURRENT_SUMMATION_DELIVERD, (uint8_t*)&tariff_summ);
+#if UART_PRINTF_MODE && DEBUG_DEVICE_DATA
+                            printf("tariff_summ: %d\r\n", tariff_summ);
 #endif
 
                             p_list += 39;
@@ -977,12 +975,8 @@ static void get_list_data() {
 
                                 uint16_t amps = reverse32(p_list->value) & 0xffff;
 
-//                                zcl_getAttrVal(APP_ENDPOINT_1, ZCL_CLUSTER_MS_ELECTRICAL_MEASUREMENT, ZCL_ATTRID_LINE_CURRENT, &attr_len, (uint8_t*)&attr_data);
-//                                uint16_t last_amps = fromPtoInteger(attr_len, attr_data);
-//
-//                                if (amps != last_amps) {
-                                    zcl_setAttrVal(APP_ENDPOINT_1, ZCL_CLUSTER_MS_ELECTRICAL_MEASUREMENT, ZCL_ATTRID_LINE_CURRENT, (uint8_t*)&amps);
-//                                }
+                                zcl_setAttrVal(APP_ENDPOINT_1, ZCL_CLUSTER_MS_ELECTRICAL_MEASUREMENT, ZCL_ATTRID_LINE_CURRENT, (uint8_t*)&amps);
+
 #if UART_PRINTF_MODE && DEBUG_DEVICE_DATA
                                 printf("amps: %d\r\n", amps);
 #endif
@@ -993,13 +987,8 @@ static void get_list_data() {
 
                                     uint16_t volts = reverse32(p_list->value) / 10;
 
+                                    zcl_setAttrVal(APP_ENDPOINT_1, ZCL_CLUSTER_MS_ELECTRICAL_MEASUREMENT, ZCL_ATTRID_RMS_VOLTAGE, (uint8_t*)&volts);
 
-//                                    zcl_getAttrVal(APP_ENDPOINT_1, ZCL_CLUSTER_MS_ELECTRICAL_MEASUREMENT, ZCL_ATTRID_RMS_VOLTAGE, &attr_len, (uint8_t*)&attr_data);
-//                                    uint16_t last_volts = fromPtoInteger(attr_len, attr_data);
-//
-//                                    if (volts != last_volts) {
-                                        zcl_setAttrVal(APP_ENDPOINT_1, ZCL_CLUSTER_MS_ELECTRICAL_MEASUREMENT, ZCL_ATTRID_RMS_VOLTAGE, (uint8_t*)&volts);
-//                                    }
 #if UART_PRINTF_MODE && DEBUG_DEVICE_DATA
                                     printf("voltage: %d\r\n", volts);
 #endif
@@ -1015,12 +1004,8 @@ static void get_list_data() {
 
                                         uint16_t pwr = power & 0xffff;
 
-//                                        zcl_getAttrVal(APP_ENDPOINT_1, ZCL_CLUSTER_MS_ELECTRICAL_MEASUREMENT, ZCL_ATTRID_APPARENT_POWER, &attr_len, (uint8_t*)&attr_data);
-//                                        uint16_t last_pwr = fromPtoInteger(attr_len, attr_data);
-//
-//                                        if (pwr != last_pwr) {
-                                            zcl_setAttrVal(APP_ENDPOINT_1, ZCL_CLUSTER_MS_ELECTRICAL_MEASUREMENT, ZCL_ATTRID_APPARENT_POWER, (uint8_t*)&pwr);
-//                                        }
+                                        zcl_setAttrVal(APP_ENDPOINT_1, ZCL_CLUSTER_MS_ELECTRICAL_MEASUREMENT, ZCL_ATTRID_APPARENT_POWER, (uint8_t*)&pwr);
+
 #if UART_PRINTF_MODE && DEBUG_DEVICE_DATA
                                         printf("power: %d\r\n", pwr);
 #endif
@@ -1052,12 +1037,7 @@ static void get_resbat_data() {
         battery_level++;
     }
 
-//    zcl_getAttrVal(APP_ENDPOINT_1, ZCL_CLUSTER_SE_METERING, ZCL_ATTRID_REMAINING_BATTERY_LIFE, &attr_len, (uint8_t*)&attr_data);
-//    uint8_t last_bl = fromPtoInteger(attr_len, attr_data);
-//
-//    if (battery_level != last_bl) {
-        zcl_setAttrVal(APP_ENDPOINT_1, ZCL_CLUSTER_SE_METERING, ZCL_ATTRID_REMAINING_BATTERY_LIFE, (uint8_t*)&battery_level);
-//    }
+    zcl_setAttrVal(APP_ENDPOINT_1, ZCL_CLUSTER_SE_METERING, ZCL_ATTRID_REMAINING_BATTERY_LIFE, (uint8_t*)&battery_level);
 
 #if UART_PRINTF_MODE && DEBUG_DEVICE_DATA
     printf("Resource battery: %d.%d%%\r\n", (worktime*100)/lifetime, ((worktime*100)%lifetime)*100/lifetime);
@@ -1088,10 +1068,17 @@ uint8_t measure_meter_nartis_100() {
 
     if (ret) {
         if (new_start) {                /* after reset                                  */
-            get_serial_number_data();
-            get_date_release_data();
+//            get_serial_number_data();
+//            get_date_release_data();
             new_start = false;
         }
+        if (serial_number[0] == 0) {
+            get_serial_number_data();
+        }
+        if (date_release[0] == 0) {
+            get_date_release_data();
+        }
+
         get_list_data();                /* get 4 tariffs, voltage net ~220, power, amps */
         get_resbat_data();              /* get resource battery                         */
         send_cmd_disc();                /* disconnect                                   */
