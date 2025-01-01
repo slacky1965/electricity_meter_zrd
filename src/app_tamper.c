@@ -36,7 +36,7 @@ void tamper_handler() {
 #endif /* UART_PRINTF_MODE */
                 zcl_getAttrVal(APP_ENDPOINT_1, ZCL_CLUSTER_SE_METERING, ZCL_ATTRID_STATUS, &attr_len, (uint8_t*)&attr_data);
                 attr_data &= ~(1 << TAMPER_DETECT);
-                printf("attr_data: 0x%x\r\n", attr_data);
+//                printf("attr_data: 0x%x\r\n", attr_data);
                 zcl_setAttrVal(APP_ENDPOINT_1, ZCL_CLUSTER_SE_METERING, ZCL_ATTRID_STATUS, (uint8_t*)&attr_data);
             }
         }
@@ -49,7 +49,7 @@ void tamper_handler() {
 #endif /* UART_PRINTF_MODE */
                 zcl_getAttrVal(APP_ENDPOINT_1, ZCL_CLUSTER_SE_METERING, ZCL_ATTRID_STATUS, &attr_len, (uint8_t*)&attr_data);
                 attr_data |= (1 << TAMPER_DETECT);
-                printf("attr_data: 0x%x\r\n", attr_data);
+//                printf("attr_data: 0x%x\r\n", attr_data);
                 zcl_setAttrVal(APP_ENDPOINT_1, ZCL_CLUSTER_SE_METERING, ZCL_ATTRID_STATUS, (uint8_t*)&attr_data);
             }
         }

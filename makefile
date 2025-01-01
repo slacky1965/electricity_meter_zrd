@@ -145,21 +145,21 @@ sizedummy \
 all: pre-build main-build
 
 flash: $(BIN_FILE)
-	@python3 $(TOOLS_PATH)/TlsrPgm.py -p$(DOWNLOAD_PORT) -z11 -a-100 -s -m we 0x8000 $(BIN_FILE)
+	@python3 $(TOOLS_PATH)/TlsrPgm.py -p$(DOWNLOAD_PORT) -z11 -a 100 -s -m we 0x8000 $(BIN_FILE)
 	
 	
 erase-flash:
-	@python3 $(TOOLS_PATH)/TlsrPgm.py -p$(DOWNLOAD_PORT) -z11 -a-100 -s ea
+	@python3 $(TOOLS_PATH)/TlsrPgm.py -p$(DOWNLOAD_PORT) -z11 -a 100 -s ea
 	
 erase-flash-fimware:
-	@python3 $(TOOLS_PATH)/TlsrPgm.py -p$(DOWNLOAD_PORT) -z11 -a-100 -s es 0x8000 0x78000
+	@python3 $(TOOLS_PATH)/TlsrPgm.py -p$(DOWNLOAD_PORT) -z11 -a 100 -s es 0x8000 0x78000
 	
 
 flash-bootloader:
-	@python3 $(TOOLS_PATH)/TlsrPgm.py -p$(DOWNLOAD_PORT) -z11 -a-100 -s -m we 0 $(BOOTLOADER)
+	@python3 $(TOOLS_PATH)/TlsrPgm.py -p$(DOWNLOAD_PORT) -z11 -a 100 -s -m we 0 $(BOOTLOADER)
 
 reset:
-	@python3 $(TOOLS_PATH)/TlsrPgm.py -p$(DOWNLOAD_PORT) -z11 -a-100 -s -t50 -a2550 -m -w i
+	@python3 $(TOOLS_PATH)/TlsrPgm.py -p$(DOWNLOAD_PORT) -z11 -a 100 -s -t50 -a2550 -m -w i
 
 # Main-build Target
 #main-build: clean $(ELF_FILE) secondary-outputs

@@ -20,6 +20,9 @@ static package_t    request_pkt;
 static package_t    response_pkt;
 static uint8_t      package_buff[PKT_BUFF_MAX_LEN];
 static board_type_t board_type = BOARD_TYPE_UNKNOWN;
+static uint8_t serial_number[SE_ATTR_SN_SIZE+1] = {0};
+static uint8_t date_release[DATA_MAX_LEN+2] = {0};
+
 
 static uint8_t checksum(const uint8_t *src_buffer, uint8_t len) {
   // skip 73 55 header (and 55 footer is beyond checksum anyway)
@@ -500,8 +503,6 @@ void get_serial_number_data() {
 
         pkt_data31_t *serial_number_response = (pkt_data31_t*)pkt;
 
-        uint8_t serial_number[SE_ATTR_SN_SIZE+1] = {0};
-
         if (set_zcl_str(serial_number_response->data, serial_number, SE_ATTR_SN_SIZE)) {
             zcl_setAttrVal(APP_ENDPOINT_1, ZCL_CLUSTER_SE_METERING, ZCL_ATTRID_METER_SERIAL_NUMBER, (uint8_t*)&serial_number);
 #if UART_PRINTF_MODE && DEBUG_DEVICE_DATA
@@ -522,8 +523,6 @@ void get_date_release_data() {
     if (pkt) {
 
         pkt_data31_t *date_release_response = (pkt_data31_t*)pkt;
-
-        uint8_t date_release[DATA_MAX_LEN+2] = {0};
 
         if (set_zcl_str(date_release_response->data, date_release, DATA_MAX_LEN+1)) {
             zcl_setAttrVal(APP_ENDPOINT_1, ZCL_CLUSTER_SE_METERING, ZCL_ATTRID_CUSTOM_DATE_RELEASE, (uint8_t*)&date_release);
@@ -611,15 +610,24 @@ uint8_t measure_meter_kaskad_1_mt() {
         get_info_data();
         get_cfg_data();
         if (new_start) {               /* after reset          */
-            get_serial_number_data();
-            get_date_release_data();
+            serial_number[0] = 0;
+            date_release[0] = 0;
+//            get_serial_number_data();
+//            get_date_release_data();
             new_start = false;
         }
-        get_tariffs_data();            /* get 4 tariffs        */
-        get_resbat_data();             /* get resource battery */
-        get_voltage_data();            /* get voltage net ~220 */
-        get_power_data();              /* get power            */
-        get_amps_data();               /* get amps             */
+//        if (serial_number[0] == 0) {
+//            get_serial_number_data();
+//        }
+//        if (date_release[0] == 0) {
+//            get_date_release_data();
+//        }
+
+//        get_tariffs_data();            /* get 4 tariffs        */
+//        get_resbat_data();             /* get resource battery */
+//        get_voltage_data();            /* get voltage net ~220 */
+//        get_power_data();              /* get power            */
+//        get_amps_data();               /* get amps             */
 
         fault_measure_flag = false;
     } else {
