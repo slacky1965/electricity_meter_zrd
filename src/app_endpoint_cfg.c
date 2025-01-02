@@ -192,6 +192,7 @@ zcl_seAttr_t g_zcl_seAttrs = {
     .device_model = DEVICE_UNDEFINED, // Electric Metering
     .device_address = 0,
     .device_name = {9,'N','o',' ','D','e','v','i','c','e'},
+    .device_password = {1, '0'},
     .measurement_period = DEFAULT_MEASUREMENT_PERIOD,
 };
 
@@ -201,7 +202,7 @@ const zclAttrInfo_t se_attrTbl[] = {
     {ZCL_ATTRID_CURRENT_TIER_2_SUMMATION_DELIVERD,  ZCL_UINT48,     RR, (uint8_t*)&g_zcl_seAttrs.tariff_2               },
     {ZCL_ATTRID_CURRENT_TIER_3_SUMMATION_DELIVERD,  ZCL_UINT48,     RR, (uint8_t*)&g_zcl_seAttrs.tariff_3               },
     {ZCL_ATTRID_CURRENT_TIER_4_SUMMATION_DELIVERD,  ZCL_UINT48,     RR, (uint8_t*)&g_zcl_seAttrs.tariff_4               },
-    {ZCL_ATTRID_STATUS,                             ZCL_BITMAP8,    RR,  (uint8_t*)&g_zcl_seAttrs.status                 },
+    {ZCL_ATTRID_STATUS,                             ZCL_BITMAP8,    RR,  (uint8_t*)&g_zcl_seAttrs.status                },
     {ZCL_ATTRID_UNIT_OF_MEASURE,                    ZCL_UINT8,      R,  (uint8_t*)&g_zcl_seAttrs.unit_of_measure        },
     {ZCL_ATTRID_MULTIPLIER,                         ZCL_UINT24,     RR, (uint8_t*)&g_zcl_seAttrs.multiplier             },
     {ZCL_ATTRID_DIVISOR,                            ZCL_UINT24,     RR, (uint8_t*)&g_zcl_seAttrs.divisor                },
@@ -211,6 +212,7 @@ const zclAttrInfo_t se_attrTbl[] = {
     {ZCL_ATTRID_METERING_DEVICE_TYPE,               ZCL_BITMAP8,    R,  (uint8_t*)&g_zcl_seAttrs.device_type            },
     {ZCL_ATTRID_CUSTOM_DEVICE_MANUFACTURER,         ZCL_ENUM8,      RW, (uint8_t*)&g_zcl_seAttrs.device_model           },
     {ZCL_ATTRID_CUSTOM_DEVICE_ADDRESS,              ZCL_UINT32,     RW, (uint8_t*)&g_zcl_seAttrs.device_address         },
+    {ZCL_ATTRID_CUSTOM_DEVICE_PASSWORD,             ZCL_OCTET_STR,  RW, (uint8_t*)&g_zcl_seAttrs.device_password        },
     {ZCL_ATTRID_CUSTOM_MEASUREMENT_PERIOD,          ZCL_UINT8,      RW, (uint8_t*)&g_zcl_seAttrs.measurement_period     },
     {ZCL_ATTRID_CUSTOM_DATE_RELEASE,                ZCL_OCTET_STR,  RR, (uint8_t*)&g_zcl_seAttrs.date_release           },
     {ZCL_ATTRID_CUSTOM_DEVICE_MODEL,                ZCL_OCTET_STR,  RR, (uint8_t*)&g_zcl_seAttrs.device_name            },

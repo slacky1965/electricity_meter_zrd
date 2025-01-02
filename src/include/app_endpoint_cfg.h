@@ -71,6 +71,7 @@ typedef struct {
     uint8_t  device_model;
     uint32_t device_address;
     uint8_t  device_name[1+DEVICE_NAME_LEN];
+    uint8_t  device_password[9];    // [0] - size [1]...[8] - Password
     uint8_t  measurement_period;
 } zcl_seAttr_t;
 

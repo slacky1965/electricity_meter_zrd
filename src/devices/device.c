@@ -140,6 +140,8 @@ uint8_t set_device_model(device_model_t model) {
 
     if (dev_config.device_model != model) {
         dev_config.device_model = model;
+        /* reset password when changing model */
+        dev_config.device_password.size = 0;
         save = true;
         write_config();
 #if UART_PRINTF_MODE

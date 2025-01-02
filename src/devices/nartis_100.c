@@ -10,6 +10,7 @@
 #include "nartis_100.h"
 
 #define PASSWORD        "111"
+//#define PASSWORD        "12345678"
 #define CLIENT_ADDRESS  0x20
 #define PHY_DEVICE      0x10
 #define LOGICAL_DEVICE  0x01
@@ -656,15 +657,19 @@ static uint8_t send_cmd_open_session() {
     info_field_data[info_field_len++] = 0x03;
     aarq_len++;
     auth_len++;
-    info_field_data[info_field_len++] = meter.password[0];
-    aarq_len++;
-    auth_len++;
-    info_field_data[info_field_len++] = meter.password[1];
-    aarq_len++;
-    auth_len++;
-    info_field_data[info_field_len++] = meter.password[2];
-    aarq_len++;
-    auth_len++;
+    memcpy(&info_field_data[info_field_len], meter.password.data, meter.password.size);
+    info_field_len += meter.password.size;
+    aarq_len += meter.password.size;
+    auth_len += meter.password.size;
+//    info_field_data[info_field_len++] = meter.password[0];
+//    aarq_len++;
+//    auth_len++;
+//    info_field_data[info_field_len++] = meter.password[1];
+//    aarq_len++;
+//    auth_len++;
+//    info_field_data[info_field_len++] = meter.password[2];
+//    aarq_len++;
+//    auth_len++;
     info_field_data[auth_len_idx] = auth_len;
     memcpy(info_field_data+info_field_len, user_info, sizeof(user_info));
     info_field_len += sizeof(user_info);
@@ -1134,7 +1139,14 @@ void nartis100_init() {
     meter.window_rx = 1;
     meter.window_tx = 1;
     meter.format.type = TYPE3;
-    memcpy(&meter.password, PASSWORD, sizeof(PASSWORD));
+    if (dev_config.device_password.size) {
+        memcpy(&meter.password, &dev_config.device_password, sizeof(m_password_t));
+    } else {
+        strcpy((char*)meter.password.data, PASSWORD);
+        meter.password.size = sizeof(PASSWORD)-1;
+    }
+    //printf("size: %d, meter password: %s\r\n", meter.password.size, meter.password.data);
+//    memcpy(&meter.password, PASSWORD, sizeof(PASSWORD));
 }
 
 static uint8_t measure_meter_nartis_100_1() {
