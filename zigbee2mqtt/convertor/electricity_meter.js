@@ -41,6 +41,14 @@ const tzLocal = {
         };
       },
   },
+  device_password_config: {
+    key: ['device_password_preset'],
+    convertSet: async (entity, key, value, meta) => {
+      const device_password_preset = value.toString();
+      await entity.write('seMetering', {0xf005: {value: device_password_preset, type: 0x41}});
+      return {readAfterWriteTime: 250, state: {device_password_preset: value}};
+    },
+  },
   device_measurement_config: {
     key: ['device_measurement_preset'],
       convertSet: async (entity, key, rawValue, meta) => {
@@ -56,70 +64,98 @@ const tzLocal = {
         };
       },
   },
-  metering: {
+  device_metering: {
     key:['tariff', 'tariff1', 'tariff2', 'tariff3', 'tariff4', 'tariff_summ'],
-        convertGet: async (entity, key, meta) => {
-	        await entity.read('seMetering', ['currentTier1SummDelivered', 'currentTier2SummDelivered', 'currentTier3SummDelivered', 'currentTier4SummDelivered', 'currentSummDelivered', 'multiplier', 'divisor']);
-        },
-	    convertSet: async (entity, key, value, meta) => {
-	        return null;
-	    },
+      convertGet: async (entity, key, meta) => {
+        await entity.read('seMetering', ['currentTier1SummDelivered', 
+                                         'currentTier2SummDelivered', 
+                                         'currentTier3SummDelivered', 
+                                         'currentTier4SummDelivered', 
+                                         'currentSummDelivered', 
+                                         'multiplier', 
+                                         'divisor']);
+      },
+      convertSet: async (entity, key, value, meta) => {
+      return null;
+      },
+  },
+  device_battery_life: {
     key:['battery_life'],
-        convertGet: async (entity, key, meta) => {
-	        await entity.read('seMetering', ['remainingBattLife']);
-	    },
-	    convertSet: async (entity, key, value, meta) => {
-		    return null;
-	    },
+    convertGet: async (entity, key, meta) => {
+      await entity.read('seMetering', ['remainingBattLife']);
+    },
+    convertSet: async (entity, key, value, meta) => {
+      return null;
+    },
+  },
+  device_serial_number: {
     key:['serial_number'],
-        convertGet: async (entity, key, meta) => {
-	        await entity.read('seMetering', ['meterSerialNumber']);
-	    },
-	    convertSet: async (entity, key, value, meta) => {
-		    return null;
-	    },
+    convertGet: async (entity, key, meta) => {
+      await entity.read('seMetering', ['meterSerialNumber']);
+    },
+    convertSet: async (entity, key, value, meta) => {
+      return null;
+    },
+  },
+  device_date_release: {
     key:['date_release'],
-        convertGet: async (entity, key, meta) => {
-	        await entity.read('seMetering', [0xf003]);
-	    },
-	    convertSet: async (entity, key, value, meta) => {
-		    return null;
-	    },
+    convertGet: async (entity, key, meta) => {
+      await entity.read('seMetering', [0xf003]);
+    },
+    convertSet: async (entity, key, value, meta) => {
+      return null;
+    },
+  },
+  device_model_name: {
     key:['model_name'],
-        convertGet: async (entity, key, meta) => {
-	        await entity.read('seMetering', [0xf004]);
-	    },
-	    convertSet: async (entity, key, value, meta) => {
-		    return null;
-	    },
+    convertGet: async (entity, key, meta) => {
+      await entity.read('seMetering', [0xf004]);
+    },
+    convertSet: async (entity, key, value, meta) => {
+      return null;
+    },
+  },
+  device_voltage: {
     key:['voltage'],
-        convertGet: async (entity, key, meta) => {
-	        await entity.read('haElectricalMeasurement', ['rmsVoltage', 'acVoltageMultiplier', 'acVoltageDivisor']);
-	    },
-	    convertSet: async (entity, key, value, meta) => {
-		    return null;
-	    },
+    convertGet: async (entity, key, meta) => {
+      await entity.read('haElectricalMeasurement', ['rmsVoltage', 
+                                                    'acVoltageMultiplier', 
+                                                    'acVoltageDivisor']);
+    },
+    convertSet: async (entity, key, value, meta) => {
+      return null;
+    },
+  },
+  device_current: {
     key:['current'],
-        convertGet: async (entity, key, meta) => {
-	        await entity.read('haElectricalMeasurement', ['instantaneousLineCurrent', 'acCurrentMultiplier', 'acCurrentDivisor']);
-	    },
-	    convertSet: async (entity, key, value, meta) => {
-		    return null;
-	    },
+    convertGet: async (entity, key, meta) => {
+      await entity.read('haElectricalMeasurement', ['instantaneousLineCurrent', 
+                                                    'acCurrentMultiplier', 
+                                                    'acCurrentDivisor']);
+    },
+    convertSet: async (entity, key, value, meta) => {
+      return null;
+    },
+  },
+  device_power: {
     key:['power'],
-        convertGet: async (entity, key, meta) => {
-	        await entity.read('haElectricalMeasurement', ['apparentPower', 'acPowerMultiplier', 'acPowerDivisor']);
-	    },
-	    convertSet: async (entity, key, value, meta) => {
-		    return null;
-	    },
+    convertGet: async (entity, key, meta) => {
+      await entity.read('haElectricalMeasurement', ['apparentPower', 
+                                                    'acPowerMultiplier', 
+                                                    'acPowerDivisor']);
+    },
+    convertSet: async (entity, key, value, meta) => {
+      return null;
+    },
+  },
+  device_temperature: {
     key:['temperature'],
-        convertGet: async (entity, key, meta) => {
-	        await entity.read('genDeviceTempCfg', ['currentTemperature']);
-	    },
-	    convertSet: async (entity, key, value, meta) => {
-		    return null;
-	    },
+    convertGet: async (entity, key, meta) => {
+      await entity.read('genDeviceTempCfg', ['currentTemperature']);
+    },
+    convertSet: async (entity, key, value, meta) => {
+      return null;
+    },
   },
 };
 
@@ -216,7 +252,7 @@ const fzLocal = {
         const result = {};
         if (msg.data.hasOwnProperty('remainingBattLife')) {
           const data = parseInt(msg.data['remainingBattLife']);
-          result.BatteryLife = data;
+          result.battery_life = data;
 		}
         return result;
     },
@@ -228,7 +264,7 @@ const fzLocal = {
         const result = {};
         if (msg.data.hasOwnProperty('meterSerialNumber')) {
             const data = msg.data['meterSerialNumber'];
-            result.SerialNumber = data.toString();
+            result.serial_number = data.toString();
 		}
         return result;
     },
@@ -252,7 +288,7 @@ const fzLocal = {
         const result = {};
         if (msg.data.hasOwnProperty(0xf003)) {
             const data = msg.data[0xf003];
-            result.DateRelease = data.toString();
+            result.date_release = data.toString();
 		}
         return result;
     },
@@ -264,7 +300,7 @@ const fzLocal = {
         const result = {};
         if (msg.data.hasOwnProperty(0xf004)) {
             const data = msg.data[0xf004];
-            result.ModelName = data.toString();
+            result.model_name = data.toString();
 		}
         return result;
     },
@@ -302,7 +338,7 @@ const fzLocal = {
         const result = {};
         if (msg.data.hasOwnProperty('rmsVoltage')) {
           const data = parseInt(msg.data['rmsVoltage']);
-          result.Voltage = data/voltage_divisor*voltage_multiplier;
+          result.voltage = data/voltage_divisor*voltage_multiplier;
           //meta.logger.info('Voltage: ' + data + ', multiplier: ' + voltage_multiplier + ', divisor: ' + voltage_divisor);
 		}
         return result;
@@ -341,7 +377,7 @@ const fzLocal = {
         const result = {};
         if (msg.data.hasOwnProperty('instantaneousLineCurrent')) {
           const data = parseInt(msg.data['instantaneousLineCurrent']);
-          result.Current = data/current_divisor*current_multiplier;
+          result.current = data/current_divisor*current_multiplier;
 		}
         return result;
     },
@@ -379,7 +415,7 @@ const fzLocal = {
         const result = {};
         if (msg.data.hasOwnProperty('apparentPower')) {
           const data = parseInt(msg.data['apparentPower']);
-          result.Power = data/power_divisor*power_multiplier;
+          result.power = data/power_divisor*power_multiplier;
 		}
         return result;
     },
@@ -414,12 +450,12 @@ const fzLocal = {
     cluster: 'genDeviceTempCfg',
     type: ['attributeReport', 'readResponse'],
     convert: (model, msg, publish, options, meta) => {
-        const result = {};
-        if (msg.data.hasOwnProperty('currentTemperature')) {
-          const data = parseInt(msg.data['currentTemperature']);
-          result.Temperature = data;
-		}
-        return result;
+      const result = {};
+      if (msg.data.hasOwnProperty('currentTemperature')) {
+        const data = parseInt(msg.data['currentTemperature']);
+        result.temperature = data;
+		  }
+      return result;
     },
   },
 }
@@ -454,7 +490,10 @@ const definition = {
                  fzLocal.c_multiplier, fzLocal.c_divisor, fzLocal.current,
                  fzLocal.p_multiplier, fzLocal.p_divisor, fzLocal.power,
                  fzLocal.temperature], // We will add this later
-    toZigbee: [tzLocal.device_address_config, tzLocal.device_model_config, tzLocal.device_measurement_config, tzLocal.metering],
+    toZigbee: [tzLocal.device_address_config, tzLocal.device_model_config, tzLocal.device_password_config, tzLocal.device_measurement_config, 
+               tzLocal.device_metering, tzLocal.device_battery_life, tzLocal.device_serial_number, tzLocal.device_date_release,
+               tzLocal.device_model_name, tzLocal.device_voltage, tzLocal.device_current, tzLocal.device_power, tzLocal.device_temperature
+               ],
     meta: {
         multiEndpoint: true
     },
@@ -495,16 +534,17 @@ const definition = {
       exposes.numeric('tariff3', ea.STATE_GET).withUnit('kWh').withDescription('Tariff 3'),
       exposes.numeric('tariff4', ea.STATE_GET).withUnit('kWh').withDescription('Tariff 4'),
       exposes.numeric('tariff_summ', ea.STATE_GET).withUnit('kWh').withDescription('Tariff Summation'),
-      exposes.text('ModelName', ea.STATE_GET).withDescription('Meter Model Name'),
-      exposes.text('SerialNumber', ea.STATE_GET).withDescription('Meter Serial Number'),
-      exposes.text('DateRelease', ea.STATE_GET).withDescription('Meter Date Release'),
-      exposes.numeric('Voltage', ea.STATE_GET).withUnit('V').withDescription('Voltage'),
-      exposes.numeric('Current', ea.STATE_GET).withUnit('A').withDescription('Current'),
-      exposes.numeric('Power', ea.STATE_GET).withUnit('kW').withDescription('Power'),
-      exposes.numeric('BatteryLife', ea.STATE_GET).withUnit('%').withDescription('Battery Life'),
-      exposes.numeric('Temperature', ea.STATE_GET).withUnit('°C').withDescription('Device temperature'),
+      exposes.text('model_name', ea.STATE_GET).withDescription('Meter Model Name'),
+      exposes.text('serial_number', ea.STATE_GET).withDescription('Meter Serial Number'),
+      exposes.text('date_release', ea.STATE_GET).withDescription('Meter Date Release'),
+      exposes.numeric('voltage', ea.STATE_GET).withUnit('V').withDescription('Voltage'),
+      exposes.numeric('current', ea.STATE_GET).withUnit('A').withDescription('Current'),
+      exposes.numeric('power', ea.STATE_GET).withUnit('kW').withDescription('Power'),
+      exposes.numeric('battery_life', ea.STATE_GET).withUnit('%').withDescription('Battery Life'),
+      exposes.numeric('temperature', ea.STATE_GET).withUnit('°C').withDescription('Device temperature'),
       exposes.numeric('device_address_preset', ea.STATE_SET).withDescription('Device Address'),
       exposes.enum('device_model_preset', ea.STATE_SET, switchDeviceModel).withDescription('Device Model'),
+      exposes.text('device_password_preset', ea.STATE_SET).withDescription('Meter Password'),
       exposes.numeric('device_measurement_preset', ea.STATE_SET).withDescription('Measurement Period').withValueMin(1).withValueMax(255),
       exposes.binary('tamper', ea.STATE, true, false).withDescription('Tamper'),
       exposes.binary('battery_low', ea.STATE, true, false).withDescription('Battery Low'),
