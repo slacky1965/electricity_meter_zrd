@@ -333,11 +333,11 @@ static void get_tariffs_data() {
 
     package_t *pkt = NULL;
 
-    uint64_t tariff;
-    uint64_t tariff_1;
-    uint64_t tariff_2;
-    uint64_t tariff_3;
-    uint64_t tariff_4;
+    uint64_t tariff   = 0;
+    uint64_t tariff_1 = 0;
+    uint64_t tariff_2 = 0;
+    uint64_t tariff_3 = 0;
+    uint64_t tariff_4 = 0;
 
     switch (mirtek_version) {
         case version_1:
