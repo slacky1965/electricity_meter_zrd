@@ -3,7 +3,8 @@
 
 typedef enum _command_t {
     cmd_open_channel         = 0x01,
-    cmd_tariffs_data         = 0x05,
+    cmd_tariffs_data_v1      = 0x05,
+    cmd_tariffs_data_v3      = 0x0405,
     cmd_read_configure       = 0x10,
     cmd_resource_battery     = 0x1e,
     cmd_volts_data           = 0x0129,   /* command 0x29, sub command 0x01 */
@@ -19,33 +20,11 @@ typedef enum _command_t {
 } command_t;
 
 typedef enum {
-    BOARD_TYPE_UNKNOWN = 0,
-    BOADR_TYPE1,
-    BOADR_TYPE2,
-    BOADR_TYPE3,
-} board_type_t;
-
-typedef enum {
-    BOARD_ID_01 = 0x01,     // begin board id of type1  //
-    BOARD_ID_02 = 0x02,
-    BOARD_ID_03 = 0x03,
-    BOARD_ID_04 = 0x04,
-    BOARD_ID_0C = 0x0C,
-    BOARD_ID_0D = 0x0D,
-    BOARD_ID_11 = 0x11,
-    BOARD_ID_12 = 0x12,     // end board id of type1    //
-    BOARD_ID_07 = 0x07,     // begin board id of type2  //
-    BOARD_ID_08 = 0x08,
-    BOARD_ID_0A = 0x0A,
-    BOARD_ID_0B = 0x0B,     // end board id of type2    //
-    BOARD_ID_09 = 0x09,     // begin board id of type3  //
-    BOARD_ID_0E = 0x0E,
-    BOARD_ID_0F = 0x0F,
-    BOARD_ID_10 = 0x10,
-    BOARD_ID_20 = 0x20,
-    BOARD_ID_21 = 0x21,
-    BOARD_ID_22 = 0x22      // end board id of type3    //
-} board_id_t;
+    version_unknown = 0,
+    version_1,
+    version_2,
+    version_3
+} mirtek_version_t;
 
 typedef struct __attribute__((packed)) _package_header_t {
     uint8_t  data_len   :5;     /* 0-4 bits - data lenght                               */
@@ -74,7 +53,7 @@ typedef struct __attribute__((packed)) _package_t {
     uint8_t  pkt_len;
 } package_t;
 
-typedef struct __attribute__((packed)) _pkt_tariffs_t {
+typedef struct __attribute__((packed)) {
     uint32_t sum_tariffs;
     uint8_t  byte_cfg;
     uint8_t  division_factor;
@@ -84,7 +63,20 @@ typedef struct __attribute__((packed)) _pkt_tariffs_t {
     uint32_t tariff_2;
     uint32_t tariff_3;
     uint32_t tariff_4;
-} pkt_tariffs_t;
+} pkt_tariffs_v1_t;
+
+typedef struct __attribute__((packed)) {
+    uint8_t  energy_type;
+    uint8_t  byte_cfg;
+    uint16_t div_volts;
+    uint16_t div_current;
+    uint32_t sum_tariffs;
+    uint32_t sum_tariffs_2;
+    uint32_t tariff_1;
+    uint32_t tariff_2;
+    uint32_t tariff_3;
+    uint32_t tariff_4;
+} pkt_tariffs_v3_t;
 
 typedef struct __attribute__((packed)) _pkt_amps_t {
     uint8_t  phase_num; /* number of phase    */
