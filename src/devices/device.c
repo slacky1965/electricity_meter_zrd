@@ -17,7 +17,7 @@ ev_timer_event_t *timerFaultMeasurementEvt = NULL;
 
 uint8_t device_model[DEVICE_MAX][32] = {
     {"No Device"},
-    {"KASKAD-1-MT"},
+    {"KASKAD-1-MT (MIRTEK)"},
     {"KASKAD-11-C1"},
     {"MERCURY-206"},
     {"ENERGOMERA-CE102M"},
@@ -53,6 +53,8 @@ uint8_t set_device_model(device_model_t model) {
 
     switch (model) {
         case DEVICE_KASKAD_1_MT: {
+            /* reset password when changing model */
+            dev_config.device_password.size = 0;
             measure_meter = measure_meter_kaskad_1_mt;
             baudrate = 9600;
             energy_divisor = 100;
@@ -65,12 +67,8 @@ uint8_t set_device_model(device_model_t model) {
             break;
         }
         case DEVICE_KASKAD_11: {
-            measure_meter = measure_meter_energomera_ce208by;
-            baudrate = 9600;
-            if (set_zcl_str(device_model[DEVICE_ENERGOMERA_CE208BY], name, DEVICE_NAME_LEN)) {
-                zcl_setAttrVal(APP_ENDPOINT_1, ZCL_CLUSTER_SE_METERING, ZCL_ATTRID_CUSTOM_DEVICE_MODEL, (uint8_t*)&name);
-            }
-            break;
+            /* reset password when changing model */
+            dev_config.device_password.size = 0;
             measure_meter = measure_meter_kaskad_11;
             baudrate = 2400;
             if (set_zcl_str(device_model[DEVICE_KASKAD_11], name, DEVICE_NAME_LEN)) {
@@ -118,6 +116,8 @@ uint8_t set_device_model(device_model_t model) {
             break;
         }
         case DEVICE_NARTIS_100: {
+            /* reset password when changing model */
+            dev_config.device_password.size = 0;
             nartis100_init();
             measure_meter = measure_meter_nartis_100;
             baudrate = 9600;
@@ -140,8 +140,6 @@ uint8_t set_device_model(device_model_t model) {
 
     if (dev_config.device_model != model) {
         dev_config.device_model = model;
-        /* reset password when changing model */
-        dev_config.device_password.size = 0;
         save = true;
         write_config();
 #if UART_PRINTF_MODE

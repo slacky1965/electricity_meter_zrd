@@ -75,6 +75,10 @@ static void set_command(command_t command) {
             request_pkt.data[1] = BOUNDARY;
             break;
         case cmd_tariffs_data_v3:
+        case cmd_instant_g00:
+        case cmd_instant_g10:
+        case cmd_instant_g11:
+        case cmd_instant_g12:
         case cmd_amps_data:
         case cmd_volts_data:
         case cmd_serial_number:
@@ -606,18 +610,18 @@ static void get_resbat_data() {
     }
 }
 
-static void get_info_data() {
-
-#if UART_PRINTF_MODE
-    printf("\r\nCommand get info\r\n");
-#endif
-
-    package_t *pkt = get_pkt_data(cmd_get_info);
-
-    if (pkt) {
-        printf("board id: %x\r\n", pkt->data[0]);
-    }
-}
+//static void get_info_data() {
+//
+//#if UART_PRINTF_MODE
+//    printf("\r\nCommand get info\r\n");
+//#endif
+//
+//    package_t *pkt = get_pkt_data(cmd_get_info);
+//
+//    if (pkt) {
+//        printf("board id: %x\r\n", pkt->data[0]);
+//    }
+//}
 
 static uint8_t get_cfg_data() {
 
@@ -644,6 +648,52 @@ static uint8_t get_cfg_data() {
     }
 
     return mirtek_version;
+}
+
+static void get_instant_data() {
+
+#if UART_PRINTF_MODE
+    printf("\r\nCommand get instant values\r\n");
+#endif
+
+    package_t *pkt = get_pkt_data(cmd_instant_g00);
+
+    if (pkt) {
+
+        pkt_instant_g00_t *instant = (pkt_instant_g00_t *)pkt->data;
+
+        zcl_setAttrVal(APP_ENDPOINT_1, ZCL_CLUSTER_MS_ELECTRICAL_MEASUREMENT, ZCL_ATTRID_RMS_VOLTAGE, (uint8_t*)&instant->voltage_a);
+
+#if UART_PRINTF_MODE && DEBUG_DEVICE_DATA
+        printf("phase: A, volts: %d\r\n", instant->voltage_a);
+#endif
+
+        uint32_t amps = from24to32(instant->current_a);
+
+        /* current has 2 bytes in the home assistant */
+        while (amps > 0xffff) amps /= 10;
+
+        uint16_t current = amps & 0xffff;
+
+        zcl_setAttrVal(APP_ENDPOINT_1, ZCL_CLUSTER_MS_ELECTRICAL_MEASUREMENT, ZCL_ATTRID_LINE_CURRENT, (uint8_t*)&current);
+
+
+#if UART_PRINTF_MODE && DEBUG_DEVICE_DATA
+        printf("phase: A, amps: %d\r\n", current);
+#endif
+
+        uint32_t power = from24to32(instant->active_power);
+
+        while (power > 0xffff) power /= 10;
+
+        uint16_t pwr = power & 0xffff;
+
+        zcl_setAttrVal(APP_ENDPOINT_1, ZCL_CLUSTER_MS_ELECTRICAL_MEASUREMENT, ZCL_ATTRID_APPARENT_POWER, (uint8_t*)&pwr);
+
+#if UART_PRINTF_MODE && DEBUG_DEVICE_DATA
+        printf("power: %d\r\n", pwr);
+#endif
+    }
 }
 
 void pkt_test(command_t command) {
@@ -675,11 +725,22 @@ uint8_t measure_meter_kaskad_1_mt() {
             get_date_release_data();
         }
 
-        get_tariffs_data();            /* get 4 tariffs        */
-        get_resbat_data();             /* get resource battery */
-        get_voltage_data();            /* get voltage net ~220 */
-        get_power_data();              /* get power            */
-        get_amps_data();               /* get amps             */
+        get_tariffs_data();             /* get 4 tariffs                */
+        get_resbat_data();              /* get resource battery         */
+
+        switch (mirtek_version) {
+            case version_1:
+                get_voltage_data();     /* get voltage net ~220         */
+                get_power_data();       /* get power                    */
+                get_amps_data();        /* get amps                     */
+                break;
+            case version_3:
+                get_instant_data();     /* get voltage, power, current  */
+                break;
+            default:
+                break;
+        }
+
 
         fault_measure_flag = false;
     } else {

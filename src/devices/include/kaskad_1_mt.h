@@ -8,6 +8,10 @@ typedef enum _command_t {
     cmd_read_configure       = 0x10,
     cmd_resource_battery     = 0x1e,
     cmd_volts_data           = 0x0129,   /* command 0x29, sub command 0x01 */
+    cmd_instant_g00          = 0x002b,
+    cmd_instant_g10          = 0x102b,
+    cmd_instant_g11          = 0x112b,
+    cmd_instant_g12          = 0x122b,
     cmd_amps_data            = 0x012c,
     cmd_power_data           = 0x2d,
     cmd_serial_number        = 0x010a,
@@ -93,6 +97,22 @@ typedef struct __attribute__((packed)) _pkt_power_t {
     uint8_t  byte_cfg;
     uint8_t  division_factor;
 } pkt_power_t;
+
+typedef struct __attribute__((packed)) {
+    uint8_t  group_num;
+    uint16_t voltage_factor;
+    uint16_t current_factor;
+    uint8_t  active_power[3];
+    uint8_t  reactive_power[3];
+    uint16_t freq;
+    uint16_t cos;
+    uint16_t voltage_a;
+    uint16_t voltage_b;
+    uint16_t voltage_c;
+    uint8_t  current_a[3];
+    uint8_t  current_b[3];
+    uint8_t  current_c[3];
+} pkt_instant_g00_t;
 
 typedef struct __attribute__((packed)) _pkt_read_cfg_t {
     uint8_t  divisor            :2; /* 0 - "00000000", 1 - "0000000.0", 2 - "000000.00", 3 - "00000.000"    */
