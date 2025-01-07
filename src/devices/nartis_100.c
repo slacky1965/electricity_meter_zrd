@@ -124,6 +124,12 @@ static request_t attr_descriptor_power = {
         .attribute = {0x02, 0x00}
 };
 
+static request_t attr_descriptor_current = {
+        .class  =    {0x00, 0x03},
+        .obis   =    {0x01, 0x00, 0x0b, 0x07, 0x00, 0xff},   /* 1.0.11.7.0.255  */
+        .attribute = {0x02, 0x00}
+};
+
 static request_t attr_descriptor_time = {
         .class  =    {0x00, 0x08},
         .obis   =    {0x00, 0x00, 0x01, 0x00, 0x00, 0xff},   /* 0.0.1.0.0.255  */
@@ -965,11 +971,11 @@ static void get_current_data() {
 #endif
 
     uint16_t current = 0;
-    type_digit_t *digit_current = (type_digit_t*)get_request_data(&attr_descriptor_power);
+    type_digit_t *digit_current = (type_digit_t*)get_request_data(&attr_descriptor_current);
 
     if (digit_current) {
 
-        if (digit_current->type == TYPE_UNSIGNED_32) {
+        if (digit_current->type == TYPE_SIGNED_32 || digit_current->type == TYPE_UNSIGNED_32) {
 
             current = reverse32(digit_current->value) & 0xffff;
 
