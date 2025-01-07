@@ -14,7 +14,7 @@
 				</extensions>
 			</storageModule>
 			<storageModule moduleId="cdtBuildSystem" version="4.0.0">
-				<configuration artifactName="${ProjName}" buildArtefactType="org.eclipse.cdt.build.core.buildArtefactType.exe" buildProperties="org.eclipse.cdt.build.core.buildArtefactType=org.eclipse.cdt.build.core.buildArtefactType.exe,org.eclipse.cdt.build.core.buildType=org.eclipse.cdt.build.core.buildType.debug" cleanCommand="rm -rf" description="" id="cdt.managedbuild.config.gnu.cross.exe.debug.1437850565" name="Debug" optionalBuildProperties="org.eclipse.cdt.docker.launcher.containerbuild.property.dockerdpath=,org.eclipse.cdt.docker.launcher.containerbuild.property.selectedvolumes=,org.eclipse.cdt.docker.launcher.containerbuild.property.volumes=" parent="cdt.managedbuild.config.gnu.cross.exe.debug">
+				<configuration artifactName="${ProjName}" buildArtefactType="org.eclipse.cdt.build.core.buildArtefactType.exe" buildProperties="org.eclipse.cdt.build.core.buildArtefactType=org.eclipse.cdt.build.core.buildArtefactType.exe,org.eclipse.cdt.build.core.buildType=org.eclipse.cdt.build.core.buildType.debug" cleanCommand="rm -rf" description="" id="cdt.managedbuild.config.gnu.cross.exe.debug.1437850565" name="Debug" optionalBuildProperties="org.eclipse.cdt.docker.launcher.containerbuild.property.dockerdpath=,org.eclipse.cdt.docker.launcher.containerbuild.property.volumes=,org.eclipse.cdt.docker.launcher.containerbuild.property.selectedvolumes=" parent="cdt.managedbuild.config.gnu.cross.exe.debug">
 					<folderInfo id="cdt.managedbuild.config.gnu.cross.exe.debug.1437850565." name="/" resourcePath="">
 						<toolChain id="cdt.managedbuild.toolchain.gnu.cross.exe.debug.1932223348" name="Cross GCC" superClass="cdt.managedbuild.toolchain.gnu.cross.exe.debug">
 							<option id="cdt.managedbuild.option.gnu.cross.prefix.1662665615" name="Prefix" superClass="cdt.managedbuild.option.gnu.cross.prefix" value="tc32-elf-" valueType="string"/>
@@ -121,23 +121,24 @@
 	<storageModule moduleId="org.eclipse.cdt.internal.ui.text.commentOwnerProjectMappings"/>
 	<storageModule moduleId="org.eclipse.cdt.make.core.buildtargets">
 		<buildTargets>
-			<target name="3. Firmware" path="" targetID="org.eclipse.cdt.build.MakeTargetBuilder">
+			<target name="4. Firmware 512K" path="" targetID="org.eclipse.cdt.build.MakeTargetBuilder">
 				<buildCommand>make</buildCommand>
+				<buildArguments/>
 				<buildTarget>all</buildTarget>
 				<stopOnError>true</stopOnError>
-				<useDefaultCommand>true</useDefaultCommand>
+				<useDefaultCommand>false</useDefaultCommand>
 				<runAllBuilders>true</runAllBuilders>
 			</target>
 			<target name="clean" path="" targetID="org.eclipse.cdt.build.MakeTargetBuilder">
 				<buildCommand>make</buildCommand>
-				<buildArguments/>
 				<buildTarget>clean</buildTarget>
 				<stopOnError>true</stopOnError>
 				<useDefaultCommand>true</useDefaultCommand>
 				<runAllBuilders>true</runAllBuilders>
 			</target>
-			<target name="4. Flash firmware" path="" targetID="org.eclipse.cdt.build.MakeTargetBuilder">
+			<target name="6. Flash firmware" path="" targetID="org.eclipse.cdt.build.MakeTargetBuilder">
 				<buildCommand>make</buildCommand>
+				<buildArguments/>
 				<buildTarget>flash</buildTarget>
 				<stopOnError>true</stopOnError>
 				<useDefaultCommand>true</useDefaultCommand>
@@ -145,6 +146,7 @@
 			</target>
 			<target name="erase-flash" path="" targetID="org.eclipse.cdt.build.MakeTargetBuilder">
 				<buildCommand>make</buildCommand>
+				<buildArguments/>
 				<buildTarget>erase-flash</buildTarget>
 				<stopOnError>true</stopOnError>
 				<useDefaultCommand>true</useDefaultCommand>
@@ -152,13 +154,12 @@
 			</target>
 			<target name="reset" path="" targetID="org.eclipse.cdt.build.MakeTargetBuilder">
 				<buildCommand>make</buildCommand>
-				<buildArguments/>
 				<buildTarget>reset</buildTarget>
 				<stopOnError>true</stopOnError>
 				<useDefaultCommand>true</useDefaultCommand>
 				<runAllBuilders>true</runAllBuilders>
 			</target>
-			<target name="1. bootloader" path="" targetID="org.eclipse.cdt.build.MakeTargetBuilder">
+			<target name="1. bootloader 512K" path="" targetID="org.eclipse.cdt.build.MakeTargetBuilder">
 				<buildCommand>make</buildCommand>
 				<buildArguments>-f bootloader.makefile</buildArguments>
 				<buildTarget>bootloader</buildTarget>
@@ -166,7 +167,7 @@
 				<useDefaultCommand>false</useDefaultCommand>
 				<runAllBuilders>true</runAllBuilders>
 			</target>
-			<target name="2. Flash bootloader" path="" targetID="org.eclipse.cdt.build.MakeTargetBuilder">
+			<target name="3. Flash bootloader" path="" targetID="org.eclipse.cdt.build.MakeTargetBuilder">
 				<buildCommand>make</buildCommand>
 				<buildArguments>-f bootloader.makefile</buildArguments>
 				<buildTarget>bootloader-flash</buildTarget>
@@ -176,10 +177,25 @@
 			</target>
 			<target name="erase-flash-fimware" path="" targetID="org.eclipse.cdt.build.MakeTargetBuilder">
 				<buildCommand>make</buildCommand>
-				<buildArguments/>
 				<buildTarget>erase-flash-fimware</buildTarget>
 				<stopOnError>true</stopOnError>
 				<useDefaultCommand>true</useDefaultCommand>
+				<runAllBuilders>true</runAllBuilders>
+			</target>
+			<target name="2. bootloader 1M" path="" targetID="org.eclipse.cdt.build.MakeTargetBuilder">
+				<buildCommand>make</buildCommand>
+				<buildArguments>-f bootloader.makefile CHIP_TYPE=TLSR_8258_1M</buildArguments>
+				<buildTarget>bootloader</buildTarget>
+				<stopOnError>true</stopOnError>
+				<useDefaultCommand>false</useDefaultCommand>
+				<runAllBuilders>true</runAllBuilders>
+			</target>
+			<target name="5. Firmware 1M" path="" targetID="org.eclipse.cdt.build.MakeTargetBuilder">
+				<buildCommand>make</buildCommand>
+				<buildArguments/>
+				<buildTarget>all</buildTarget>
+				<stopOnError>true</stopOnError>
+				<useDefaultCommand>false</useDefaultCommand>
 				<runAllBuilders>true</runAllBuilders>
 			</target>
 		</buildTargets>

@@ -34,7 +34,15 @@
 		#define CHIP_TYPE					TLSR_8267
 	#endif
 #elif defined(MCU_CORE_8258)
+#ifndef CHIP_TYPE
 		#define CHIP_TYPE					TLSR_8258_512K//TLSR_8258_1M
+#endif
+//#if (CHIP_TYPE == TLSR_8258_512K)
+//#error TLSR_8258_512K
+//#endif
+//#if (CHIP_TYPE == TLSR_8258_1M)
+//#error TLSR_8258_1M
+//#endif
 #elif defined(MCU_CORE_8278)
 		#define CHIP_TYPE					TLSR_8278
 #elif defined(MCU_CORE_B91)

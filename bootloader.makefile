@@ -4,6 +4,8 @@ PROJECT_NAME := bootloader
 # Set the serial port number for downloading the firmware
 DOWNLOAD_PORT := COM3
 
+CHIP_TYPE := TLSR_8258_512K
+
 COMPILE_OS = $(shell uname -o)
 LINUX_OS = GNU/Linux
 
@@ -11,6 +13,16 @@ ifeq ($(COMPILE_OS),$(LINUX_OS))
 	COMPILE_PREFIX = /opt/tc32/bin/tc32
 else
 	COMPILE_PREFIX = C:/TelinkSDK/opt/tc32/bin/tc32
+endif
+
+ifeq ($(CHIP_TYPE),TLSR_8258_512K)
+	PFX_NAME = 512K
+else
+	ifeq ($(CHIP_TYPE),TLSR_8258_1M)
+		PFX_NAME = 1M
+	else
+		PFX_NAME = UNKNOWN
+	endif
 endif
 
 AS      = $(COMPILE_PREFIX)-elf-as
@@ -30,6 +42,7 @@ BOOT_FLAG = -DMCU_CORE_8258 -DMCU_STARTUP_8258
 SDK_PATH := ./tl_zigbee_sdk
 SRC_PATH := ./src
 OUT_PATH := ./out
+BIN_PATH := ./bin
 MAKE_INCLUDES := ./make
 TOOLS_PATH := ./tools
 
@@ -65,6 +78,7 @@ GCC_FLAGS := \
 GCC_FLAGS += \
 $(DEVICE_TYPE) \
 $(MCU_TYPE) \
+-DCHIP_TYPE=$(CHIP_TYPE) \
 -D__PROJECT_TL_BOOT_LOADER__=1
 
 OBJ_SRCS := 
@@ -126,6 +140,7 @@ $(BIN_FILE): $(ELF_FILE)
 	@echo 'Create Flash image (binary format)'
 	@$(OBJCOPY) -v -O binary $(ELF_FILE)  $(BIN_FILE)
 	@python3 $(TL_Check) $(BIN_FILE)
+	@cp $(BIN_FILE) $(BIN_PATH)/$(PROJECT_NAME)_$(PFX_NAME).bin
 	@echo 'Finished building: $@'
 	@echo ' '
 
