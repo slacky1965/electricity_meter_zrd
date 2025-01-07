@@ -16,9 +16,13 @@
 #define STUFF_55    0x11
 #define STUFF_73    0x22
 
-static package_t request_pkt;
-static package_t response_pkt;
-static uint8_t   package_buff[PKT_BUFF_MAX_LEN];
+static package_t    request_pkt;
+static package_t    response_pkt;
+static uint8_t      package_buff[PKT_BUFF_MAX_LEN];
+static mirtek_version_t mirtek_version = version_unknown;
+static uint8_t serial_number[SE_ATTR_SN_SIZE+1] = {0};
+static uint8_t date_release[DATA_MAX_LEN+2] = {0};
+
 
 static uint8_t checksum(const uint8_t *src_buffer, uint8_t len) {
   // skip 73 55 header (and 55 footer is beyond checksum anyway)
@@ -50,11 +54,17 @@ static void set_command(command_t command) {
     request_pkt.header.address_to = dev_config.device_address; // = 20109;
     request_pkt.header.address_from = PROG_ADDR;
     request_pkt.header.command = command & 0xff;
-    request_pkt.header.password_status = PASSWORD;
+    if (dev_config.device_password.size != 0) {
+        request_pkt.header.password_status = atoi(dev_config.device_password.size, dev_config.device_password.data) & 0xffffffff;
+    } else {
+        request_pkt.header.password_status = PASSWORD;
+    }
+
+    printf("password: %d\r\n", request_pkt.header.password_status);
 
     switch (command) {
         case cmd_open_channel:
-        case cmd_tariffs_data:
+        case cmd_tariffs_data_v1:
         case cmd_power_data:
         case cmd_read_configure:
         case cmd_get_info:
@@ -64,6 +74,11 @@ static void set_command(command_t command) {
             request_pkt.data[0] = checksum((uint8_t*)&request_pkt, request_pkt.pkt_len);
             request_pkt.data[1] = BOUNDARY;
             break;
+        case cmd_tariffs_data_v3:
+        case cmd_instant_g00:
+        case cmd_instant_g10:
+        case cmd_instant_g11:
+        case cmd_instant_g12:
         case cmd_amps_data:
         case cmd_volts_data:
         case cmd_serial_number:
@@ -320,64 +335,101 @@ static void get_tariffs_data() {
     printf("\r\nCommand get tariffs\r\n");
 #endif
 
-    package_t *pkt = get_pkt_data(cmd_tariffs_data);
+    package_t *pkt = NULL;
+
+    uint64_t tariff   = 0;
+    uint64_t tariff_1 = 0;
+    uint64_t tariff_2 = 0;
+    uint64_t tariff_3 = 0;
+    uint64_t tariff_4 = 0;
+
+    switch (mirtek_version) {
+        case version_1:
+            pkt = get_pkt_data(cmd_tariffs_data_v1);
+            break;
+        case version_3:
+            pkt = get_pkt_data(cmd_tariffs_data_v3);
+            break;
+        default:
+            break;
+    }
 
     if (pkt) {
 
-        pkt_tariffs_t *tariffs_response = (pkt_tariffs_t*)pkt->data;
+        pkt_tariffs_v1_t *tariffs_response_v1 = (pkt_tariffs_v1_t*)pkt->data;
+        pkt_tariffs_v3_t *tariffs_response_v3 = (pkt_tariffs_v3_t*)pkt->data;
 
-        uint64_t tariff = tariffs_response->tariff_1 & 0xffffffffffff;
+        switch (mirtek_version) {
+            case version_1:
+                tariff_1 = tariffs_response_v1->tariff_1 & 0xffffffffffff;
+                tariff_2 = tariffs_response_v1->tariff_2 & 0xffffffffffff;
+                tariff_3 = tariffs_response_v1->tariff_3 & 0xffffffffffff;
+                tariff_4 = tariffs_response_v1->tariff_4 & 0xffffffffffff;
+                break;
+            case version_3:
+                tariff_1 = tariffs_response_v3->tariff_1 & 0xffffffffffff;
+                tariff_2 = tariffs_response_v3->tariff_2 & 0xffffffffffff;
+                tariff_3 = tariffs_response_v3->tariff_3 & 0xffffffffffff;
+                tariff_4 = tariffs_response_v3->tariff_4 & 0xffffffffffff;
+                break;
+            default:
+                break;
+        }
+
+
+
+
 //        uint64_t last_tariff;
 //
 //        zcl_getAttrVal(APP_ENDPOINT_1, ZCL_CLUSTER_SE_METERING, ZCL_ATTRID_CURRENT_TIER_1_SUMMATION_DELIVERD, &attr_len, (uint8_t*)&attr_data);
 //        last_tariff = fromPtoInteger(attr_len, attr_data);
 //
 //        if (tariff > last_tariff) {
-            zcl_setAttrVal(APP_ENDPOINT_1, ZCL_CLUSTER_SE_METERING, ZCL_ATTRID_CURRENT_TIER_1_SUMMATION_DELIVERD, (uint8_t*)&tariff);
+            zcl_setAttrVal(APP_ENDPOINT_1, ZCL_CLUSTER_SE_METERING, ZCL_ATTRID_CURRENT_TIER_1_SUMMATION_DELIVERD, (uint8_t*)&tariff_1);
 //        }
 
 #if UART_PRINTF_MODE && DEBUG_DEVICE_DATA
-        printf("tariff1: %d\r\n", tariff);
+        printf("tariff1: %d\r\n", tariff_1);
 #endif
 
-        tariff = tariffs_response->tariff_2 & 0xffffffffffff;
 
 //        zcl_getAttrVal(APP_ENDPOINT_1, ZCL_CLUSTER_SE_METERING, ZCL_ATTRID_CURRENT_TIER_2_SUMMATION_DELIVERD, &attr_len, (uint8_t*)&attr_data);
 //        last_tariff = fromPtoInteger(attr_len, attr_data);
 //
 //        if (tariff > last_tariff) {
-            zcl_setAttrVal(APP_ENDPOINT_1, ZCL_CLUSTER_SE_METERING, ZCL_ATTRID_CURRENT_TIER_2_SUMMATION_DELIVERD, (uint8_t*)&tariff);
+            zcl_setAttrVal(APP_ENDPOINT_1, ZCL_CLUSTER_SE_METERING, ZCL_ATTRID_CURRENT_TIER_2_SUMMATION_DELIVERD, (uint8_t*)&tariff_2);
 //        }
 
 #if UART_PRINTF_MODE && DEBUG_DEVICE_DATA
-        printf("tariff2: %d\r\n", tariff);
+        printf("tariff2: %d\r\n", tariff_2);
 #endif
 
-        tariff = tariffs_response->tariff_3 & 0xffffffffffff;
 
 //        zcl_getAttrVal(APP_ENDPOINT_1, ZCL_CLUSTER_SE_METERING, ZCL_ATTRID_CURRENT_TIER_3_SUMMATION_DELIVERD, &attr_len, (uint8_t*)&attr_data);
 //        last_tariff = fromPtoInteger(attr_len, attr_data);
 //
 //        if (tariff > last_tariff) {
-            zcl_setAttrVal(APP_ENDPOINT_1, ZCL_CLUSTER_SE_METERING, ZCL_ATTRID_CURRENT_TIER_3_SUMMATION_DELIVERD, (uint8_t*)&tariff);
+            zcl_setAttrVal(APP_ENDPOINT_1, ZCL_CLUSTER_SE_METERING, ZCL_ATTRID_CURRENT_TIER_3_SUMMATION_DELIVERD, (uint8_t*)&tariff_3);
 //        }
 
 #if UART_PRINTF_MODE && DEBUG_DEVICE_DATA
-        printf("tariff3: %d\r\n", tariff);
+        printf("tariff3: %d\r\n", tariff_3);
 #endif
 
-        tariff = tariffs_response->tariff_4 & 0xffffffffffff;
 
 //        zcl_getAttrVal(APP_ENDPOINT_1, ZCL_CLUSTER_SE_METERING, ZCL_ATTRID_CURRENT_TIER_4_SUMMATION_DELIVERD, &attr_len, (uint8_t*)&attr_data);
 //        last_tariff = fromPtoInteger(attr_len, attr_data);
 //
 //        if (tariff > last_tariff) {
-            zcl_setAttrVal(APP_ENDPOINT_1, ZCL_CLUSTER_SE_METERING, ZCL_ATTRID_CURRENT_TIER_4_SUMMATION_DELIVERD, (uint8_t*)&tariff);
+            zcl_setAttrVal(APP_ENDPOINT_1, ZCL_CLUSTER_SE_METERING, ZCL_ATTRID_CURRENT_TIER_4_SUMMATION_DELIVERD, (uint8_t*)&tariff_4);
 //        }
 
 #if UART_PRINTF_MODE && DEBUG_DEVICE_DATA
-        printf("tariff4: %d\r\n", tariff);
+        printf("tariff4: %d\r\n", tariff_4);
 #endif
+
+        tariff = tariff_1 + tariff_2 + tariff_3 + tariff_4;
+        zcl_setAttrVal(APP_ENDPOINT_1, ZCL_CLUSTER_SE_METERING, ZCL_ATTRID_CURRENT_SUMMATION_DELIVERD, (uint8_t*)&tariff);
 
     }
 }
@@ -496,8 +548,6 @@ void get_serial_number_data() {
 
         pkt_data31_t *serial_number_response = (pkt_data31_t*)pkt;
 
-        uint8_t serial_number[SE_ATTR_SN_SIZE+1] = {0};
-
         if (set_zcl_str(serial_number_response->data, serial_number, SE_ATTR_SN_SIZE)) {
             zcl_setAttrVal(APP_ENDPOINT_1, ZCL_CLUSTER_SE_METERING, ZCL_ATTRID_METER_SERIAL_NUMBER, (uint8_t*)&serial_number);
 #if UART_PRINTF_MODE && DEBUG_DEVICE_DATA
@@ -518,8 +568,6 @@ void get_date_release_data() {
     if (pkt) {
 
         pkt_data31_t *date_release_response = (pkt_data31_t*)pkt;
-
-        uint8_t date_release[DATA_MAX_LEN+2] = {0};
 
         if (set_zcl_str(date_release_response->data, date_release, DATA_MAX_LEN+1)) {
             zcl_setAttrVal(APP_ENDPOINT_1, ZCL_CLUSTER_SE_METERING, ZCL_ATTRID_CUSTOM_DATE_RELEASE, (uint8_t*)&date_release);
@@ -562,7 +610,91 @@ static void get_resbat_data() {
     }
 }
 
+//static void get_info_data() {
+//
+//#if UART_PRINTF_MODE
+//    printf("\r\nCommand get info\r\n");
+//#endif
+//
+//    package_t *pkt = get_pkt_data(cmd_get_info);
+//
+//    if (pkt) {
+//        printf("board id: %x\r\n", pkt->data[0]);
+//    }
+//}
 
+static uint8_t get_cfg_data() {
+
+#if UART_PRINTF_MODE
+    printf("\r\nCommand get configuration\r\n");
+#endif
+
+    package_t *pkt = get_pkt_data(cmd_read_configure);
+
+    if (pkt) {
+        if (pkt->header.data_len == 7) {
+#if UART_PRINTF_MODE
+            printf("\r\nMirtek protocol v1\r\n");
+#endif
+            mirtek_version = version_1;
+        } else {
+#if UART_PRINTF_MODE
+            printf("\r\nMirtek protocol v3\r\n");
+#endif
+            mirtek_version = version_3;
+            uint16_t power_divisor = 1000;
+            zcl_setAttrVal(APP_ENDPOINT_1, ZCL_CLUSTER_MS_ELECTRICAL_MEASUREMENT, ZCL_ATTRID_AC_POWER_DIVISOR, (uint8_t*)&power_divisor);
+        }
+    }
+
+    return mirtek_version;
+}
+
+static void get_instant_data() {
+
+#if UART_PRINTF_MODE
+    printf("\r\nCommand get instant values\r\n");
+#endif
+
+    package_t *pkt = get_pkt_data(cmd_instant_g00);
+
+    if (pkt) {
+
+        pkt_instant_g00_t *instant = (pkt_instant_g00_t *)pkt->data;
+
+        zcl_setAttrVal(APP_ENDPOINT_1, ZCL_CLUSTER_MS_ELECTRICAL_MEASUREMENT, ZCL_ATTRID_RMS_VOLTAGE, (uint8_t*)&instant->voltage_a);
+
+#if UART_PRINTF_MODE && DEBUG_DEVICE_DATA
+        printf("phase: A, volts: %d\r\n", instant->voltage_a);
+#endif
+
+        uint32_t amps = from24to32(instant->current_a);
+
+        /* current has 2 bytes in the home assistant */
+        while (amps > 0xffff) amps /= 10;
+
+        uint16_t current = amps & 0xffff;
+
+        zcl_setAttrVal(APP_ENDPOINT_1, ZCL_CLUSTER_MS_ELECTRICAL_MEASUREMENT, ZCL_ATTRID_LINE_CURRENT, (uint8_t*)&current);
+
+
+#if UART_PRINTF_MODE && DEBUG_DEVICE_DATA
+        printf("phase: A, amps: %d\r\n", current);
+#endif
+
+        uint32_t power = from24to32(instant->active_power);
+
+        while (power > 0xffff) power /= 10;
+
+        uint16_t pwr = power & 0xffff;
+
+        zcl_setAttrVal(APP_ENDPOINT_1, ZCL_CLUSTER_MS_ELECTRICAL_MEASUREMENT, ZCL_ATTRID_APPARENT_POWER, (uint8_t*)&pwr);
+
+#if UART_PRINTF_MODE && DEBUG_DEVICE_DATA
+        printf("power: %d\r\n", pwr);
+#endif
+    }
+}
 
 void pkt_test(command_t command) {
     package_t *pkt;
@@ -579,16 +711,36 @@ uint8_t measure_meter_kaskad_1_mt() {
     uint8_t ret = ping_start_data();        /* ping to device       */
 
     if (ret) {
+//        get_info_data();
+        get_cfg_data();
         if (new_start) {               /* after reset          */
-            get_serial_number_data();
-            get_date_release_data();
+            serial_number[0] = 0;
+            date_release[0] = 0;
             new_start = false;
         }
-        get_tariffs_data();            /* get 4 tariffs        */
-        get_resbat_data();             /* get resource battery */
-        get_voltage_data();            /* get voltage net ~220 */
-        get_power_data();              /* get power            */
-        get_amps_data();               /* get amps             */
+        if (serial_number[0] == 0) {
+            get_serial_number_data();
+        }
+        if (date_release[0] == 0) {
+            get_date_release_data();
+        }
+
+        get_tariffs_data();             /* get 4 tariffs                */
+        get_resbat_data();              /* get resource battery         */
+
+        switch (mirtek_version) {
+            case version_1:
+                get_voltage_data();     /* get voltage net ~220         */
+                get_power_data();       /* get power                    */
+                get_amps_data();        /* get amps                     */
+                break;
+            case version_3:
+                get_instant_data();     /* get voltage, power, current  */
+                break;
+            default:
+                break;
+        }
+
 
         fault_measure_flag = false;
     } else {

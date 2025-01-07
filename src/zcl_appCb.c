@@ -184,7 +184,7 @@ static void app_zclWriteReqCmd(uint16_t clusterId, zclWriteCmd_t *pWriteReqCmd)
     if (clusterId == ZCL_CLUSTER_SE_METERING) {
         for (uint8_t i = 0; i < numAttr; i++) {
             if (attr[i].attrID == ZCL_ATTRID_CUSTOM_DEVICE_ADDRESS && attr[i].dataType == ZCL_DATA_TYPE_UINT32) {
-                uint32_t device_address = BUILD_U32(attr->attrData[0], attr->attrData[1], attr->attrData[2], attr->attrData[3]);
+                uint32_t device_address = BUILD_U32(attr[i].attrData[0], attr[i].attrData[1], attr[i].attrData[2], attr[i].attrData[3]);
                 if (dev_config.device_address != device_address) {
                     dev_config.device_address = device_address;
                     write_config();
@@ -197,6 +197,27 @@ static void app_zclWriteReqCmd(uint16_t clusterId, zclWriteCmd_t *pWriteReqCmd)
                 device_model_t model = *attr[i].attrData;
                 set_device_model(model);
                 zcl_setAttrVal(APP_ENDPOINT_1, ZCL_CLUSTER_SE_METERING, ZCL_ATTRID_CUSTOM_DEVICE_MANUFACTURER, (uint8_t*)&model);
+            } else if (attr[i].attrID == ZCL_ATTRID_CUSTOM_DEVICE_PASSWORD && attr[i].dataType == ZCL_DATA_TYPE_OCTET_STR) {
+                dev_config.device_password.size = attr[i].attrData[0];
+                memset(dev_config.device_password.data, 0, sizeof(dev_config.device_password.data));
+                memcpy(dev_config.device_password.data, attr[i].attrData+1, attr[i].attrData[0]);
+                switch (dev_config.device_model) {
+                    case DEVICE_NARTIS_100:
+                        nartis100_init();
+                        break;
+                    case DEVICE_KASKAD_1_MT:
+                        if (dev_config.device_password.size > 8) {
+                            dev_config.device_password.size = 8;
+                        }
+                        break;
+                    default:
+                        break;
+                }
+                write_config();
+#if UART_PRINTF_MODE // && DEBUG_LEVEL
+                printf("New device password: %s\r\n", print_str_zcl((uint8_t*)&dev_config.device_password));
+#endif
+                zcl_setAttrVal(APP_ENDPOINT_1, ZCL_CLUSTER_SE_METERING, ZCL_ATTRID_CUSTOM_DEVICE_PASSWORD, (uint8_t*)&dev_config.device_password);
             } else if (attr[i].attrID == ZCL_ATTRID_CUSTOM_MEASUREMENT_PERIOD && attr[i].dataType == ZCL_DATA_TYPE_UINT8) {
                 uint8_t period_in_min = *attr[i].attrData;
                 if (period_in_min == 0) period_in_min = 1;

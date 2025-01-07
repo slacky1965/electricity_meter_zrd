@@ -3,10 +3,15 @@
 
 typedef enum _command_t {
     cmd_open_channel         = 0x01,
-    cmd_tariffs_data         = 0x05,
+    cmd_tariffs_data_v1      = 0x05,
+    cmd_tariffs_data_v3      = 0x0405,
     cmd_read_configure       = 0x10,
     cmd_resource_battery     = 0x1e,
     cmd_volts_data           = 0x0129,   /* command 0x29, sub command 0x01 */
+    cmd_instant_g00          = 0x002b,
+    cmd_instant_g10          = 0x102b,
+    cmd_instant_g11          = 0x112b,
+    cmd_instant_g12          = 0x122b,
     cmd_amps_data            = 0x012c,
     cmd_power_data           = 0x2d,
     cmd_serial_number        = 0x010a,
@@ -17,6 +22,13 @@ typedef enum _command_t {
     cmd_get_info             = 0x30,
     cmd_test_error           = 0x60
 } command_t;
+
+typedef enum {
+    version_unknown = 0,
+    version_1,
+    version_2,
+    version_3
+} mirtek_version_t;
 
 typedef struct __attribute__((packed)) _package_header_t {
     uint8_t  data_len   :5;     /* 0-4 bits - data lenght                               */
@@ -45,7 +57,7 @@ typedef struct __attribute__((packed)) _package_t {
     uint8_t  pkt_len;
 } package_t;
 
-typedef struct __attribute__((packed)) _pkt_tariffs_t {
+typedef struct __attribute__((packed)) {
     uint32_t sum_tariffs;
     uint8_t  byte_cfg;
     uint8_t  division_factor;
@@ -55,7 +67,20 @@ typedef struct __attribute__((packed)) _pkt_tariffs_t {
     uint32_t tariff_2;
     uint32_t tariff_3;
     uint32_t tariff_4;
-} pkt_tariffs_t;
+} pkt_tariffs_v1_t;
+
+typedef struct __attribute__((packed)) {
+    uint8_t  energy_type;
+    uint8_t  byte_cfg;
+    uint16_t div_volts;
+    uint16_t div_current;
+    uint32_t sum_tariffs;
+    uint32_t sum_tariffs_2;
+    uint32_t tariff_1;
+    uint32_t tariff_2;
+    uint32_t tariff_3;
+    uint32_t tariff_4;
+} pkt_tariffs_v3_t;
 
 typedef struct __attribute__((packed)) _pkt_amps_t {
     uint8_t  phase_num; /* number of phase    */
@@ -72,6 +97,22 @@ typedef struct __attribute__((packed)) _pkt_power_t {
     uint8_t  byte_cfg;
     uint8_t  division_factor;
 } pkt_power_t;
+
+typedef struct __attribute__((packed)) {
+    uint8_t  group_num;
+    uint16_t voltage_factor;
+    uint16_t current_factor;
+    uint8_t  active_power[3];
+    uint8_t  reactive_power[3];
+    uint16_t freq;
+    uint16_t cos;
+    uint16_t voltage_a;
+    uint16_t voltage_b;
+    uint16_t voltage_c;
+    uint8_t  current_a[3];
+    uint8_t  current_b[3];
+    uint8_t  current_c[3];
+} pkt_instant_g00_t;
 
 typedef struct __attribute__((packed)) _pkt_read_cfg_t {
     uint8_t  divisor            :2; /* 0 - "00000000", 1 - "0000000.0", 2 - "000000.00", 3 - "00000.000"    */

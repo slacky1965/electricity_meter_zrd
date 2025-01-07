@@ -10,6 +10,7 @@
 #include "nartis_100.h"
 
 #define PASSWORD        "111"
+//#define PASSWORD        "12345678"
 #define CLIENT_ADDRESS  0x20
 #define PHY_DEVICE      0x10
 #define LOGICAL_DEVICE  0x01
@@ -45,6 +46,11 @@ static uint16_t release_year;
 static uint8_t present_month;
 static uint16_t present_year;
 
+static uint64_t tariff_summ;
+
+static uint8_t serial_number[SE_ATTR_SN_SIZE+1] = {0};
+static uint8_t date_release[DATA_MAX_LEN+2] = {0};
+
 
 static request_t attr_descriptor_serial_number = {
         .class =     {0x00, 0x01},
@@ -58,11 +64,79 @@ static request_t attr_descriptor_date_release = {
         .attribute = {0x02, 0x00}
 };
 
-static request_t attr_descriptor_list = {
-        .class  =    {0x00, 0x07},
-        .obis   =    {0x01, 0x00, 0x5e, 0x07, 0x00, 0xff},   /* 1.0.94.7.0.255   */
+static request_t attr_descriptor_tariff1AP = {
+        .class  =    {0x00, 0x03},
+        .obis   =    {0x01, 0x00, 0x01, 0x08, 0x01, 0xff},   /* 1.0.1.8.1.255   */
         .attribute = {0x02, 0x00}
 };
+
+static request_t attr_descriptor_tariff1AM = {
+        .class  =    {0x00, 0x03},
+        .obis   =    {0x01, 0x00, 0x02, 0x08, 0x01, 0xff},   /* 1.0.2.8.1.255   */
+        .attribute = {0x02, 0x00}
+};
+
+static request_t attr_descriptor_tariff2AP = {
+        .class  =    {0x00, 0x03},
+        .obis   =    {0x01, 0x00, 0x01, 0x08, 0x02, 0xff},   /* 1.0.1.8.2.255   */
+        .attribute = {0x02, 0x00}
+};
+
+static request_t attr_descriptor_tariff2AM = {
+        .class  =    {0x00, 0x03},
+        .obis   =    {0x01, 0x00, 0x02, 0x08, 0x02, 0xff},   /* 1.0.2.8.2.255   */
+        .attribute = {0x02, 0x00}
+};
+
+static request_t attr_descriptor_tariff3AP = {
+        .class  =    {0x00, 0x03},
+        .obis   =    {0x01, 0x00, 0x01, 0x08, 0x03, 0xff},   /* 1.0.1.8.3.255   */
+        .attribute = {0x02, 0x00}
+};
+
+static request_t attr_descriptor_tariff3AM = {
+        .class  =    {0x00, 0x03},
+        .obis   =    {0x01, 0x00, 0x02, 0x08, 0x03, 0xff},   /* 1.0.2.8.3.255   */
+        .attribute = {0x02, 0x00}
+};
+
+static request_t attr_descriptor_tariff4AP = {
+        .class  =    {0x00, 0x03},
+        .obis   =    {0x01, 0x00, 0x01, 0x08, 0x04, 0xff},   /* 1.0.1.8.4.255   */
+        .attribute = {0x02, 0x00}
+};
+
+static request_t attr_descriptor_tariff4AM = {
+        .class  =    {0x00, 0x03},
+        .obis   =    {0x01, 0x00, 0x02, 0x08, 0x04, 0xff},   /* 1.0.2.8.4.255   */
+        .attribute = {0x02, 0x00}
+};
+
+static request_t attr_descriptor_voltage = {
+        .class  =    {0x00, 0x03},
+        .obis   =    {0x01, 0x00, 0x0c, 0x07, 0x00, 0xff},   /* 1.0.12.7.0.255  */
+        .attribute = {0x02, 0x00}
+};
+
+static request_t attr_descriptor_power = {
+        .class  =    {0x00, 0x03},
+        .obis   =    {0x01, 0x00, 0x09, 0x07, 0x00, 0xff},   /* 1.0.9.7.0.255  */
+        .attribute = {0x02, 0x00}
+};
+
+static request_t attr_descriptor_current = {
+        .class  =    {0x00, 0x03},
+        .obis   =    {0x01, 0x00, 0x0b, 0x07, 0x00, 0xff},   /* 1.0.11.7.0.255  */
+        .attribute = {0x02, 0x00}
+};
+
+static request_t attr_descriptor_time = {
+        .class  =    {0x00, 0x08},
+        .obis   =    {0x00, 0x00, 0x01, 0x00, 0x00, 0xff},   /* 0.0.1.0.0.255  */
+        .attribute = {0x02, 0x00}
+};
+
+
 
 static void send_notification();
 
@@ -589,15 +663,19 @@ static uint8_t send_cmd_open_session() {
     info_field_data[info_field_len++] = 0x03;
     aarq_len++;
     auth_len++;
-    info_field_data[info_field_len++] = meter.password[0];
-    aarq_len++;
-    auth_len++;
-    info_field_data[info_field_len++] = meter.password[1];
-    aarq_len++;
-    auth_len++;
-    info_field_data[info_field_len++] = meter.password[2];
-    aarq_len++;
-    auth_len++;
+    memcpy(&info_field_data[info_field_len], meter.password.data, meter.password.size);
+    info_field_len += meter.password.size;
+    aarq_len += meter.password.size;
+    auth_len += meter.password.size;
+//    info_field_data[info_field_len++] = meter.password[0];
+//    aarq_len++;
+//    auth_len++;
+//    info_field_data[info_field_len++] = meter.password[1];
+//    aarq_len++;
+//    auth_len++;
+//    info_field_data[info_field_len++] = meter.password[2];
+//    aarq_len++;
+//    auth_len++;
     info_field_data[auth_len_idx] = auth_len;
     memcpy(info_field_data+info_field_len, user_info, sizeof(user_info));
     info_field_len += sizeof(user_info);
@@ -667,7 +745,7 @@ static uint8_t send_cmd_open_session() {
 }
 
 
-static uint8_t *get_request_data(request_t request) {
+static uint8_t *get_request_data(request_t *request) {
 
     uint8_t *pkt_buff = (uint8_t*)&raw_package;
 
@@ -681,7 +759,7 @@ static uint8_t *get_request_data(request_t request) {
     info_field_data[info_field_len++] = 0x01;
     info_field_data[info_field_len++] = 0xc1;
 
-    memcpy(info_field_data+info_field_len, &request, sizeof(request_t));
+    memcpy(info_field_data+info_field_len, request, sizeof(request_t));
     info_field_len += sizeof(request_t);
 
     memset(pkt_buff, 0, sizeof(package_t));
@@ -742,13 +820,16 @@ static void get_serial_number_data() {
     printf("\r\nCommand get serial number\r\n");
 #endif
 
-    type_digit_t *unsigned32 = (type_digit_t*)get_request_data(attr_descriptor_serial_number);
+//    type_digit_t *unsigned32 = (type_digit_t*)get_request_data(attr_descriptor_serial_number);
+    uint8_t *ptr = get_request_data(&attr_descriptor_serial_number);
+    type_digit_t *unsigned32 = (type_digit_t*)ptr;
+    type_octet_string_t *str = (type_octet_string_t*)ptr;
 
-    if (unsigned32) {
-        if (unsigned32->type == 0x06) {
+
+    if (ptr) {
+        if (unsigned32->type == TYPE_UNSIGNED_32) {
             uint32_t addr = reverse32(unsigned32->value);
 
-            uint8_t serial_number[SE_ATTR_SN_SIZE+1] = {0};
             uint8_t sn[SE_ATTR_SN_SIZE];
 
             itoa(addr, sn);
@@ -759,6 +840,15 @@ static void get_serial_number_data() {
                 printf("Serial Number: %s, len: %d\r\n", serial_number+1, *serial_number);
 #endif
             }
+        } else if (str->type == TYPE_OCTET_STRING) {
+
+            serial_number[0] = str->size;
+            memcpy(serial_number+1, &str->str, str->size);
+
+            zcl_setAttrVal(APP_ENDPOINT_1, ZCL_CLUSTER_SE_METERING, ZCL_ATTRID_METER_SERIAL_NUMBER, (uint8_t*)&serial_number);
+#if UART_PRINTF_MODE && DEBUG_DEVICE_DATA
+            printf("Serial Number: %s, len: %d\r\n", serial_number+1, *serial_number);
+#endif
         }
     }
 }
@@ -769,7 +859,7 @@ static void get_date_release_data() {
     printf("\r\nCommand get date release\r\n");
 #endif
 
-    type_octet_string_t *o_str = (type_octet_string_t*)get_request_data(attr_descriptor_date_release);
+    type_octet_string_t *o_str = (type_octet_string_t*)get_request_data(&attr_descriptor_date_release);
 
     if (o_str) {
         if (o_str->type == TYPE_OCTET_STRING && o_str->size) {
@@ -779,7 +869,7 @@ static void get_date_release_data() {
             release_year |= *ptr++;
             release_month = *ptr++;
             uint8_t  release_day = *ptr++;
-            uint8_t  date_release[DATA_MAX_LEN+2] = {0};
+//            uint8_t  date_release[DATA_MAX_LEN+2] = {0};
             uint8_t  dr[11] = {0};
             uint8_t  dr_len = 0;
 
@@ -820,219 +910,203 @@ static void get_date_release_data() {
     }
 }
 
-/*
- * data: 0x0600000506
- *       06: type - unsigned32
- *       00000506: value - 1286
- *
- * data: 0x05000e8405
- *       05: type - integer32
- *       000e8405: value - 951301
- *
- * first place 0x06
- *       01 - ET A+
- *       02 - T1 A+
- *       03 - T2 A+
- *       04 - T3 A+
- *       05 - T4 A+
- *       06 - T5 A+
- *       07 - T6 A+
- *       08 - T7 A+
- *       09 - T8 A+
- *       10 - ET A-
- *       11 - T1 A-
- *       12 - T2 A-
- *       13 - T3 A-
- *       14 - T4 A-
- *       15 - T5 A-
- *       16 - T6 A-
- *       17 - T7 A-
- *       18 - T8 A-
- *       19 - ET R+
- *       20 - T1 R+
- *       21 - T2 R+
- *       22 - T3 R+
- *       23 - T4 R+
- *       24 - T5 R+
- *       25 - T6 R+
- *       26 - T7 R+
- *       27 - T8 R+
- *       28 - ET R-
- *       29 - T1 R-
- *       30 - T2 R-
- *       31 - T3 R-
- *       32 - T4 R-
- *       33 - T5 R-
- *       34 - T6 R-
- *       35 - T7 R-
- *       36 - T8 R-
- *       37 - ?
- *       38 - ?
- *       39 - ?
- *       40 - Current
- *       41 - Current Neutral
- *       42 - ?
- *       43 - Voltage
- *       44 - Ratio Power
- *       45 - Full Power
- *       46 - Active Power
- *       47 - Reactive Power
- *
- *       tariff1 = 'T1 A+' + 'T1 A-'
- *                  6343   +  1707 =  8050
- */
-
-static void get_list_data() {
+static void get_voltage_data() {
 
 #if UART_PRINTF_MODE && (DEBUG_DEVICE_DATA || DEBUG_PACKAGE)
-    printf("\r\nCommand running to get list\r\n");
+    printf("\r\nCommand get voltage\r\n");
 #endif
 
-    uint8_t *ptr = get_request_data(attr_descriptor_list);
+    uint32_t voltage = 0;
+    type_digit_t *digit_voltage = (type_digit_t*)get_request_data(&attr_descriptor_voltage);
 
-    if (ptr) {
-        ptr += 4;
+    if (digit_voltage) {
 
-        type_octet_string_t *present_date = (type_octet_string_t*)ptr;
+        if (digit_voltage->type == TYPE_UNSIGNED_32) {
+            voltage = reverse32(digit_voltage->value);
+
+            uint16_t volts = voltage / 10;
+
+            zcl_setAttrVal(APP_ENDPOINT_1, ZCL_CLUSTER_MS_ELECTRICAL_MEASUREMENT, ZCL_ATTRID_RMS_VOLTAGE, (uint8_t*)&volts);
+
+#if UART_PRINTF_MODE && DEBUG_DEVICE_DATA
+            printf("voltage: %d\r\n", volts);
+#endif
+        }
+    }
+}
+
+static void get_power_data() {
+
+#if UART_PRINTF_MODE && (DEBUG_DEVICE_DATA || DEBUG_PACKAGE)
+    printf("\r\nCommand get power\r\n");
+#endif
+
+    uint32_t power = 0;
+    type_digit_t *digit_power = (type_digit_t*)get_request_data(&attr_descriptor_power);
+
+    if (digit_power) {
+
+        if (digit_power->type == TYPE_UNSIGNED_32) {
+
+            power = reverse32(digit_power->value) / 1000;
+
+            //power = 42258; //1505010; //
+            //power /= 1000;
+
+            uint16_t pwr = power & 0xffff;
+
+            zcl_setAttrVal(APP_ENDPOINT_1, ZCL_CLUSTER_MS_ELECTRICAL_MEASUREMENT, ZCL_ATTRID_APPARENT_POWER, (uint8_t*)&pwr);
+
+#if UART_PRINTF_MODE && DEBUG_DEVICE_DATA
+            printf("power: %d\r\n", pwr);
+#endif
+        }
+    }
+}
+
+static void get_current_data() {
+
+#if UART_PRINTF_MODE && (DEBUG_DEVICE_DATA || DEBUG_PACKAGE)
+    printf("\r\nCommand get current\r\n");
+#endif
+
+    uint16_t current = 0;
+    type_digit_t *digit_current = (type_digit_t*)get_request_data(&attr_descriptor_current);
+
+    if (digit_current) {
+
+        if (digit_current->type == TYPE_SIGNED_32 || digit_current->type == TYPE_UNSIGNED_32) {
+
+            current = reverse32(digit_current->value) & 0xffff;
+
+            zcl_setAttrVal(APP_ENDPOINT_1, ZCL_CLUSTER_MS_ELECTRICAL_MEASUREMENT, ZCL_ATTRID_LINE_CURRENT, (uint8_t*)&current);
+
+#if UART_PRINTF_MODE && DEBUG_DEVICE_DATA
+            printf("current: %d\r\n", current);
+#endif
+        }
+    }
+}
+
+static void get_time_data() {
+
+#if UART_PRINTF_MODE && (DEBUG_DEVICE_DATA || DEBUG_PACKAGE)
+    printf("\r\nCommand get time\r\n");
+#endif
+
+    uint8_t *ptr;
+
+    type_octet_string_t *present_date = (type_octet_string_t*)get_request_data(&attr_descriptor_time);
+
+    if (present_date) {
 
         if (present_date->type == TYPE_OCTET_STRING) {
+
             ptr = &present_date->str;
             present_year = (uint16_t)((*ptr++) << 8);
             present_year |= *ptr++;
             present_month = *ptr++;
 
-            type_digit_t *p_list = (type_digit_t*)((uint8_t*)&present_date->str + present_date->size);
-
-            type_digit_t *tariff_A_p = p_list + 1;
-            type_digit_t *tariff_A_m = tariff_A_p + 9;
-
-            if (tariff_A_p->type == TYPE_UNSIGNED_32 && tariff_A_m->type == TYPE_UNSIGNED_32) {
-
-                uint64_t tariff = (reverse32(tariff_A_p->value) + reverse32(tariff_A_m->value)) & 0xffffffffffff;
-
-//                zcl_getAttrVal(APP_ENDPOINT_1, ZCL_CLUSTER_SE_METERING, ZCL_ATTRID_CURRENT_TIER_1_SUMMATION_DELIVERD, &attr_len, (uint8_t*)&attr_data);
-//                uint64_t last_tariff = fromPtoInteger(attr_len, attr_data);
-//
-//                if (tariff > last_tariff) {
-                    zcl_setAttrVal(APP_ENDPOINT_1, ZCL_CLUSTER_SE_METERING, ZCL_ATTRID_CURRENT_TIER_1_SUMMATION_DELIVERD, (uint8_t*)&tariff);
-//                }
 #if UART_PRINTF_MODE && DEBUG_DEVICE_DATA
-                printf("tariff1: %d\r\n", tariff);
+            printf("year: %d, mon: %d\r\n", present_year, present_month);
 #endif
-
-                tariff_A_p++;
-                tariff_A_m = tariff_A_p + 9;
-
-                if (tariff_A_p->type == TYPE_UNSIGNED_32 && tariff_A_m->type == TYPE_UNSIGNED_32) {
-
-                    tariff = (reverse32(tariff_A_p->value) + reverse32(tariff_A_m->value)) & 0xffffffffffff;
-
-//                    zcl_getAttrVal(APP_ENDPOINT_1, ZCL_CLUSTER_SE_METERING, ZCL_ATTRID_CURRENT_TIER_2_SUMMATION_DELIVERD, &attr_len, (uint8_t*)&attr_data);
-//                    last_tariff = fromPtoInteger(attr_len, attr_data);
-//
-//                    if (tariff > last_tariff) {
-                        zcl_setAttrVal(APP_ENDPOINT_1, ZCL_CLUSTER_SE_METERING, ZCL_ATTRID_CURRENT_TIER_2_SUMMATION_DELIVERD, (uint8_t*)&tariff);
-//                    }
-#if UART_PRINTF_MODE && DEBUG_DEVICE_DATA
-                    printf("tariff2: %d\r\n", tariff);
-#endif
-
-                    tariff_A_p++;
-                    tariff_A_m = tariff_A_p + 9;
-
-                    if (tariff_A_p->type == TYPE_UNSIGNED_32 && tariff_A_m->type == TYPE_UNSIGNED_32) {
-
-                        tariff = (reverse32(tariff_A_p->value) + reverse32(tariff_A_m->value)) & 0xffffffffffff;
-
-//                        zcl_getAttrVal(APP_ENDPOINT_1, ZCL_CLUSTER_SE_METERING, ZCL_ATTRID_CURRENT_TIER_3_SUMMATION_DELIVERD, &attr_len, (uint8_t*)&attr_data);
-//                        last_tariff = fromPtoInteger(attr_len, attr_data);
-//
-//                        if (tariff > last_tariff) {
-                            zcl_setAttrVal(APP_ENDPOINT_1, ZCL_CLUSTER_SE_METERING, ZCL_ATTRID_CURRENT_TIER_3_SUMMATION_DELIVERD, (uint8_t*)&tariff);
-//                        }
-#if UART_PRINTF_MODE && DEBUG_DEVICE_DATA
-                        printf("tariff3: %d\r\n", tariff);
-#endif
-
-                        tariff_A_p++;
-                        tariff_A_m = tariff_A_p + 9;
-
-                        if (tariff_A_p->type == TYPE_UNSIGNED_32 && tariff_A_m->type == TYPE_UNSIGNED_32) {
-
-                            tariff = (reverse32(tariff_A_p->value) + reverse32(tariff_A_m->value)) & 0xffffffffffff;
-
-//                            zcl_getAttrVal(APP_ENDPOINT_1, ZCL_CLUSTER_SE_METERING, ZCL_ATTRID_CURRENT_TIER_4_SUMMATION_DELIVERD, &attr_len, (uint8_t*)&attr_data);
-//                            last_tariff = fromPtoInteger(attr_len, attr_data);
-//
-//                            if (tariff > last_tariff) {
-                                zcl_setAttrVal(APP_ENDPOINT_1, ZCL_CLUSTER_SE_METERING, ZCL_ATTRID_CURRENT_TIER_4_SUMMATION_DELIVERD, (uint8_t*)&tariff);
-//                            }
-#if UART_PRINTF_MODE && DEBUG_DEVICE_DATA
-                            printf("tariff4: %d\r\n", tariff);
-#endif
-
-                            p_list += 39;
-
-                            if (p_list->type == TYPE_SIGNED_32) {
-
-                                uint16_t amps = reverse32(p_list->value) & 0xffff;
-
-//                                zcl_getAttrVal(APP_ENDPOINT_1, ZCL_CLUSTER_MS_ELECTRICAL_MEASUREMENT, ZCL_ATTRID_LINE_CURRENT, &attr_len, (uint8_t*)&attr_data);
-//                                uint16_t last_amps = fromPtoInteger(attr_len, attr_data);
-//
-//                                if (amps != last_amps) {
-                                    zcl_setAttrVal(APP_ENDPOINT_1, ZCL_CLUSTER_MS_ELECTRICAL_MEASUREMENT, ZCL_ATTRID_LINE_CURRENT, (uint8_t*)&amps);
-//                                }
-#if UART_PRINTF_MODE && DEBUG_DEVICE_DATA
-                                printf("amps: %d\r\n", amps);
-#endif
-
-                                p_list += 3;
-
-                                if (p_list->type == TYPE_UNSIGNED_32) {
-
-                                    uint16_t volts = reverse32(p_list->value) / 10;
-
-
-//                                    zcl_getAttrVal(APP_ENDPOINT_1, ZCL_CLUSTER_MS_ELECTRICAL_MEASUREMENT, ZCL_ATTRID_RMS_VOLTAGE, &attr_len, (uint8_t*)&attr_data);
-//                                    uint16_t last_volts = fromPtoInteger(attr_len, attr_data);
-//
-//                                    if (volts != last_volts) {
-                                        zcl_setAttrVal(APP_ENDPOINT_1, ZCL_CLUSTER_MS_ELECTRICAL_MEASUREMENT, ZCL_ATTRID_RMS_VOLTAGE, (uint8_t*)&volts);
-//                                    }
-#if UART_PRINTF_MODE && DEBUG_DEVICE_DATA
-                                    printf("voltage: %d\r\n", volts);
-#endif
-
-                                    p_list += 2;
-
-                                    if (p_list->type == TYPE_UNSIGNED_32) {
-
-                                        uint32_t power = reverse32(p_list->value) / 1000;
-
-                                        //power = 42258; //1505010; //
-                                        //power /= 1000;
-
-                                        uint16_t pwr = power & 0xffff;
-
-//                                        zcl_getAttrVal(APP_ENDPOINT_1, ZCL_CLUSTER_MS_ELECTRICAL_MEASUREMENT, ZCL_ATTRID_APPARENT_POWER, &attr_len, (uint8_t*)&attr_data);
-//                                        uint16_t last_pwr = fromPtoInteger(attr_len, attr_data);
-//
-//                                        if (pwr != last_pwr) {
-                                            zcl_setAttrVal(APP_ENDPOINT_1, ZCL_CLUSTER_MS_ELECTRICAL_MEASUREMENT, ZCL_ATTRID_APPARENT_POWER, (uint8_t*)&pwr);
-//                                        }
-#if UART_PRINTF_MODE && DEBUG_DEVICE_DATA
-                                        printf("power: %d\r\n", pwr);
-#endif
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
         }
     }
+}
+
+static uint32_t get_tariffA(request_t *attr_desc) {
+
+    uint32_t tariff = 0;
+    type_digit_t *tariff_A = (type_digit_t*)get_request_data(attr_desc);
+
+    if (tariff_A->type == TYPE_UNSIGNED_32) {
+        tariff = reverse32(tariff_A->value);
+    }
+
+//    sleep_ms(300);
+
+    return tariff;
+}
+
+static void get_tariffs_1_2_data() {
+
+    uint64_t tariff;
+    uint32_t tariffP, tariffM;
+
+#if UART_PRINTF_MODE && (DEBUG_DEVICE_DATA || DEBUG_PACKAGE)
+    printf("\r\nCommand get 1 and 2 tariffs\r\n");
+#endif
+
+    tariff_summ = 0;
+
+    tariffP = get_tariffA(&attr_descriptor_tariff1AP);
+    tariffM = get_tariffA(&attr_descriptor_tariff1AM);
+
+    tariff = (tariffP + tariffM) & 0xffffffffffff;
+
+    tariff_summ += tariff;
+
+    zcl_setAttrVal(APP_ENDPOINT_1, ZCL_CLUSTER_SE_METERING, ZCL_ATTRID_CURRENT_TIER_1_SUMMATION_DELIVERD, (uint8_t*)&tariff);
+
+#if UART_PRINTF_MODE && DEBUG_DEVICE_DATA
+    printf("tariff1: %d\r\n", tariff);
+#endif
+
+    tariffP = get_tariffA(&attr_descriptor_tariff2AP);
+    tariffM = get_tariffA(&attr_descriptor_tariff2AM);
+
+    tariff = (tariffP + tariffM) & 0xffffffffffff;
+
+    tariff_summ += tariff;
+
+    zcl_setAttrVal(APP_ENDPOINT_1, ZCL_CLUSTER_SE_METERING, ZCL_ATTRID_CURRENT_TIER_2_SUMMATION_DELIVERD, (uint8_t*)&tariff);
+
+#if UART_PRINTF_MODE && DEBUG_DEVICE_DATA
+    printf("tariff2: %d\r\n", tariff);
+#endif
+
+}
+
+static void get_tariffs_3_4_data() {
+
+    uint64_t tariff;
+    uint32_t tariffP, tariffM;
+
+#if UART_PRINTF_MODE && (DEBUG_DEVICE_DATA || DEBUG_PACKAGE)
+    printf("\r\nCommand get 3 adn 4 tariffs\r\n");
+#endif
+
+    tariffP = get_tariffA(&attr_descriptor_tariff3AP);
+    tariffM = get_tariffA(&attr_descriptor_tariff3AM);
+
+    tariff = (tariffP + tariffM) & 0xffffffffffff;
+
+    tariff_summ += tariff;
+
+    zcl_setAttrVal(APP_ENDPOINT_1, ZCL_CLUSTER_SE_METERING, ZCL_ATTRID_CURRENT_TIER_3_SUMMATION_DELIVERD, (uint8_t*)&tariff);
+
+#if UART_PRINTF_MODE && DEBUG_DEVICE_DATA
+    printf("tariff3: %d\r\n", tariff);
+#endif
+
+    tariffP = get_tariffA(&attr_descriptor_tariff4AP);
+    tariffM = get_tariffA(&attr_descriptor_tariff4AM);
+
+    tariff = (tariffP + tariffM) & 0xffffffffffff;
+
+    tariff_summ += tariff;
+
+    zcl_setAttrVal(APP_ENDPOINT_1, ZCL_CLUSTER_SE_METERING, ZCL_ATTRID_CURRENT_TIER_4_SUMMATION_DELIVERD, (uint8_t*)&tariff);
+
+#if UART_PRINTF_MODE && DEBUG_DEVICE_DATA
+    printf("tariff4: %d\r\n", tariff);
+#endif
+
+    zcl_setAttrVal(APP_ENDPOINT_1, ZCL_CLUSTER_SE_METERING, ZCL_ATTRID_CURRENT_SUMMATION_DELIVERD, (uint8_t*)&tariff_summ);
+#if UART_PRINTF_MODE && DEBUG_DEVICE_DATA
+    printf("tariff_summ: %d\r\n", tariff_summ);
+#endif
+
 }
 
 static void get_resbat_data() {
@@ -1052,12 +1126,7 @@ static void get_resbat_data() {
         battery_level++;
     }
 
-//    zcl_getAttrVal(APP_ENDPOINT_1, ZCL_CLUSTER_SE_METERING, ZCL_ATTRID_REMAINING_BATTERY_LIFE, &attr_len, (uint8_t*)&attr_data);
-//    uint8_t last_bl = fromPtoInteger(attr_len, attr_data);
-//
-//    if (battery_level != last_bl) {
-        zcl_setAttrVal(APP_ENDPOINT_1, ZCL_CLUSTER_SE_METERING, ZCL_ATTRID_REMAINING_BATTERY_LIFE, (uint8_t*)&battery_level);
-//    }
+    zcl_setAttrVal(APP_ENDPOINT_1, ZCL_CLUSTER_SE_METERING, ZCL_ATTRID_REMAINING_BATTERY_LIFE, (uint8_t*)&battery_level);
 
 #if UART_PRINTF_MODE && DEBUG_DEVICE_DATA
     printf("Resource battery: %d.%d%%\r\n", (worktime*100)/lifetime, ((worktime*100)%lifetime)*100/lifetime);
@@ -1076,23 +1145,40 @@ void nartis100_init() {
     meter.window_rx = 1;
     meter.window_tx = 1;
     meter.format.type = TYPE3;
-    memcpy(&meter.password, PASSWORD, sizeof(PASSWORD));
+    if (dev_config.device_password.size) {
+        memcpy(&meter.password, &dev_config.device_password, sizeof(m_password_t));
+    } else {
+        strcpy((char*)meter.password.data, PASSWORD);
+        meter.password.size = sizeof(PASSWORD)-1;
+    }
+    //printf("size: %d, meter password: %s\r\n", meter.password.size, meter.password.data);
+//    memcpy(&meter.password, PASSWORD, sizeof(PASSWORD));
 }
 
-
-uint8_t measure_meter_nartis_100() {
+static uint8_t measure_meter_nartis_100_1() {
 
     send_cmd_snrm();                    /* start connection                             */
 
-    uint32_t ret = send_cmd_open_session();
+    uint8_t ret = send_cmd_open_session();
 
     if (ret) {
         if (new_start) {                /* after reset                                  */
-            get_serial_number_data();
-            get_date_release_data();
+            serial_number[0] = 0;
+            date_release[0] = 0;
             new_start = false;
         }
-        get_list_data();                /* get 4 tariffs, voltage net ~220, power, amps */
+        if (serial_number[0] == 0) {
+            get_serial_number_data();
+        }
+        if (date_release[0] == 0) {
+            get_date_release_data();
+        }
+
+        get_voltage_data();
+        get_power_data();
+        get_current_data();
+        get_time_data();
+
         get_resbat_data();              /* get resource battery                         */
         send_cmd_disc();                /* disconnect                                   */
 
@@ -1103,6 +1189,61 @@ uint8_t measure_meter_nartis_100() {
             timerFaultMeasurementEvt = TL_ZB_TIMER_SCHEDULE(fault_measure_meterCb, NULL, TIMEOUT_10MIN);
         }
     }
+
+    return ret;
+}
+
+static uint8_t measure_meter_nartis_100_2() {
+
+    send_cmd_snrm();                    /* start connection                             */
+
+    uint8_t ret = send_cmd_open_session();
+
+    if (ret) {
+
+        get_tariffs_1_2_data();
+        send_cmd_disc();                /* disconnect                                   */
+
+        fault_measure_flag = false;
+    } else {
+        fault_measure_flag = true;
+        if (!timerFaultMeasurementEvt) {
+            timerFaultMeasurementEvt = TL_ZB_TIMER_SCHEDULE(fault_measure_meterCb, NULL, TIMEOUT_10MIN);
+        }
+    }
+
+    return ret;
+}
+
+static uint8_t measure_meter_nartis_100_3() {
+
+    send_cmd_snrm();                    /* start connection                             */
+
+    uint8_t ret = send_cmd_open_session();
+
+    if (ret) {
+
+        get_tariffs_3_4_data();
+        send_cmd_disc();                /* disconnect                                   */
+
+        fault_measure_flag = false;
+    } else {
+        fault_measure_flag = true;
+        if (!timerFaultMeasurementEvt) {
+            timerFaultMeasurementEvt = TL_ZB_TIMER_SCHEDULE(fault_measure_meterCb, NULL, TIMEOUT_10MIN);
+        }
+    }
+
+    return ret;
+}
+
+uint8_t measure_meter_nartis_100() {
+
+    uint8_t ret;
+
+    ret = measure_meter_nartis_100_1();
+    ret = measure_meter_nartis_100_2();
+    ret = measure_meter_nartis_100_3();
 
     return ret;
 }

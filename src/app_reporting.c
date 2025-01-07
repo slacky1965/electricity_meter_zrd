@@ -16,6 +16,122 @@ app_reporting_t app_reporting[ZCL_REPORTING_TABLE_NUM];
 extern void reportAttr(reportCfgInfo_t *pEntry);
 //void report_divisor_multiplier(reportCfgInfo_t *pEntry);
 
+#if DEBUG_REPORTING
+
+static uint8_t attr_name[ATTR_MAX][48] = {{"ZCL_ATTRID_CUSTOM_DEVICE_MODEL"},
+                                          {"ZCL_ATTRID_DEV_TEMP_CURR_TEMP"},
+                                          {"ZCL_ATTRID_METER_SERIAL_NUMBER"},
+                                          {"ZCL_ATTRID_CUSTOM_DATE_RELEASE"},
+                                          {"ZCL_ATTRID_MULTIPLIER"},
+                                          {"ZCL_ATTRID_DIVISOR"},
+                                          {"ZCL_ATTRID_CURRENT_SUMMATION_DELIVERD"},
+                                          {"ZCL_ATTRID_CURRENT_TIER_1_SUMMATION_DELIVERD"},
+                                          {"ZCL_ATTRID_CURRENT_TIER_2_SUMMATION_DELIVERD"},
+                                          {"ZCL_ATTRID_CURRENT_TIER_3_SUMMATION_DELIVERD"},
+                                          {"ZCL_ATTRID_CURRENT_TIER_4_SUMMATION_DELIVERD"},
+                                          {"ZCL_ATTRID_AC_VOLTAGE_MULTIPLIER"},
+                                          {"ZCL_ATTRID_AC_VOLTAGE_DIVISOR"},
+                                          {"ZCL_ATTRID_RMS_VOLTAGE"},
+                                          {"ZCL_ATTRID_AC_POWER_MULTIPLIER"},
+                                          {"ZCL_ATTRID_AC_POWER_DIVISOR"},
+                                          {"ZCL_ATTRID_APPARENT_POWER"},
+                                          {"ZCL_ATTRID_AC_CURRENT_MULTIPLIER"},
+                                          {"ZCL_ATTRID_AC_CURRENT_DIVISOR"},
+                                          {"ZCL_ATTRID_LINE_CURRENT"},
+                                          {"ZCL_ATTRID_REMAINING_BATTERY_LIFE"}};
+
+static uint8_t get_attr_name(uint16_t cluster_id, uint16_t attr_id) {
+    uint8_t attr_num;
+
+    if (cluster_id == ZCL_CLUSTER_SE_METERING) {
+        switch(attr_id) {
+            case ZCL_ATTRID_CUSTOM_DEVICE_MODEL:
+                attr_num = DEVICE_MODEL;
+                break;
+            case ZCL_ATTRID_METER_SERIAL_NUMBER:
+                attr_num = SERIAL_NUMBER;
+                break;
+            case ZCL_ATTRID_CUSTOM_DATE_RELEASE:
+                attr_num = DATE_RELEASE;
+                break;
+            case ZCL_ATTRID_MULTIPLIER:
+                attr_num = MULTIPLIER;
+                break;
+            case ZCL_ATTRID_DIVISOR:
+                attr_num = DIVISOR;
+                break;
+            case ZCL_ATTRID_CURRENT_SUMMATION_DELIVERD:
+                attr_num = CUR_SUMM_DELIVERD;
+                break;
+            case ZCL_ATTRID_CURRENT_TIER_1_SUMMATION_DELIVERD:
+                attr_num = CUR_T1_SUMM_DELIVERD;
+                break;
+            case ZCL_ATTRID_CURRENT_TIER_2_SUMMATION_DELIVERD:
+                attr_num = CUR_T2_SUMM_DELIVERD;
+                break;
+            case ZCL_ATTRID_CURRENT_TIER_3_SUMMATION_DELIVERD:
+                attr_num = CUR_T3_SUMM_DELIVERD;
+                break;
+            case ZCL_ATTRID_CURRENT_TIER_4_SUMMATION_DELIVERD:
+                attr_num = CUR_T4_SUMM_DELIVERD;
+                break;
+            case ZCL_ATTRID_REMAINING_BATTERY_LIFE:
+                attr_num = BATTERY_LIFE;
+                break;
+            default:
+                attr_num = 0xff;
+                break;
+        }
+    } else if (cluster_id == ZCL_CLUSTER_GEN_DEVICE_TEMP_CONFIG) {
+        switch(attr_id) {
+            case ZCL_ATTRID_DEV_TEMP_CURR_TEMP:
+                attr_num = CURR_TEMP;
+                break;
+            default:
+                attr_num = 0xff;
+                break;
+        }
+    } else if (cluster_id == ZCL_CLUSTER_MS_ELECTRICAL_MEASUREMENT) {
+        switch(attr_id) {
+            case ZCL_ATTRID_AC_VOLTAGE_MULTIPLIER:
+                attr_num = VOLTAGE_MULTIPLIER;
+                break;
+            case ZCL_ATTRID_AC_VOLTAGE_DIVISOR:
+                attr_num = VOLTAGE_DIVISOR;
+                break;
+            case ZCL_ATTRID_RMS_VOLTAGE:
+                attr_num = VOLTAGE;
+                break;
+            case ZCL_ATTRID_AC_POWER_MULTIPLIER:
+                attr_num = POWER_MULTIPLIER;
+                break;
+            case ZCL_ATTRID_AC_POWER_DIVISOR:
+                attr_num = POWER_DIVISOR;
+                break;
+            case ZCL_ATTRID_APPARENT_POWER:
+                attr_num = POWER;
+                break;
+            case ZCL_ATTRID_AC_CURRENT_MULTIPLIER:
+                attr_num = CURRENT_MULTIPLIER;
+                break;
+            case ZCL_ATTRID_AC_CURRENT_DIVISOR:
+                attr_num = CURRENT_DIVISOR;
+                break;
+            case ZCL_ATTRID_LINE_CURRENT:
+                attr_num = CURRENT;
+                break;
+            default:
+                attr_num = 0xff;
+                break;
+        }
+    } else {
+        attr_num = 0xff;
+    }
+
+    return attr_num;
+}
+#endif
+
 /**********************************************************************
  * Custom reporting application
  *
@@ -86,6 +202,7 @@ static uint8_t app_reportableChangeValueChk(uint8_t dataType, uint8_t *curValue,
     return needReport;
 }
 
+
 static int32_t app_reportMinAttrTimerCb(void *arg) {
     app_reporting_t *app_reporting = (app_reporting_t*)arg;
     reportCfgInfo_t *pEntry = app_reporting->pEntry;
@@ -103,8 +220,14 @@ static int32_t app_reportMinAttrTimerCb(void *arg) {
         reportAttr(pEntry);
         app_reporting->time_posted = clock_time();
 #if UART_PRINTF_MODE && DEBUG_REPORTING
-        printf("Report Min_Interval has been sent. endPoint: %d, clusterID: 0x%x, attrID: 0x%x, minInterval: %d, maxInterval: %d\r\n",
-                pEntry->endPoint, pEntry->clusterID, pEntry->attrID, pEntry->minInterval, pEntry->maxInterval);
+        uint8_t attr_num = get_attr_name(pEntry->clusterID, pEntry->attrID);
+        if (attr_num == 0xff) {
+            printf("Report Min_Interval has been sent. endPoint: %d, clusterID: 0x%x, attrID: 0x%x, minInterval: %d, maxInterval: %d\r\n",
+                    pEntry->endPoint, pEntry->clusterID, pEntry->attrID, pEntry->minInterval, pEntry->maxInterval);
+        } else {
+            printf("Report Min_Interval has been sent. endPoint: %d, clusterID: 0x%x, attrID: %s, minInterval: %d, maxInterval: %d\r\n",
+                    pEntry->endPoint, pEntry->clusterID, attr_name[attr_num], pEntry->minInterval, pEntry->maxInterval);
+        }
 #endif
         return 0;
     }
@@ -122,8 +245,14 @@ static int32_t app_reportMinAttrTimerCb(void *arg) {
         reportAttr(pEntry);
         app_reporting->time_posted = clock_time();
 #if UART_PRINTF_MODE && DEBUG_REPORTING
-        printf("Report Min_Interval has been sent. endPoint: %d, clusterID: 0x%x, attrID: 0x%x, minInterval: %d, maxInterval: %d\r\n",
-                pEntry->endPoint, pEntry->clusterID, pEntry->attrID, pEntry->minInterval, pEntry->maxInterval);
+        uint8_t attr_num = get_attr_name(pEntry->clusterID, pEntry->attrID);
+        if (attr_num == 0xff) {
+            printf("Report Min_Interval has been sent. endPoint: %d, clusterID: 0x%x, attrID: 0x%x, minInterval: %d, maxInterval: %d\r\n",
+                    pEntry->endPoint, pEntry->clusterID, pEntry->attrID, pEntry->minInterval, pEntry->maxInterval);
+        } else {
+            printf("Report Min_Interval has been sent. endPoint: %d, clusterID: 0x%x, attrID: %s, minInterval: %d, maxInterval: %d\r\n",
+                    pEntry->endPoint, pEntry->clusterID, attr_name[attr_num], pEntry->minInterval, pEntry->maxInterval);
+        }
 #endif
     }
 
@@ -141,8 +270,14 @@ static int32_t app_reportMaxAttrTimerCb(void *arg) {
         report_divisor_multiplier(pEntry);
         reportAttr(pEntry);
 #if UART_PRINTF_MODE && DEBUG_REPORTING
-        printf("Report Max_Interval has been sent. endPoint: %d, clusterID: 0x%x, attrID: 0x%x, minInterval: %d, maxInterval: %d\r\n",
-                pEntry->endPoint, pEntry->clusterID, pEntry->attrID, pEntry->minInterval, pEntry->maxInterval);
+        uint8_t attr_num = get_attr_name(pEntry->clusterID, pEntry->attrID);
+        if (attr_num == 0xff) {
+            printf("Report Max_Interval has been sent. endPoint: %d, clusterID: 0x%x, attrID: 0x%x, minInterval: %d, maxInterval: %d\r\n",
+                    pEntry->endPoint, pEntry->clusterID, pEntry->attrID, pEntry->minInterval, pEntry->maxInterval);
+        } else {
+            printf("Report Max_Interval has been sent. endPoint: %d, clusterID: 0x%x, attrID: %s, minInterval: %d, maxInterval: %d\r\n",
+                    pEntry->endPoint, pEntry->clusterID, attr_name[attr_num], pEntry->minInterval, pEntry->maxInterval);
+        }
 #endif
     }
 
@@ -164,7 +299,14 @@ static void app_reportAttrTimerStart() {
                     if (!app_reporting[i].timerReportMinEvt) {
                         if (pEntry->minInterval && pEntry->maxInterval && pEntry->minInterval <= pEntry->maxInterval) {
 #if UART_PRINTF_MODE && DEBUG_REPORTING
-                            printf("Start minTimer. endPoint: %d, clusterID: 0x%x, attrID: 0x%x, min: %d, max: %d\r\n", pEntry->endPoint, pEntry->clusterID, pEntry->attrID, pEntry->minInterval, pEntry->maxInterval);
+                            uint8_t attr_num = get_attr_name(pEntry->clusterID, pEntry->attrID);
+                            if (attr_num == 0xff) {
+                                printf("Start minTimer. endPoint: %d, clusterID: 0x%x, attrID: 0x%x, min: %d, max: %d\r\n",
+                                        pEntry->endPoint, pEntry->clusterID, pEntry->attrID, pEntry->minInterval, pEntry->maxInterval);
+                            } else {
+                                printf("Start minTimer. endPoint: %d, clusterID: 0x%x, attrID: %s, min: %d, max: %d\r\n",
+                                        pEntry->endPoint, pEntry->clusterID, attr_name[attr_num], pEntry->minInterval, pEntry->maxInterval);
+                            }
 #endif
                             app_reporting[i].timerReportMinEvt = TL_ZB_TIMER_SCHEDULE(app_reportMinAttrTimerCb, &app_reporting[i], pEntry->minInterval*1000);
                         }
@@ -174,7 +316,14 @@ static void app_reportAttrTimerStart() {
                             if (pEntry->minInterval < pEntry->maxInterval) {
                                 if (pEntry->maxInterval != pEntry->minInterval && pEntry->maxInterval > pEntry->minInterval) {
 #if UART_PRINTF_MODE && DEBUG_REPORTING
-                                    printf("Start maxTimer. endPoint: %d, clusterID: 0x%x, attrID: 0x%x, min: %d, max: %d\r\n", pEntry->endPoint, pEntry->clusterID, pEntry->attrID, pEntry->minInterval, pEntry->maxInterval);
+                                    uint8_t attr_num = get_attr_name(pEntry->clusterID, pEntry->attrID);
+                                    if (attr_num == 0xff) {
+                                        printf("Start maxTimer. endPoint: %d, clusterID: 0x%x, attrID: 0x%x, min: %d, max: %d\r\n",
+                                                pEntry->endPoint, pEntry->clusterID, pEntry->attrID, pEntry->minInterval, pEntry->maxInterval);
+                                    } else {
+                                        printf("Start maxTimer. endPoint: %d, clusterID: 0x%x, attrID: %s, min: %d, max: %d\r\n",
+                                                pEntry->endPoint, pEntry->clusterID, attr_name[attr_num], pEntry->minInterval, pEntry->maxInterval);
+                                    }
 #endif
                                     app_reporting[i].timerReportMaxEvt = TL_ZB_TIMER_SCHEDULE(app_reportMaxAttrTimerCb, &app_reporting[i], pEntry->maxInterval*1000);
                                 }
@@ -222,8 +371,14 @@ static void app_reportNoMinLimit(void) {
 
                         app_reporting[i].time_posted = clock_time();
 #if UART_PRINTF_MODE && DEBUG_REPORTING
-                        printf("Report No_Min_Limit has been sent. endPoint: %d, clusterID: 0x%x, attrID: 0x%x, minInterval: %d, maxInterval: %d\r\n",
-                                pEntry->endPoint, pEntry->clusterID, pEntry->attrID, pEntry->minInterval, pEntry->maxInterval);
+                        uint8_t attr_num = get_attr_name(pEntry->clusterID, pEntry->attrID);
+                        if (attr_num == 0xff) {
+                            printf("Report No_Min_Limit has been sent. endPoint: %d, clusterID: 0x%x, attrID: 0x%x, minInterval: %d, maxInterval: %d\r\n",
+                                    pEntry->endPoint, pEntry->clusterID, pEntry->attrID, pEntry->minInterval, pEntry->maxInterval);
+                        } else {
+                            printf("Report No_Min_Limit has been sent. endPoint: %d, clusterID: 0x%x, attrID: %s, minInterval: %d, maxInterval: %d\r\n",
+                                    pEntry->endPoint, pEntry->clusterID, attr_name[attr_num], pEntry->minInterval, pEntry->maxInterval);
+                        }
 #endif
                         if (app_reporting[i].timerReportMaxEvt) {
                             TL_ZB_TIMER_CANCEL(&app_reporting[i].timerReportMaxEvt);
@@ -232,7 +387,14 @@ static void app_reportNoMinLimit(void) {
                         if (pEntry->maxInterval != 0) {
                             app_reporting[i].timerReportMaxEvt = TL_ZB_TIMER_SCHEDULE(app_reportMaxAttrTimerCb, &app_reporting[i], pEntry->maxInterval*1000);
 #if UART_PRINTF_MODE && DEBUG_REPORTING
-                            printf("Start maxTimer. endPoint: %d, clusterID: 0x%x, attrID: 0x%x, min: %d, max: %d\r\n", pEntry->endPoint, pEntry->clusterID, pEntry->attrID, pEntry->minInterval, pEntry->maxInterval);
+                            uint8_t attr_num = get_attr_name(pEntry->clusterID, pEntry->attrID);
+                            if (attr_num == 0xff) {
+                                printf("Start maxTimer. endPoint: %d, clusterID: 0x%x, attrID: 0x%x, min: %d, max: %d\r\n",
+                                        pEntry->endPoint, pEntry->clusterID, pEntry->attrID, pEntry->minInterval, pEntry->maxInterval);
+                            } else {
+                                printf("Start maxTimer. endPoint: %d, clusterID: 0x%x, attrID: %s, min: %d, max: %d\r\n",
+                                        pEntry->endPoint, pEntry->clusterID, attr_name[attr_num], pEntry->minInterval, pEntry->maxInterval);
+                            }
 #endif
                         }
                     }
@@ -327,6 +489,7 @@ void app_all_forceReporting() {
         app_forcedReport(APP_ENDPOINT_1, ZCL_CLUSTER_SE_METERING, ZCL_ATTRID_CUSTOM_DATE_RELEASE);
         app_forcedReport(APP_ENDPOINT_1, ZCL_CLUSTER_SE_METERING, ZCL_ATTRID_MULTIPLIER);
         app_forcedReport(APP_ENDPOINT_1, ZCL_CLUSTER_SE_METERING, ZCL_ATTRID_DIVISOR);
+        app_forcedReport(APP_ENDPOINT_1, ZCL_CLUSTER_SE_METERING, ZCL_ATTRID_CURRENT_SUMMATION_DELIVERD);
         app_forcedReport(APP_ENDPOINT_1, ZCL_CLUSTER_SE_METERING, ZCL_ATTRID_CURRENT_TIER_1_SUMMATION_DELIVERD);
         app_forcedReport(APP_ENDPOINT_1, ZCL_CLUSTER_SE_METERING, ZCL_ATTRID_CURRENT_TIER_2_SUMMATION_DELIVERD);
         app_forcedReport(APP_ENDPOINT_1, ZCL_CLUSTER_SE_METERING, ZCL_ATTRID_CURRENT_TIER_3_SUMMATION_DELIVERD);

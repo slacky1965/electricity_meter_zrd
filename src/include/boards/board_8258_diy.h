@@ -13,6 +13,14 @@ extern "C" {
 #define PB6_FUNC                AS_GPIO
 #define PULL_WAKEUP_SRC_PB6     PM_PIN_PULLUP_1M
 
+/************************* Configure TAMPER GPIO ***************************************/
+#define TAMPER                  GPIO_PC4
+#define PC4_INPUT_ENABLE        ON
+#define PC4_DATA_OUT            OFF
+#define PC4_OUTPUT_ENABLE       OFF
+#define PC4_FUNC                AS_GPIO
+#define PULL_WAKEUP_SRC_PC4     PM_PIN_PULLUP_1M
+
 /**************************** Configure LED ******************************************/
 
 #define LED_STATUS              GPIO_PC0

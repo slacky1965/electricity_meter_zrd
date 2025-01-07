@@ -57,6 +57,43 @@ uint32_t itoa(uint32_t value, uint8_t *ptr) {
     return count;
 }
 
+uint8_t *digit64toString(uint64_t value) {
+    static uint8_t buff[32] = {0};
+    uint8_t *buffer = buff;
+    buffer += 17;
+    *--buffer = 0;
+    do {
+        *--buffer = value % 10 + '0';
+        value /= 10;
+    } while (value != 0);
+
+    return buffer;
+}
+
+uint64_t atoi(uint16_t len, uint8_t *data) {
+
+    uint64_t value = 0, mp;
+    uint8_t ch;
+
+    if (len > 16) len = 16;
+
+    uint16_t v_len = len - 1;
+
+    for (uint8_t i = 0; i < len; i++, v_len--) {
+        ch = data[i];
+        if (ch >= '0' && ch <= '9') {
+            mp = ch - '0';
+            for (uint8_t ii = 0; ii < v_len; ii++) {
+                mp = mp * 10;
+            }
+            value += mp;
+        } else {
+            break;
+        }
+    }
+    return value;
+}
+
 uint32_t from24to32(const uint8_t *str) {
 
     uint32_t value;
@@ -74,9 +111,7 @@ uint64_t fromPtoInteger(uint16_t len, uint8_t *data) {
 
     if (len > 8) len = 8;
 
-    uint16_t v_len = len-1;
-
-    for (uint8_t i = 0; i < len; i++, v_len--) {
+    for (uint8_t i = 0; i < len; i++) {
         value |= (uint64_t)data[i] << (i*8);
     }
 
@@ -118,5 +153,24 @@ uint16_t reverse16(uint16_t in) {
     destination[0] = source[1];
 
     return out;
+}
+
+uint8_t *print_str_zcl(uint8_t *str_zcl) {
+    static uint8_t str[32+1];
+    uint8_t len = *str_zcl;
+
+    if (len == 0) {
+        *str = 0;
+    } else {
+        if (len > 32) len = 32;
+
+        for (uint8_t i = 0; i < len; i++) {
+            str[i] = str_zcl[i+1];
+        }
+
+        str[len] = 0;
+    }
+
+    return str;
 }
 

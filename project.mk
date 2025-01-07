@@ -16,6 +16,8 @@ $(OUT_PATH)/$(SRC_PATH)/app_reporting.o \
 $(OUT_PATH)/$(SRC_PATH)/app_utility.o \
 $(OUT_PATH)/$(SRC_PATH)/app_led.o \
 $(OUT_PATH)/$(SRC_PATH)/app_button.o \
+$(OUT_PATH)/$(SRC_PATH)/app_arith64.o \
+$(OUT_PATH)/$(SRC_PATH)/app_tamper.o \
 $(OUT_PATH)/$(SRC_PATH)/devices/device.o \
 $(OUT_PATH)/$(SRC_PATH)/devices/kaskad_1_mt.o \
 $(OUT_PATH)/$(SRC_PATH)/devices/kaskad_11.o \
@@ -23,6 +25,7 @@ $(OUT_PATH)/$(SRC_PATH)/devices/mercury_206.o \
 $(OUT_PATH)/$(SRC_PATH)/devices/energomera_ce102m.o \
 $(OUT_PATH)/$(SRC_PATH)/devices/neva_mt124.o \
 $(OUT_PATH)/$(SRC_PATH)/devices/nartis_100.o \
+$(OUT_PATH)/$(SRC_PATH)/devices/energomera_ce208by.o \
 $(OUT_PATH)/$(SRC_PATH)/app_main.o
 
 
