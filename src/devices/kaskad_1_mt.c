@@ -642,9 +642,9 @@ static uint8_t get_cfg_data() {
             printf("\r\nMirtek protocol v3\r\n");
 #endif
             mirtek_version = version_3;
+            uint16_t power_divisor = 1000;
+            zcl_setAttrVal(APP_ENDPOINT_1, ZCL_CLUSTER_MS_ELECTRICAL_MEASUREMENT, ZCL_ATTRID_AC_POWER_DIVISOR, (uint8_t*)&power_divisor);
         }
-//        pkt_read_cfg_t *cfg = (pkt_read_cfg_t*)pkt->data;
-//        printf("cfg role: %x\r\n", cfg->role);
     }
 
     return mirtek_version;
