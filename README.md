@@ -6,7 +6,7 @@
 
 [Repository electricity_meter_zrd](https://github.com/slacky1965/electricity_meter_zrd)
 
-[Версия 1 устройства хранится в отдельной ветке](https://github.com/slacky1965/electricity_meter_zrd/tree/version1)
+[Версия 1 устройства хранится в отдельной ветке](https://github.com/slacky1965/electricity_meter_zrd/tree/version1) и больше не поддерживается.
 
 ---
 
