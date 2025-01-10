@@ -1,14 +1,4 @@
-#include "tl_common.h"
-#include "zb_api.h"
-#include "zcl_include.h"
-#include "bdb.h"
-#include "ota.h"
-#include "gp.h"
-
 #include "app_main.h"
-#include "app_reporting.h"
-#include "app_uart.h"
-#include "se_custom_attr.h"
 
 app_ctx_t g_appCtx;
 uint8_t device_online = false;
@@ -152,7 +142,7 @@ void app_task(void) {
 
     if(BDB_STATE_GET() == BDB_STATE_IDLE){
 
-        report_handler();
+        app_report_handler();
 
     }
 }

@@ -1,8 +1,4 @@
-#include "tl_common.h"
-
-#include "app_uart.h"
-#include "app_dev_config.h"
-#include "device.h"
+#include "app_main.h"
 
 uart_data_t rec_buff = {0,  {0, } };
 uint8_t  uart_buff[UART_BUFF_SIZE];

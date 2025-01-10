@@ -1,8 +1,4 @@
-#include "tl_common.h"
-#include "zcl_include.h"
-
-#include "app_temperature.h"
-#include "app_endpoint_cfg.h"
+#include "app_main.h"
 
 #define DIRECT_MODE_INPUT   one_wire_mode_input
 #define DIRECT_MODE_OUTPUT  one_wire_mode_output

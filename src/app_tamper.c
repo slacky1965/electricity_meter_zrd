@@ -1,6 +1,3 @@
-#include "tl_common.h"
-#include "zcl_include.h"
-
 #include "app_main.h"
 
 #define DEBOUNCE_COUNTER    32                          /* number of polls for debounce       */

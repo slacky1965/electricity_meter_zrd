@@ -4,7 +4,7 @@ PROJECT_NAME := bootloader
 # Set the serial port number for downloading the firmware
 DOWNLOAD_PORT := COM3
 
-CHIP_TYPE := TLSR_8258_512K
+CHIP_FLASH_SIZE ?= 512
 
 COMPILE_OS = $(shell uname -o)
 LINUX_OS = GNU/Linux
@@ -15,10 +15,10 @@ else
 	COMPILE_PREFIX = C:/TelinkSDK/opt/tc32/bin/tc32
 endif
 
-ifeq ($(CHIP_TYPE),TLSR_8258_512K)
+ifeq ($(CHIP_FLASH_SIZE),512)
 	PFX_NAME = 512K
 else
-	ifeq ($(CHIP_TYPE),TLSR_8258_1M)
+	ifeq ($(CHIP_FLASH_SIZE),1024)
 		PFX_NAME = 1M
 	else
 		PFX_NAME = UNKNOWN
@@ -37,7 +37,7 @@ SIZE	= $(COMPILE_PREFIX)-elf-size
 LIBS := -ldrivers_8258
 
 MCU_TYPE = -DMCU_CORE_8258=1
-BOOT_FLAG = -DMCU_CORE_8258 -DMCU_STARTUP_8258
+BOOT_FLAG = -DMCU_CORE_8258 -DMCU_STARTUP_8258 -DCHIP_FLASH_SIZE=$(CHIP_FLASH_SIZE)
 
 SDK_PATH := ./tl_zigbee_sdk
 SRC_PATH := ./src
@@ -78,7 +78,7 @@ GCC_FLAGS := \
 GCC_FLAGS += \
 $(DEVICE_TYPE) \
 $(MCU_TYPE) \
--DCHIP_TYPE=$(CHIP_TYPE) \
+-DCHIP_FLASH_SIZE=$(CHIP_FLASH_SIZE) \
 -D__PROJECT_TL_BOOT_LOADER__=1
 
 OBJ_SRCS := 

@@ -184,7 +184,7 @@
 			</target>
 			<target name="2. bootloader 1M" path="" targetID="org.eclipse.cdt.build.MakeTargetBuilder">
 				<buildCommand>make</buildCommand>
-				<buildArguments>-f bootloader.makefile CHIP_TYPE=TLSR_8258_1M</buildArguments>
+				<buildArguments>-f bootloader.makefile CHIP_FLASH_SIZE=1024</buildArguments>
 				<buildTarget>bootloader</buildTarget>
 				<stopOnError>true</stopOnError>
 				<useDefaultCommand>false</useDefaultCommand>
@@ -192,7 +192,7 @@
 			</target>
 			<target name="5. Firmware 1M" path="" targetID="org.eclipse.cdt.build.MakeTargetBuilder">
 				<buildCommand>make</buildCommand>
-				<buildArguments/>
+				<buildArguments> CHIP_FLASH_SIZE=1024</buildArguments>
 				<buildTarget>all</buildTarget>
 				<stopOnError>true</stopOnError>
 				<useDefaultCommand>false</useDefaultCommand>

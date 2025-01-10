@@ -26,16 +26,7 @@
 /**********************************************************************
  * INCLUDES
  */
-#include "tl_common.h"
-#include "zb_api.h"
-#include "zcl_include.h"
-#include "ota.h"
-
 #include "app_main.h"
-#include "app_endpoint_cfg.h"
-#include "app_dev_config.h"
-#include "app_reporting.h"
-#include "se_custom_attr.h"
 
 /**********************************************************************
  * LOCAL CONSTANTS

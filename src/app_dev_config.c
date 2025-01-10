@@ -1,9 +1,4 @@
-#include "tl_common.h"
-#include "zb_api.h"
-#include "zcl_include.h"
-
-#include "app_dev_config.h"
-#include "device.h"
+#include "app_main.h"
 
 #define ID_CONFIG   0x0FED141A
 #define TOP_MASK    0xFFFFFFFF
@@ -43,9 +38,7 @@ void init_config(uint8_t print) {
 
     nv_sts_t st = NV_SUCC;
 
-#if UART_PRINTF_MODE
-    printf("\r\nOTA mode disabled. MCU boot from address: 0x%x\r\n", APP_IMAGE_ADDR);
-#endif /* UART_PRINTF_MODE */
+    start_message();
 
 #if !NV_ENABLE
 #error "NV_ENABLE must be enable in "stack_cfg.h" file!"

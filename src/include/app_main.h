@@ -1,6 +1,15 @@
 #ifndef SRC_INCLUDE_APP_MAIN_H_
 #define SRC_INCLUDE_APP_MAIN_H_
 
+#include "tl_common.h"
+#include "zcl_include.h"
+#include "bdb.h"
+#include "ota.h"
+#include "gp.h"
+
+#include "se_custom_attr.h"
+#include "app_reporting.h"
+#include "app_uart.h"
 #include "app_endpoint_cfg.h"
 #include "app_button.h"
 #include "app_led.h"

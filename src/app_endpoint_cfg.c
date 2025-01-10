@@ -1,8 +1,4 @@
-#include "tl_common.h"
-#include "zcl_include.h"
-
-#include "se_custom_attr.h"
-#include "app_endpoint_cfg.h"
+#include "app_main.h"
 
 #ifndef ZCL_BASIC_MFG_NAME
 #define ZCL_BASIC_MFG_NAME     		{6,'T','E','L','I','N','K'}
