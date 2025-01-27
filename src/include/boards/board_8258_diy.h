@@ -58,7 +58,7 @@ extern "C" {
 
 #if UART_PRINTF_MODE
 #define DEBUG_INFO_TX_PIN       GPIO_PB1    //printf
-#define BAUDRATE                115200
+#define DEBUG_BAUDRATE          115200
 #endif
 
 /************************* Configure Temperature ***********************************/
