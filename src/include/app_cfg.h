@@ -57,15 +57,7 @@ extern "C" {
  */
 //#define CHIP_FLASH_SIZE 1024
 
-
-#if (CHIP_FLASH_SIZE == 512)
-#include "version_cfg_512k.h"
-#elif (CHIP_FLASH_SIZE == 1024)
-#include "version_cfg_1m.h"
-#else
-#error CHIP_TYPE must be TLSR_8258_512K or TLSR_8258_1M
-#endif
-
+#include "version_cfg.h"
 
 /* Debug mode config */
 #define UART_PRINTF_MODE                ON
@@ -74,7 +66,7 @@ extern "C" {
 #define DEBUG_PACKAGE                   ON
 #define DEBUG_TAMPER                    ON
 #define DEBUG_REPORTING                 OFF
-#define DEBUG_TEMPERATURE               OFF
+#define DEBUG_TEMPERATURE               ON
 #define DEBUG_OTA                       OFF
 
 #define USB_PRINTF_MODE                 OFF
