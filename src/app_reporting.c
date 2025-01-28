@@ -174,7 +174,7 @@ void report_divisor_multiplier(reportCfgInfo_t *pEntry) {
             case ZCL_ATTRID_CURRENT_TIER_2_SUMMATION_DELIVERD:
             case ZCL_ATTRID_CURRENT_TIER_3_SUMMATION_DELIVERD:
             case ZCL_ATTRID_CURRENT_TIER_4_SUMMATION_DELIVERD:
-                printf("report tariff, counter_delivered_multdiv: %d\r\n", counter_delivered_multdiv);
+                //printf("report tariff, counter_delivered_multdiv: %d\r\n", counter_delivered_multdiv);
                 if(counter_delivered_multdiv++ == 0) {
                     app_forcedReport(APP_ENDPOINT_1, ZCL_CLUSTER_SE_METERING, ZCL_ATTRID_MULTIPLIER);
                     app_forcedReport(APP_ENDPOINT_1, ZCL_CLUSTER_SE_METERING, ZCL_ATTRID_DIVISOR);
@@ -190,7 +190,7 @@ void report_divisor_multiplier(reportCfgInfo_t *pEntry) {
     } else if (pEntry->clusterID == ZCL_CLUSTER_MS_ELECTRICAL_MEASUREMENT) {
         switch (pEntry->attrID) {
             case ZCL_ATTRID_LINE_CURRENT:
-                printf("report current, counter_current_multdiv: %d\r\n", counter_current_multdiv);
+                //printf("report current, counter_current_multdiv: %d\r\n", counter_current_multdiv);
                 if(counter_current_multdiv++ == 0) {
                     app_forcedReport(APP_ENDPOINT_1, ZCL_CLUSTER_MS_ELECTRICAL_MEASUREMENT, ZCL_ATTRID_AC_CURRENT_MULTIPLIER);
                     app_forcedReport(APP_ENDPOINT_1, ZCL_CLUSTER_MS_ELECTRICAL_MEASUREMENT, ZCL_ATTRID_AC_CURRENT_DIVISOR);
@@ -201,7 +201,7 @@ void report_divisor_multiplier(reportCfgInfo_t *pEntry) {
                 }
                 break;
             case ZCL_ATTRID_RMS_VOLTAGE:
-                printf("report voltage, counter_voltage_multdiv: %d\r\n", counter_voltage_multdiv);
+                //printf("report voltage, counter_voltage_multdiv: %d\r\n", counter_voltage_multdiv);
                 if(counter_voltage_multdiv++ == 0) {
                     app_forcedReport(APP_ENDPOINT_1, ZCL_CLUSTER_MS_ELECTRICAL_MEASUREMENT, ZCL_ATTRID_AC_VOLTAGE_MULTIPLIER);
                     app_forcedReport(APP_ENDPOINT_1, ZCL_CLUSTER_MS_ELECTRICAL_MEASUREMENT, ZCL_ATTRID_AC_VOLTAGE_DIVISOR);
@@ -212,7 +212,7 @@ void report_divisor_multiplier(reportCfgInfo_t *pEntry) {
                 }
                 break;
             case ZCL_ATTRID_APPARENT_POWER:
-                printf("report power, counter_power_multdiv: %d\r\n", counter_power_multdiv);
+                //printf("report power, counter_power_multdiv: %d\r\n", counter_power_multdiv);
                 if(counter_power_multdiv++ == 0) {
                     app_forcedReport(APP_ENDPOINT_1, ZCL_CLUSTER_MS_ELECTRICAL_MEASUREMENT, ZCL_ATTRID_AC_POWER_MULTIPLIER);
                     app_forcedReport(APP_ENDPOINT_1, ZCL_CLUSTER_MS_ELECTRICAL_MEASUREMENT, ZCL_ATTRID_AC_POWER_DIVISOR);
