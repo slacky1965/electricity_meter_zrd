@@ -43,7 +43,7 @@ LIBS := -lzb_router -ldrivers_8258 -lsoft-fp
 
 DEVICE_TYPE = -DROUTER=1
 MCU_TYPE = -DMCU_CORE_8258=1
-BOOT_FLAG = -DMCU_CORE_8258 -DMCU_STARTUP_8258
+BOOT_FLAG = -DMCU_CORE_8258 -DMCU_STARTUP_8258 -DCHIP_FLASH_SIZE=$(CHIP_FLASH_SIZE)
 
 SDK_PATH := ./tl_zigbee_sdk
 SRC_PATH := ./src
@@ -216,11 +216,12 @@ $(BIN_FILE): $(ELF_FILE)
 	@echo 'Create Flash image (binary format)'
 	@$(OBJCOPY) -v -O binary $(ELF_FILE)  $(BIN_FILE)
 	@python3 $(TL_Check) $(BIN_FILE)
-	@echo 'Finished building: $@'
-	@echo ' '
-	@cp $(BIN_FILE) $(BIN_PATH)/$(FIRMWARE_FILE)
 	@echo 'Copy $(BIN_FILE) to $(BIN_PATH)/$(FIRMWARE_FILE)'
+	@cp $(BIN_FILE) $(BIN_PATH)/$(FIRMWARE_FILE)
+	@echo 'Create zigbee OTA file from' $(BIN_PATH)/$(FIRMWARE_FILE)
 	@python3 $(MAKE_OTA) -ot $(PROJECT_NAME) $(BIN_PATH)/$(FIRMWARE_FILE)
+	@echo ' '
+	@echo 'Finished building: $@'
 	@echo ' '
 	
 
@@ -238,11 +239,11 @@ sizedummy: $(ELF_FILE)
 
 # Other Targets
 clean:
-	-$(RM) $(FLASH_IMAGE) $(ELFS) $(OBJS) $(SIZEDUMMY) $(LST_FILE) $(ELF_FILE) *.bin
+	-$(RM) $(FLASH_IMAGE) $(ELFS) $(OBJS) $(SIZEDUMMY) $(LST_FILE) $(ELF_FILE) $(BIN_PATH)/*.zigbee
 	-@echo ' '
 
 clean-project:
-	-$(RM) $(FLASH_IMAGE) $(ELFS) $(SIZEDUMMY) $(LST_FILE) $(ELF_FILE) $(PROJECT_NAME)_$(VERSION_RELEASE).$(VERSION_BUILD).bin
+	-$(RM) $(FLASH_IMAGE) $(ELFS) $(SIZEDUMMY) $(LST_FILE) $(ELF_FILE) $(BIN_PATH)/*.zigbee
 	-$(RM) -R $(OUT_PATH)/$(SRC_PATH)/*.o
 	-$(RM) -R $(OUT_PATH)/$(SRC_PATH)/common/*.o
 	-$(RM) -R $(OUT_PATH)/$(SRC_PATH)/devices/*.o
