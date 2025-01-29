@@ -66,7 +66,7 @@ extern "C" {
 #define DEBUG_PACKAGE                   ON
 #define DEBUG_TAMPER                    ON
 #define DEBUG_REPORTING                 OFF
-#define DEBUG_TEMPERATURE               ON
+#define DEBUG_TEMPERATURE               OFF
 #define DEBUG_OTA                       OFF
 
 #define USB_PRINTF_MODE                 OFF

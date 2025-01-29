@@ -160,13 +160,13 @@ void get_temp_handler(void *args) {
         if (!temp_outside) {
             if (temp3 < temp2 - TEMP_DIFF || temp3 > temp2 + TEMP_DIFF) {
                 temp_outside = true;
-                printf("Temperature outside: %d\r\n", temp3);
+                //printf("Temperature outside: %d\r\n", temp3);
                 tsensor_err = TSENSOR_OUTSIDE;
             }
         } else {
             temp_outside = false;
             if (temp3 > temp1 - TEMP_DIFF && temp3 < temp1 + TEMP_DIFF) {
-                printf("Temperature outside true\r\n");
+                //printf("Temperature outside true\r\n");
                 temp2 = temp3;
             }
         }
