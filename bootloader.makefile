@@ -107,7 +107,7 @@ RM := rm -rf
 LST_FILE := $(OUT_PATH)/$(PROJECT_NAME).lst
 BIN_FILE := $(OUT_PATH)/$(PROJECT_NAME).bin
 ELF_FILE := $(OUT_PATH)/$(PROJECT_NAME).elf
-
+BOOT_FILE := $(BIN_PATH)/$(PROJECT_NAME)_$(PFX_NAME).bin
 
 SIZEDUMMY += \
 sizedummy \
@@ -116,8 +116,19 @@ sizedummy \
 # All Target
 bootloader: pre-build main-build
 
-bootloader-flash: $(BIN_FILE)
-	@python3 $(TOOLS_PATH)/TlsrPgm.py -b921600 -p$(DOWNLOAD_PORT) -t50 -a2550 -m -w we 0 $(BIN_FILE)
+flash-bootloader-512k:
+	@echo ' '
+	@echo Upload file $(BOOT_FILE) to flash 512K
+	@echo ' '
+	@python3 $(TOOLS_PATH)/TlsrPgm.py -b921600 -p$(DOWNLOAD_PORT) -t50 -a2550 -m -w we 0 $(BOOT_FILE)
+	@echo ' '
+
+flash-bootloader-1m:
+	@echo ' '
+	@echo Upload file $(BOOT_FILE) to flash 1M
+	@echo ' '
+	@python3 $(TOOLS_PATH)/TlsrPgm.py -b921600 -p$(DOWNLOAD_PORT) -t50 -a2550 -m -w we 0 $(BOOT_FILE)
+	@echo ' '
 
 # Main-build Target
 main-build: clean $(ELF_FILE) secondary-outputs
@@ -140,7 +151,7 @@ $(BIN_FILE): $(ELF_FILE)
 	@echo 'Create Flash image (binary format)'
 	@$(OBJCOPY) -v -O binary $(ELF_FILE)  $(BIN_FILE)
 	@python3 $(TL_Check) $(BIN_FILE)
-	@cp $(BIN_FILE) $(BIN_PATH)/$(PROJECT_NAME)_$(PFX_NAME).bin
+	@cp $(BIN_FILE) $(BOOT_FILE)
 	@echo 'Finished building: $@'
 	@echo ' '
 
