@@ -128,7 +128,7 @@ Electricity Meter состоит из двух частей. Основной, �
 
 Корпус напечатан на 3D принтере.
 
-<img src="https://raw.githubusercontent.com/slacky1965/electricity_meter_zrd/main/doc/images/box/box_detail.jpg"/>
+<img src="https://raw.githubusercontent.com/slacky1965/electricity_meter_zrd/main/doc/images/box/box_details.jpg"/>
 
 <img src="https://raw.githubusercontent.com/slacky1965/electricity_meter_zrd/main/doc/images/box/box_common.jpg"/>
 
