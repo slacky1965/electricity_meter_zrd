@@ -95,21 +95,27 @@ Electricity Meter состоит из двух частей. Основной, �
 
 <div align="center">
 Плата основной части (верх).
+
 <img src="https://raw.githubusercontent.com/slacky1965/electricity_meter_zrd/main/doc/images/board/board_common_top.png"/>
 
 Плата основной части (низ).
+
 <img src="https://raw.githubusercontent.com/slacky1965/electricity_meter_zrd/main/doc/images/board/board_common_bottom.png"/>
 
 Плата zigbee части на модуле E180-Z5812SP (верх).
+
 <img src="https://raw.githubusercontent.com/slacky1965/electricity_meter_zrd/main/doc/images/board/board_ebyte_top.png"/>
 
 Плата zigbee части на модуле E180-Z5812SP (низ).
+
 <img src="https://raw.githubusercontent.com/slacky1965/electricity_meter_zrd/main/doc/images/board/board_ebyte_bottom.png"/>
 
 Плата zigbee части на модуле ZTU (верх).
+
 <img src="https://raw.githubusercontent.com/slacky1965/electricity_meter_zrd/main/doc/images/board/board_ztu_top.png"/>
 
 Плата zigbee части на модуле ZTU (низ).
+
 <img src="https://raw.githubusercontent.com/slacky1965/electricity_meter_zrd/main/doc/images/board/board_ztu_bottom.png"/>
 </div>
 
