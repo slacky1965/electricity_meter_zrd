@@ -65,7 +65,7 @@
 
 <img src="https://raw.githubusercontent.com/slacky1965/electricity_meter_zrd/main/doc/images/E180-Z5812SP.jpg"/>
 
-2. Модуль от компании Tuya на чипе TLSR8258F1KAT32 - ZTU.
+Модуль от компании Tuya на чипе TLSR8258F1KAT32 - ZTU.
 
 <img src="https://raw.githubusercontent.com/slacky1965/electricity_meter_zrd/main/doc/images/module_ztu.png"/>
 
