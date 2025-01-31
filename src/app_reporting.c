@@ -1,19 +1,14 @@
-#include "tl_common.h"
-#include "zb_api.h"
-#include "zcl_include.h"
-#include "bdb.h"
-#include "ota.h"
-#include "gp.h"
-
-#include "app_reporting.h"
 #include "app_main.h"
-#include "se_custom_attr.h"
 
 #define BUILD_U48(b0, b1, b2, b3, b4, b5)   ( (uint64_t)((((uint64_t)(b5) & 0x0000000000ff) << 40) + (((uint64_t)(b4) & 0x0000000000ff) << 32) + (((uint64_t)(b3) & 0x0000000000ff) << 24) + (((uint64_t)(b2) & 0x0000000000ff) << 16) + (((uint64_t)(b1) & 0x0000000000ff) << 8) + ((uint64_t)(b0) & 0x00000000FF)) )
 
+uint8_t counter_delivered_multdiv = 0;
+uint8_t counter_current_multdiv = 0;
+uint8_t counter_power_multdiv = 0;
+uint8_t counter_voltage_multdiv = 0;
+
 app_reporting_t app_reporting[ZCL_REPORTING_TABLE_NUM];
 
-extern void reportAttr(reportCfgInfo_t *pEntry);
 //void report_divisor_multiplier(reportCfgInfo_t *pEntry);
 
 #if DEBUG_REPORTING
@@ -138,6 +133,36 @@ static uint8_t get_attr_name(uint16_t cluster_id, uint16_t attr_id) {
  * Local function
  */
 
+static void reportAttr(reportCfgInfo_t *pEntry) {
+    if(!zb_bindingTblSearched(pEntry->clusterID, pEntry->endPoint)){
+        return;
+    }
+
+    epInfo_t dstEpInfo;
+    TL_SETSTRUCTCONTENT(dstEpInfo, 0);
+
+    dstEpInfo.dstAddrMode = APS_DSTADDR_EP_NOTPRESETNT;
+    dstEpInfo.profileId = pEntry->profileID;
+
+    zclAttrInfo_t *pAttrEntry = zcl_findAttribute(pEntry->endPoint, pEntry->clusterID, pEntry->attrID);
+    if(!pAttrEntry){
+        //should not happen.
+        ZB_EXCEPTION_POST(SYS_EXCEPTTION_ZB_ZCL_ENTRY);
+        return;
+    }
+
+    u16 len = zcl_getAttrSize(pAttrEntry->type, pAttrEntry->data);
+
+    len = (len>8) ? (8):(len);
+
+    //store for next compare
+    memcpy(pEntry->prevData, pAttrEntry->data, len);
+
+    zcl_sendReportCmd(pEntry->endPoint, &dstEpInfo,  TRUE, ZCL_FRAME_SERVER_CLIENT_DIR,
+                      pEntry->clusterID, pAttrEntry->id, pAttrEntry->type, pAttrEntry->data);
+}
+
+
 void report_divisor_multiplier(reportCfgInfo_t *pEntry) {
 
     //force report for multiplier and divisor
@@ -149,9 +174,15 @@ void report_divisor_multiplier(reportCfgInfo_t *pEntry) {
             case ZCL_ATTRID_CURRENT_TIER_2_SUMMATION_DELIVERD:
             case ZCL_ATTRID_CURRENT_TIER_3_SUMMATION_DELIVERD:
             case ZCL_ATTRID_CURRENT_TIER_4_SUMMATION_DELIVERD:
-                //printf("report tariff\r\n");
-                app_forcedReport(APP_ENDPOINT_1, ZCL_CLUSTER_SE_METERING, ZCL_ATTRID_MULTIPLIER);
-                app_forcedReport(APP_ENDPOINT_1, ZCL_CLUSTER_SE_METERING, ZCL_ATTRID_DIVISOR);
+                //printf("report tariff, counter_delivered_multdiv: %d\r\n", counter_delivered_multdiv);
+                if(counter_delivered_multdiv++ == 0) {
+                    app_forcedReport(APP_ENDPOINT_1, ZCL_CLUSTER_SE_METERING, ZCL_ATTRID_MULTIPLIER);
+                    app_forcedReport(APP_ENDPOINT_1, ZCL_CLUSTER_SE_METERING, ZCL_ATTRID_DIVISOR);
+                } else {
+                    if (counter_delivered_multdiv == 10) {
+                        counter_delivered_multdiv = 0;
+                    }
+                }
                 break;
             default:
                 break;
@@ -159,19 +190,37 @@ void report_divisor_multiplier(reportCfgInfo_t *pEntry) {
     } else if (pEntry->clusterID == ZCL_CLUSTER_MS_ELECTRICAL_MEASUREMENT) {
         switch (pEntry->attrID) {
             case ZCL_ATTRID_LINE_CURRENT:
-                //printf("report current\r\n");
-                app_forcedReport(APP_ENDPOINT_1, ZCL_CLUSTER_MS_ELECTRICAL_MEASUREMENT, ZCL_ATTRID_AC_CURRENT_MULTIPLIER);
-                app_forcedReport(APP_ENDPOINT_1, ZCL_CLUSTER_MS_ELECTRICAL_MEASUREMENT, ZCL_ATTRID_AC_CURRENT_DIVISOR);
+                //printf("report current, counter_current_multdiv: %d\r\n", counter_current_multdiv);
+                if(counter_current_multdiv++ == 0) {
+                    app_forcedReport(APP_ENDPOINT_1, ZCL_CLUSTER_MS_ELECTRICAL_MEASUREMENT, ZCL_ATTRID_AC_CURRENT_MULTIPLIER);
+                    app_forcedReport(APP_ENDPOINT_1, ZCL_CLUSTER_MS_ELECTRICAL_MEASUREMENT, ZCL_ATTRID_AC_CURRENT_DIVISOR);
+                } else {
+                    if (counter_current_multdiv == 10) {
+                        counter_current_multdiv = 0;
+                    }
+                }
                 break;
             case ZCL_ATTRID_RMS_VOLTAGE:
-                //printf("report voltage\r\n");
-                app_forcedReport(APP_ENDPOINT_1, ZCL_CLUSTER_MS_ELECTRICAL_MEASUREMENT, ZCL_ATTRID_AC_VOLTAGE_MULTIPLIER);
-                app_forcedReport(APP_ENDPOINT_1, ZCL_CLUSTER_MS_ELECTRICAL_MEASUREMENT, ZCL_ATTRID_AC_VOLTAGE_DIVISOR);
+                //printf("report voltage, counter_voltage_multdiv: %d\r\n", counter_voltage_multdiv);
+                if(counter_voltage_multdiv++ == 0) {
+                    app_forcedReport(APP_ENDPOINT_1, ZCL_CLUSTER_MS_ELECTRICAL_MEASUREMENT, ZCL_ATTRID_AC_VOLTAGE_MULTIPLIER);
+                    app_forcedReport(APP_ENDPOINT_1, ZCL_CLUSTER_MS_ELECTRICAL_MEASUREMENT, ZCL_ATTRID_AC_VOLTAGE_DIVISOR);
+                } else {
+                    if (counter_voltage_multdiv == 10) {
+                        counter_voltage_multdiv = 0;
+                    }
+                }
                 break;
             case ZCL_ATTRID_APPARENT_POWER:
-                //printf("report power\r\n");
-                app_forcedReport(APP_ENDPOINT_1, ZCL_CLUSTER_MS_ELECTRICAL_MEASUREMENT, ZCL_ATTRID_AC_POWER_MULTIPLIER);
-                app_forcedReport(APP_ENDPOINT_1, ZCL_CLUSTER_MS_ELECTRICAL_MEASUREMENT, ZCL_ATTRID_AC_POWER_DIVISOR);
+                //printf("report power, counter_power_multdiv: %d\r\n", counter_power_multdiv);
+                if(counter_power_multdiv++ == 0) {
+                    app_forcedReport(APP_ENDPOINT_1, ZCL_CLUSTER_MS_ELECTRICAL_MEASUREMENT, ZCL_ATTRID_AC_POWER_MULTIPLIER);
+                    app_forcedReport(APP_ENDPOINT_1, ZCL_CLUSTER_MS_ELECTRICAL_MEASUREMENT, ZCL_ATTRID_AC_POWER_DIVISOR);
+                } else {
+                    if (counter_power_multdiv == 10) {
+                        counter_power_multdiv = 0;
+                    }
+                }
                 break;
             default:
                 break;
@@ -463,7 +512,7 @@ void app_reporting_init() {
 //    sleep_ms(0xffffffff);
 }
 
-void report_handler(void) {
+void app_report_handler(void) {
 
     if (zb_isDeviceJoinedNwk()) {
 

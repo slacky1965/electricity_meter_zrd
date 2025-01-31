@@ -4,6 +4,8 @@ PROJECT_NAME := electricity_meter_zrd
 # Set the serial port number for downloading the firmware
 DOWNLOAD_PORT := COM3
 
+CHIP_FLASH_SIZE ?= 512
+
 COMPILE_OS = $(shell uname -o)
 LINUX_OS = GNU/Linux
 
@@ -12,6 +14,18 @@ ifeq ($(COMPILE_OS),$(LINUX_OS))
 else
 	COMPILE_PREFIX = C:/TelinkSDK/opt/tc32/bin/tc32
 	WIN32 = -DWIN32=1
+endif
+
+ifeq ($(CHIP_FLASH_SIZE),512)
+	PFX_NAME = 512K
+	VERSION_RELEASE := V$(shell awk -F " " '/APP_RELEASE/ {gsub("0x",""); printf "%.1f", $$3/10.0; exit}' ./src/include/version_cfg_512k.h)
+else
+	ifeq ($(CHIP_FLASH_SIZE),1024)
+		PFX_NAME = 1M
+		VERSION_RELEASE := V$(shell awk -F " " '/APP_RELEASE/ {gsub("0x",""); printf "%.1f", $$3/10.0; exit}' ./src/include/version_cfg_1m.h)
+	else
+		PFX_NAME = UNKNOWN
+	endif
 endif
 
 AS      = $(COMPILE_PREFIX)-elf-as
@@ -27,21 +41,20 @@ LIBS := -lzb_router -ldrivers_8258 -lsoft-fp
 
 DEVICE_TYPE = -DROUTER=1
 MCU_TYPE = -DMCU_CORE_8258=1
-BOOT_FLAG = -DMCU_CORE_8258 -DMCU_STARTUP_8258
+BOOT_FLAG = -DMCU_CORE_8258 -DMCU_STARTUP_8258 -DCHIP_FLASH_SIZE=$(CHIP_FLASH_SIZE)
 
 SDK_PATH := ./tl_zigbee_sdk
 SRC_PATH := ./src
 OUT_PATH := ./out
-OTA_PATH := ./zigbee2mqtt/OTA
+BIN_PATH := ./bin
 MAKE_INCLUDES := ./make
 TOOLS_PATH := ./tools
-VERSION_RELEASE := V$(shell awk -F " " '/APP_RELEASE/ {gsub("0x",""); printf "%.1f", $$3/10.0; exit}' $(SRC_PATH)/include/version_cfg.h)
-VERSION_BUILD := $(shell awk -F " " '/APP_BUILD/ {gsub("0x",""); printf "%02d", $$3; exit}' ./src/include/version_cfg.h)
 ZCL_VERSION_FILE := $(shell git log -1 --format=%cd --date=format:%Y%m%d -- src |  sed -e "'s/./\'&\',/g'" -e "'s/.$$//'")
+VERSION_BUILD := $(shell awk -F " " '/APP_BUILD/ {gsub("0x",""); printf "%02d", $$3; exit}' ./src/include/version_cfg.h)
 
 
 TL_Check = $(TOOLS_PATH)/tl_check_fw.py
-TL_OTA_TOOL = ./zigbee_ota_tool_v2.2.exe
+MAKE_OTA = $(TOOLS_PATH)/make_ota.py
 
 INCLUDE_PATHS := \
 -I$(SDK_PATH)/platform \
@@ -90,7 +103,8 @@ endif
   
 GCC_FLAGS += \
 $(DEVICE_TYPE) \
-$(MCU_TYPE)
+$(MCU_TYPE) \
+-DCHIP_FLASH_SIZE=$(CHIP_FLASH_SIZE)
 
 #$(WIN32)
 
@@ -134,8 +148,8 @@ LST_FILE := $(OUT_PATH)/$(PROJECT_NAME).lst
 BIN_FILE := $(OUT_PATH)/$(PROJECT_NAME).bin
 ELF_FILE := $(OUT_PATH)/$(PROJECT_NAME).elf
 LOWER_NAME := $(shell echo $(PROJECT_NAME) | tr [:upper:] [:lower:])
-FIRMWARE_FILE := $(LOWER_NAME)_$(VERSION_RELEASE).$(VERSION_BUILD).bin
-BOOTLOADER := $(TOOLS_PATH)/bootloader/bootloader_8258_512k.bin
+FIRMWARE_FILE := $(LOWER_NAME)_$(PFX_NAME)_$(VERSION_RELEASE).$(VERSION_BUILD).bin
+BOOT_FILE := $(BIN_PATH)/bootloader_$(PFX_NAME).bin
 
 SIZEDUMMY += \
 sizedummy \
@@ -144,19 +158,62 @@ sizedummy \
 # All Target
 all: pre-build main-build
 
-flash: $(BIN_FILE)
-	@python3 $(TOOLS_PATH)/TlsrPgm.py -p$(DOWNLOAD_PORT) -z11 -a 100 -s -m we 0x8000 $(BIN_FILE)
+flash-firmware-512k:
+	@echo ' '
+	@echo Upload file $(BOOT_FILE) to flash 1M
+	@echo ' '
+	@python3 $(TOOLS_PATH)/TlsrPgm.py -p$(DOWNLOAD_PORT) -z11 -a 100 -s -m we 0 $(BOOT_FILE)
+	@echo ' '
+	@echo Upload file $(BIN_PATH)/$(FIRMWARE_FILE) to flash 512K
+	@echo ' '
+	@python3 $(TOOLS_PATH)/TlsrPgm.py -p$(DOWNLOAD_PORT) -z11 -a 100 -s -m we 0x8000 $(BIN_PATH)/$(FIRMWARE_FILE)
+	@echo ' '
 	
+flash-firmware-1m:
+	@echo ' '
+	@echo Upload file $(BOOT_FILE) to flash 1M
+	@echo ' '
+	@python3 $(TOOLS_PATH)/TlsrPgm.py -p$(DOWNLOAD_PORT) -z11 -a 100 -s -m we 0 $(BOOT_FILE)
+	@echo ' '
+	@echo Upload file $(BIN_PATH)/$(FIRMWARE_FILE) to flash 1M
+	@echo ' '
+	@python3 $(TOOLS_PATH)/TlsrPgm.py -p$(DOWNLOAD_PORT) -z11 -a 100 -s -m we 0x8000 $(BIN_PATH)/$(FIRMWARE_FILE)
+	@echo ' '
 	
-erase-flash:
-	@python3 $(TOOLS_PATH)/TlsrPgm.py -p$(DOWNLOAD_PORT) -z11 -a 100 -s ea
-	
-erase-flash-fimware:
-	@python3 $(TOOLS_PATH)/TlsrPgm.py -p$(DOWNLOAD_PORT) -z11 -a 100 -s es 0x8000 0x78000
-	
+erase-flash_512k:
+	@echo ' '
+	@echo Erase all flash 512K
+	@echo ' '
+	@python3 $(TOOLS_PATH)/TlsrPgm.py -p$(DOWNLOAD_PORT) -z11 -a 100 -s es 0x0 0x77000
+	@python3 $(TOOLS_PATH)/TlsrPgm.py -p$(DOWNLOAD_PORT) -z11 -a 100 -s es 0x7a000 0x6000
+	@echo ' '
 
-flash-bootloader:
-	@python3 $(TOOLS_PATH)/TlsrPgm.py -p$(DOWNLOAD_PORT) -z11 -a 100 -s -m we 0 $(BOOTLOADER)
+erase-flash-1m:
+	@echo ' '
+	@echo Erase all flash 1M
+	@echo ' '
+	@python3 $(TOOLS_PATH)/TlsrPgm.py -p$(DOWNLOAD_PORT) -z11 -a 100 -s es 0x0 0xfc000
+	@python3 $(TOOLS_PATH)/TlsrPgm.py -p$(DOWNLOAD_PORT) -z11 -a 100 -s es 0xff000 0x1000
+	@echo ' '
+
+erase-flash-fimware-512k:
+	@echo ' '
+	@echo Erase firmwawre flash 512K
+	@echo ' '
+	@python3 $(TOOLS_PATH)/TlsrPgm.py -p$(DOWNLOAD_PORT) -z11 -a 100 -s es 0x8000 0x6e000
+	@python3 $(TOOLS_PATH)/TlsrPgm.py -p$(DOWNLOAD_PORT) -z11 -a 100 -s es 0x76000 0x1000
+	@echo ' '
+	
+erase-flash-fimware-1m:
+	@echo ' '
+	@echo Erase firmwawre flash 1M
+	@echo ' '
+	@python3 $(TOOLS_PATH)/TlsrPgm.py -p$(DOWNLOAD_PORT) -z11 -a 100 -s es 0x8000 0xF4000
+	@python3 $(TOOLS_PATH)/TlsrPgm.py -p$(DOWNLOAD_PORT) -z11 -a 100 -s es 0xff000 0x1000
+	@echo ' '
+
+erase-flash-bootloader:
+	@python3 $(TOOLS_PATH)/TlsrPgm.py -p$(DOWNLOAD_PORT) -z11 -a 100 -s es 0x0 0x8000
 
 reset:
 	@python3 $(TOOLS_PATH)/TlsrPgm.py -p$(DOWNLOAD_PORT) -z11 -a 100 -s -t50 -a2550 -m -w i
@@ -164,7 +221,7 @@ reset:
 # Main-build Target
 #main-build: clean $(ELF_FILE) secondary-outputs
 
-main-build: clean-project $(ELF_FILE) secondary-outputs
+main-build: clean $(ELF_FILE) secondary-outputs
 
 # Tool invocations
 $(ELF_FILE): $(OBJS) $(USER_OBJS)
@@ -180,15 +237,39 @@ $(LST_FILE): $(ELF_FILE)
 	@echo 'Finished building: $@'
 	@echo ' '
 
+ifeq ($(CHIP_FLASH_SIZE),512)
+
 $(BIN_FILE): $(ELF_FILE)
 	@echo 'Create Flash image (binary format)'
 	@$(OBJCOPY) -v -O binary $(ELF_FILE)  $(BIN_FILE)
 	@python3 $(TL_Check) $(BIN_FILE)
 	@echo 'Finished building: $@'
 	@echo ' '
-	@cp $(BIN_FILE) $(FIRMWARE_FILE)
-	@echo 'Copy $(BIN_FILE) to $(FIRMWARE_FILE)'
+	@cp $(BIN_FILE) $(BIN_PATH)/$(FIRMWARE_FILE)
+	@echo 'Copy $(BIN_FILE) to $(BIN_PATH)/$(FIRMWARE_FILE)'
 	@echo ' '
+	
+	
+else
+ifeq ($(CHIP_FLASH_SIZE),1024)
+	
+$(BIN_FILE): $(ELF_FILE)
+	@echo 'Create Flash image (binary format)'
+	@$(OBJCOPY) -v -O binary $(ELF_FILE)  $(BIN_FILE)
+	@python3 $(TL_Check) $(BIN_FILE)
+	@echo 'Copy $(BIN_FILE) to $(BIN_PATH)/$(FIRMWARE_FILE)'
+	@cp $(BIN_FILE) $(BIN_PATH)/$(FIRMWARE_FILE)
+	@echo 'Create zigbee OTA file from' $(BIN_PATH)/$(FIRMWARE_FILE)
+	@python3 $(MAKE_OTA) -ot $(PROJECT_NAME) $(BIN_PATH)/$(FIRMWARE_FILE)
+	@echo ' '
+	@echo 'Finished building: $@'
+	@echo ' '
+	
+
+endif
+endif
+
+
 
 
 sizedummy: $(ELF_FILE)
@@ -199,11 +280,11 @@ sizedummy: $(ELF_FILE)
 
 # Other Targets
 clean:
-	-$(RM) $(FLASH_IMAGE) $(ELFS) $(OBJS) $(SIZEDUMMY) $(LST_FILE) $(ELF_FILE) *.bin
+	-$(RM) $(FLASH_IMAGE) $(ELFS) $(OBJS) $(SIZEDUMMY) $(LST_FILE) $(ELF_FILE) $(BIN_PATH)/*.zigbee
 	-@echo ' '
 
 clean-project:
-	-$(RM) $(FLASH_IMAGE) $(ELFS) $(SIZEDUMMY) $(LST_FILE) $(ELF_FILE) $(PROJECT_NAME)_$(VERSION_RELEASE).$(VERSION_BUILD).bin
+	-$(RM) $(FLASH_IMAGE) $(ELFS) $(SIZEDUMMY) $(LST_FILE) $(ELF_FILE) $(BIN_PATH)/*.zigbee
 	-$(RM) -R $(OUT_PATH)/$(SRC_PATH)/*.o
 	-$(RM) -R $(OUT_PATH)/$(SRC_PATH)/common/*.o
 	-$(RM) -R $(OUT_PATH)/$(SRC_PATH)/devices/*.o
@@ -212,7 +293,6 @@ clean-project:
 	
 pre-build:
 	mkdir -p $(foreach s,$(OUT_DIR),$(OUT_PATH)$(s))
-	mkdir -p $(OTA_PATH); 
 	-@echo ' '
 
 post-build:

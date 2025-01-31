@@ -1,11 +1,3 @@
-#include "tl_common.h"
-#include "zb_api.h"
-#include "zcl_include.h"
-#include "gp.h"
-
-#include "app_utility.h"
-#include "app_button.h"
-#include "app_reporting.h"
 #include "app_main.h"
 
 #define DEBOUNCE_BUTTON     16                          /* number of polls for debounce       */

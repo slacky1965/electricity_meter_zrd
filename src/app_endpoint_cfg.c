@@ -1,8 +1,4 @@
-#include "tl_common.h"
-#include "zcl_include.h"
-
-#include "se_custom_attr.h"
-#include "app_endpoint_cfg.h"
+#include "app_main.h"
 
 #ifndef ZCL_BASIC_MFG_NAME
 #define ZCL_BASIC_MFG_NAME     		{6,'T','E','L','I','N','K'}
@@ -107,7 +103,7 @@ zcl_basicAttr_t g_zcl_basicAttrs =
     .zclVersion     = 0x03,
     .appVersion     = APP_RELEASE,
     .stackVersion   = (STACK_RELEASE|STACK_BUILD),
-    .hwVersion      = 0x00,
+    .hwVersion      = HW_VERSION,
     .manuName       = ZCL_BASIC_MFG_NAME,
     .modelId        = ZCL_BASIC_MODEL_ID,
     .dateCode       = ZCL_BASIC_DATE_CODE,
@@ -126,6 +122,7 @@ const zclAttrInfo_t basic_attrTbl[] =
     { ZCL_ATTRID_BASIC_HW_VER,              ZCL_UINT8,      R,  (uint8_t*)&g_zcl_basicAttrs.hwVersion       },
     { ZCL_ATTRID_BASIC_MFR_NAME,            ZCL_CHAR_STR,   R,  (uint8_t*)g_zcl_basicAttrs.manuName         },
     { ZCL_ATTRID_BASIC_MODEL_ID,            ZCL_CHAR_STR,   R,  (uint8_t*)g_zcl_basicAttrs.modelId          },
+    { ZCL_ATTRID_BASIC_DATE_CODE,           ZCL_CHAR_STR,   R,  (uint8_t*)g_zcl_basicAttrs.dateCode         },
     { ZCL_ATTRID_BASIC_POWER_SOURCE,        ZCL_ENUM8,      R,  (uint8_t*)&g_zcl_basicAttrs.powerSource     },
     { ZCL_ATTRID_BASIC_DEV_ENABLED,         ZCL_BOOLEAN,    RW, (uint8_t*)&g_zcl_basicAttrs.deviceEnable    },
     { ZCL_ATTRID_BASIC_SW_BUILD_ID,         ZCL_CHAR_STR,   R,  (uint8_t*)&g_zcl_basicAttrs.swBuildId       },

@@ -1,12 +1,15 @@
-# <a id="Top">Electricity Meter Zigbee TLSR8258 (E-Byte E180-Z5812SP)</a>
+# <a id="Top">Electricity Meter Zigbee TLSR8258</a>
 
 ## Устройство для дистанционного мониторинга многотарифных однофазных счетчиков с последующей передачей показаний в Home Assistant.
 
-**Включает в себя схему оптопорта и модуль от E-Byte E180-Z5812SP, который работает, как Zigbee-роутер**
+**Включает в себя схему оптопорта и модуль от E-Byte E180-Z5812SP или от Tuya ZTU, который работает, как Zigbee-роутер**
 
 [Repository electricity_meter_zrd](https://github.com/slacky1965/electricity_meter_zrd)
 
 [Версия 1 устройства хранится в отдельной ветке](https://github.com/slacky1965/electricity_meter_zrd/tree/version1) и больше не поддерживается.
+
+> [!WARNING]
+> Внимание! Нумерация версий может начинаться с 2 или с 3. Например 2.0.03 или 3.0.03. Версия, которая начинается с 2, собрана для модуля E-Byte E180-Z5812SP. Версия, которая начинается с 3, собрана для модуля Tuya ZTU. Во 2 версии нет ОТА. В 3 версии ОТА реализована.
 
 ---
 
@@ -56,9 +59,15 @@
 
 ## <a id="hardware">Железо</a>
 
-В проекте используется модуль от компании E-BYTE на чипе TLSR8258F512ET32 - E180-Z5812SP.
+В проекте используется два варианта модулей.
+
+Модуль от компании E-BYTE на чипе TLSR8258F512ET32 - E180-Z5812SP.
 
 <img src="https://raw.githubusercontent.com/slacky1965/electricity_meter_zrd/main/doc/images/E180-Z5812SP.jpg"/>
+
+2. Модуль от компании Tuya на чипе TLSR8258F1KAT32 - ZTU.
+
+<img src="https://raw.githubusercontent.com/slacky1965/electricity_meter_zrd/main/doc/images/module_ztu.png"/>
 
 Испытывалось все на вот таком dongle от Telink
 
@@ -70,15 +79,51 @@
 
 Electricity Meter состоит из двух частей. Основной, на которой расположены оптопорт, usb разъем и питание. И модуль zigbee с датчиком температуры. Так сделано для универсальности. К оптопорту можно подключить практически что угодно (модуль на другом чипе, UART-USB преобразователь и т.д.).
 
-<img src="https://raw.githubusercontent.com/slacky1965/electricity_meter_zrd/main/doc/images/schematic_electericity_meter_zrd_3d_box_common.jpg"/>
 
-<img src="https://raw.githubusercontent.com/slacky1965/electricity_meter_zrd/main/doc/images/schematic_electricity_meter_zrd_3d_box_zigbee.jpg"/>
+<div align="center">
+Схема основной части с оптопортом.
+</div>
+<img src="https://raw.githubusercontent.com/slacky1965/electricity_meter_zrd/main/doc/images/schematic_common.jpg"/>
+
+<div align="center">
+Схема zigbee на модуле E180-Z5812SP.
+</div>
+<img src="https://raw.githubusercontent.com/slacky1965/electricity_meter_zrd/main/doc/images/schematic_zigbee_e180.jpg"/>
+
+<div align="center">
+Схема zigbee на модуле ZTU.
+</div>
+<img src="https://raw.githubusercontent.com/slacky1965/electricity_meter_zrd/main/doc/images/schematic_zigbee_ztu.jpg"/>
 
 **Плата**
 
-<img src="https://raw.githubusercontent.com/slacky1965/electricity_meter_zrd/main/doc/images/board/board_3d_box_common.jpg"/>
+<div align="center">
+Плата основной части (верх).
+</div>
+<img src="https://raw.githubusercontent.com/slacky1965/electricity_meter_zrd/main/doc/images/board/board_common_top.png"/>
 
-<img src="https://raw.githubusercontent.com/slacky1965/electricity_meter_zrd/main/doc/images/board/board_3d_box_zigbee.jpg"/>
+<div align="center">
+Плата основной части (низ).
+</div>
+<img src="https://raw.githubusercontent.com/slacky1965/electricity_meter_zrd/main/doc/images/board/board_common_bottom.png"/>
+
+<div align="center">
+Плата zigbee части на модуле E180-Z5812SP (верх).
+</div>
+<img src="https://raw.githubusercontent.com/slacky1965/electricity_meter_zrd/main/doc/images/board/board_ebyte_top.png"/>
+
+<div align="center">
+Плата zigbee части на модуле E180-Z5812SP (низ).
+<img src="https://raw.githubusercontent.com/slacky1965/electricity_meter_zrd/main/doc/images/board/board_ebyte_bottom.png"/>
+
+<div align="center">
+Плата zigbee части на модуле ZTU (верх).
+</div>
+<img src="https://raw.githubusercontent.com/slacky1965/electricity_meter_zrd/main/doc/images/board/board_ztu_top.png"/>
+
+<div align="center">
+Плата zigbee части на модуле ZTU (низ).
+<img src="https://raw.githubusercontent.com/slacky1965/electricity_meter_zrd/main/doc/images/board/board_ztu_bottom.png"/>
 
 На гребенку выведены следующие пины модуля
 
@@ -87,23 +132,33 @@ Electricity Meter состоит из двух частей. Основной, �
 
 Ссылки на проект в easyeda
 
-* [Общая часть](https://oshwlab.com/slacky/electericity_meter_zrd_3d_box_common_copy)
-* [Zigbee](https://oshwlab.com/slacky/electricity_meter_zrd_3d_box_zigbee)
+* [Общая часть](https://oshwlab.com/slacky/electricitymeter_zrd_v3_common)
+* [Zigbee E180](https://oshwlab.com/slacky/electricitymeter_zrd_v3_e180)
+* [Zigbee ZTU]( https://oshwlab.com/slacky/electricitymeter_zrd_v3_ztu)
 
 **Корпус**
 
 Корпус напечатан на 3D принтере.
 
-<img src="https://raw.githubusercontent.com/slacky1965/electricity_meter_zrd/main/doc/images/box/main_and_cover.png"/>
+<img src="https://raw.githubusercontent.com/slacky1965/electricity_meter_zrd/main/doc/images/box/box_detail.jpg"/>
 
-[STL файл основания](https://raw.githubusercontent.com/slacky1965/electricity_meter_zrd/main/doc/ElectricityMeter_Main1_short.STL)
+<img src="https://raw.githubusercontent.com/slacky1965/electricity_meter_zrd/main/doc/images/box/box_common.jpg"/>
 
-[STL крышки](https://raw.githubusercontent.com/slacky1965/electricity_meter_zrd/main/doc/ElectricityMeter_Cover_New.STL)
+<img src="https://raw.githubusercontent.com/slacky1965/electricity_meter_zrd/main/doc/images/box/box_common_e180.jpg"/>
 
+[STL файл основания](https://raw.githubusercontent.com/slacky1965/electricity_meter_zrd/main/doc/production/ElectricityMeter_Main.STL)
+
+[STL файл крышки](https://raw.githubusercontent.com/slacky1965/electricity_meter_zrd/main/doc/production/ElectricityMeter_Cover.STL)
+
+[STL файл толкателя](https://raw.githubusercontent.com/slacky1965/electricity_meter_zrd/main/doc/production/ElectricityMeter_Pusher.STL)
+
+[STL файл шайбы](https://raw.githubusercontent.com/slacky1965/electricity_meter_zrd/main/doc/production/ElectricityMeter_Spacer.STL)
+
+[STL файл гайки](https://raw.githubusercontent.com/slacky1965/electricity_meter_zrd/main/doc/production/ElectricityMeter_Screw.STL)
 
 **Готовое устройство**
 
-<img src="https://raw.githubusercontent.com/slacky1965/electricity_meter_zrd/main/doc/images/device_3d_box.jpg"/>
+<img src="https://raw.githubusercontent.com/slacky1965/electricity_meter_zrd/main/doc/images/device_ztu.jpg"/>
 
 <img src="https://raw.githubusercontent.com/slacky1965/electricity_meter_zrd/main/doc/images/device_3d_box.png"/>
 
@@ -213,7 +268,7 @@ Electricity Meter состоит из двух частей. Основной, �
 	
 **Память модуля, прошивка (firmware) и где хранится конфиг**
 
-В данном проекте обновление OTA не используется. Связано это с тем, что при конфигурации с OTA на TLSR8258F512 отведено под прошивку только 0x34000 байт. И даже, если применить модуль TLST8258F1 с 1мБ - это все равно не сильно исправляет ситуацию, в нем отведено место под прошивку 0x40000. К чему все это. Размер прошивки с 6 счетчиками подошел к своему пределу, что-то около 200000 байт. Если предположить, что счетчики будут добавляться, то мы в самом ближайшем будущем столкнемся с тем, что прошивка превысит размер выделенного под нее пространстсва. Раздельная компиляция для конкретного счетчика мне не понравилась, там вылезли свои глюки. Потому было принято решение остановиться на схеме с использованием `bootloader'a`. При таком решении и отключенном обновлением OTA, размер прошивки может достигать более 400 кБ, что достаточно много. Карту памяти можно посмотреть тут - tl_zigbee_sdk/proj/drivers/drv_nv.h.
+В прошивке 2-й версии ОТА не используется. Связано с нехваткой флеш-памяти в чипе TLSR8258F512, который применен в модуле фирмы E-Byte. В версии 3 ОТА реализована, так как модуль ZTU имеет на борту чип TLST8258F1 с 1мБ флеш-памяти. 
 
 Согласно спецификации на чип TLSR8258F512ET32 при использовании `bootloader'a` память распределена следующим образом
 
@@ -222,16 +277,27 @@ Electricity Meter состоит из двух частей. Основной, �
 		0x39000 OTA Image
 		0x6A000 NV_1
 		0x76000 MAC address
-		0x77000 C_Cfg_Info
+		0x77000 F_Cfg_Info
 		0x78000 U_Cfg_Info
 		0x7A000 NV_2
 		0x80000 End Flash
 
 Так, как обновление OTA не используется, то прошивка может занимать оба пространства `Firmware` и `OTA Image`, что в сумме составляет 0x62000 (401408) байт.
 
+Согласно спецификации на чип TLSR8258F1KAT32 при использовании `bootloader'a` память распределена следующим образом
+
+		0x00000  Bootloader
+		0x08000  Firmware
+		0x77000  OTA Image
+		0xE6000  NV
+		0xFC000  U_Cfg_Info
+		0xFE000  F_Cfg_Info
+		0xFF000  MAC address
+		0x100000 End Flash
+
 `bootloader` ничего не умеет, кроме, как запускать прошивку с адреса 0x8000.
 
-В конфиге сохраняютстя только настройки модуля. Конфиг записывается в NV_2 (куда-то в область с 0x7a000 по 0x7c000). Используется модуль NV_MODULE_APP с номером NV_ITEM_APP_USER_CFG (для понимания смотрите app_cfg.h и tl_zigbee_sdk/proj/drivers/drv_nv.h)
+В конфиге сохраняютстя только настройки модуля. Конфиг записывается в NV_2 (куда-то в область с 0x7a000 по 0x7c000) в модуле E180 и в NV (0xE6000) в модуле ZTU. Используется модуль NV_MODULE_APP с номером NV_ITEM_APP_USER_CFG (для понимания смотрите app_cfg.h и tl_zigbee_sdk/proj/drivers/drv_nv.h)
 
 В электросчетчиках используются разные протоколы обмена. Дополнительную информацию смотрите в разделе по конкретному [электросчетчику](#electricity_meters).
 
@@ -467,5 +533,11 @@ external_converters:
 	- Добавлена возможность ввода пароля (для счетчиков, где это необходимо)
 	- Полностью изменен запрос параметров для счетчика Нартис-100
 	- Добавлен счетчик Миртек-12 (выбирать нужно Каскад-1МТ)
+- Далее изменения для версии 2 и 3 будут общими.
+- x.0.03
+	- Добавлен модуль Tuya ZTU для реализации ОТА обновлений.
+	- Добавлена дата файла прошивки.
+	- Устранен баг с температурой - иногда от датчика приходило некорректное значение температуры, что искажало статистику.
+	- Обновлен SDK до версии V3.7.1.2
 
 [Наверх](#Top)

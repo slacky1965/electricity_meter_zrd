@@ -1,12 +1,4 @@
-#include "tl_common.h"
-#include "zb_api.h"
-#include "zcl_include.h"
-#include "gp.h"
-
-#include "app_led.h"
 #include "app_main.h"
-#include "app_dev_config.h"
-#include "device.h"
 
 int32_t flashLedStatusCb(void *arg) {
     if (zb_isDeviceJoinedNwk() && device_online) {

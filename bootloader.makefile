@@ -4,6 +4,8 @@ PROJECT_NAME := bootloader
 # Set the serial port number for downloading the firmware
 DOWNLOAD_PORT := COM3
 
+CHIP_FLASH_SIZE ?= 512
+
 COMPILE_OS = $(shell uname -o)
 LINUX_OS = GNU/Linux
 
@@ -11,6 +13,16 @@ ifeq ($(COMPILE_OS),$(LINUX_OS))
 	COMPILE_PREFIX = /opt/tc32/bin/tc32
 else
 	COMPILE_PREFIX = C:/TelinkSDK/opt/tc32/bin/tc32
+endif
+
+ifeq ($(CHIP_FLASH_SIZE),512)
+	PFX_NAME = 512K
+else
+	ifeq ($(CHIP_FLASH_SIZE),1024)
+		PFX_NAME = 1M
+	else
+		PFX_NAME = UNKNOWN
+	endif
 endif
 
 AS      = $(COMPILE_PREFIX)-elf-as
@@ -25,11 +37,12 @@ SIZE	= $(COMPILE_PREFIX)-elf-size
 LIBS := -ldrivers_8258
 
 MCU_TYPE = -DMCU_CORE_8258=1
-BOOT_FLAG = -DMCU_CORE_8258 -DMCU_STARTUP_8258
+BOOT_FLAG = -DMCU_CORE_8258 -DMCU_STARTUP_8258 -DCHIP_FLASH_SIZE=$(CHIP_FLASH_SIZE)
 
 SDK_PATH := ./tl_zigbee_sdk
 SRC_PATH := ./src
 OUT_PATH := ./out
+BIN_PATH := ./bin
 MAKE_INCLUDES := ./make
 TOOLS_PATH := ./tools
 
@@ -65,6 +78,7 @@ GCC_FLAGS := \
 GCC_FLAGS += \
 $(DEVICE_TYPE) \
 $(MCU_TYPE) \
+-DCHIP_FLASH_SIZE=$(CHIP_FLASH_SIZE) \
 -D__PROJECT_TL_BOOT_LOADER__=1
 
 OBJ_SRCS := 
@@ -93,7 +107,7 @@ RM := rm -rf
 LST_FILE := $(OUT_PATH)/$(PROJECT_NAME).lst
 BIN_FILE := $(OUT_PATH)/$(PROJECT_NAME).bin
 ELF_FILE := $(OUT_PATH)/$(PROJECT_NAME).elf
-
+BOOT_FILE := $(BIN_PATH)/$(PROJECT_NAME)_$(PFX_NAME).bin
 
 SIZEDUMMY += \
 sizedummy \
@@ -102,8 +116,19 @@ sizedummy \
 # All Target
 bootloader: pre-build main-build
 
-bootloader-flash: $(BIN_FILE)
-	@python3 $(TOOLS_PATH)/TlsrPgm.py -b921600 -p$(DOWNLOAD_PORT) -t50 -a2550 -m -w we 0 $(BIN_FILE)
+flash-bootloader-512k:
+	@echo ' '
+	@echo Upload file $(BOOT_FILE) to flash 512K
+	@echo ' '
+	@python3 $(TOOLS_PATH)/TlsrPgm.py -b921600 -p$(DOWNLOAD_PORT) -t50 -a2550 -m -w we 0 $(BOOT_FILE)
+	@echo ' '
+
+flash-bootloader-1m:
+	@echo ' '
+	@echo Upload file $(BOOT_FILE) to flash 1M
+	@echo ' '
+	@python3 $(TOOLS_PATH)/TlsrPgm.py -b921600 -p$(DOWNLOAD_PORT) -t50 -a2550 -m -w we 0 $(BOOT_FILE)
+	@echo ' '
 
 # Main-build Target
 main-build: clean $(ELF_FILE) secondary-outputs
@@ -126,6 +151,7 @@ $(BIN_FILE): $(ELF_FILE)
 	@echo 'Create Flash image (binary format)'
 	@$(OBJCOPY) -v -O binary $(ELF_FILE)  $(BIN_FILE)
 	@python3 $(TL_Check) $(BIN_FILE)
+	@cp $(BIN_FILE) $(BOOT_FILE)
 	@echo 'Finished building: $@'
 	@echo ' '
 

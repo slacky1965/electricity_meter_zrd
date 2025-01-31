@@ -26,12 +26,6 @@
 /**********************************************************************
  * INCLUDES
  */
-#include "tl_common.h"
-#include "zb_api.h"
-#include "zcl_include.h"
-#include "bdb.h"
-#include "ota.h"
-
 #include "app_main.h"
 
 /**********************************************************************

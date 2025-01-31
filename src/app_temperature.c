@@ -1,8 +1,4 @@
-#include "tl_common.h"
-#include "zcl_include.h"
-
-#include "app_temperature.h"
-#include "app_endpoint_cfg.h"
+#include "app_main.h"
 
 #define DIRECT_MODE_INPUT   one_wire_mode_input
 #define DIRECT_MODE_OUTPUT  one_wire_mode_output
@@ -10,7 +6,23 @@
 #define DIRECT_WRITE_LOW()  one_wire_gpio_write(0)
 #define DIRECT_READ         one_wire_gpio_read
 
+#define TEMP_DIFF           15
+
 typedef uint8_t scratch_pad_t[9];
+
+typedef enum {
+    TSENSOR_SUCCESS = 0,
+    TSENSOR_FAULT,
+    TSENSOR_OUTSIDE
+} tsensor_err_t;
+
+int16_t temp1 = 22;
+int16_t temp2 = 22;
+int16_t temp3 = 22;
+
+bool    temp_outside = false;
+
+tsensor_err_t tsensor_err = TSENSOR_SUCCESS;
 
 static void one_wire_mode_output() {
     drv_gpio_output_en(GPIO_TEMP, true);
@@ -115,21 +127,6 @@ static void ds18b20_read_scratch_pad(uint8_t *scratch_pad, uint8_t fields) {
     }
 }
 
-static float ds18b20_get_temp() {
-
-    if (!ds18b20_reset()) {
-        return 0;
-    }
-
-    ds18b20_request_temp();
-
-    scratch_pad_t scratch_pad;
-    ds18b20_read_scratch_pad(scratch_pad, 2);
-    int16_t rawTemperature = (((int16_t)scratch_pad[TEMP_MSB]) << 8) | scratch_pad[TEMP_LSB];
-    float temp = 0.0625 * rawTemperature;
-    return temp;
-}
-
 void ds18b20_init() {
     drv_gpio_input_en(GPIO_TEMP, true);
     drv_gpio_output_en(GPIO_TEMP, true);
@@ -139,15 +136,61 @@ void ds18b20_init() {
     DIRECT_WRITE_HIGH();
 }
 
+void get_temp_handler(void *args) {
+
+    tsensor_err = TSENSOR_SUCCESS;
+    int16_t temp = 22;
+
+    if (!ds18b20_reset()) {
+        tsensor_err = TSENSOR_FAULT;
+    } else {
+        ds18b20_request_temp();
+
+        scratch_pad_t scratch_pad;
+        ds18b20_read_scratch_pad(scratch_pad, 2);
+        int16_t rawTemperature = (((int16_t)scratch_pad[TEMP_MSB]) << 8) | scratch_pad[TEMP_LSB];
+        temp = rawTemperature * 625 / 10000;
+
+        temp1 = temp2;
+        temp2 = temp3;
+        temp3 = temp;
+
+        //printf("temp1: %d, temp2: %d, temp3: %d\r\n", temp1, temp2, temp3);
+
+        if (!temp_outside) {
+            if (temp3 < temp2 - TEMP_DIFF || temp3 > temp2 + TEMP_DIFF) {
+                temp_outside = true;
+                //printf("Temperature outside: %d\r\n", temp3);
+                tsensor_err = TSENSOR_OUTSIDE;
+            }
+        } else {
+            temp_outside = false;
+            if (temp3 > temp1 - TEMP_DIFF && temp3 < temp1 + TEMP_DIFF) {
+                //printf("Temperature outside true\r\n");
+                temp2 = temp3;
+            }
+        }
+    }
+
+    if (tsensor_err == TSENSOR_SUCCESS) {
+#if UART_PRINTF_MODE && DEBUG_TEMPERATURE
+        printf("Temperature: %d\r\n", temp3);
+#endif
+        zcl_setAttrVal(APP_ENDPOINT_1, ZCL_CLUSTER_GEN_DEVICE_TEMP_CONFIG, ZCL_ATTRID_DEV_TEMP_CURR_TEMP, (uint8_t*)&temp3);
+    }
+}
+
 int32_t getTemperatureCb(void *arg) {
 
-    int16_t temperature = ds18b20_get_temp();
+    TL_SCHEDULE_TASK(get_temp_handler, NULL);
 
-#if UART_PRINTF_MODE && DEBUG_TEMPERATURE
-    printf("Temperature: %d\r\n", temperature);
-#endif
-
-    zcl_setAttrVal(APP_ENDPOINT_1, ZCL_CLUSTER_GEN_DEVICE_TEMP_CONFIG, ZCL_ATTRID_DEV_TEMP_CURR_TEMP, (uint8_t*)&temperature);
+//    int16_t temperature = ds18b20_get_temp();
+//
+//#if UART_PRINTF_MODE && DEBUG_TEMPERATURE
+//    printf("Temperature: %d\r\n", temperature);
+//#endif
+//
+//    zcl_setAttrVal(APP_ENDPOINT_1, ZCL_CLUSTER_GEN_DEVICE_TEMP_CONFIG, ZCL_ATTRID_DEV_TEMP_CURR_TEMP, (uint8_t*)&temperature);
 
     return 0;
 }
