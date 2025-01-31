@@ -495,7 +495,7 @@ external_converters:
 * Не совмещены светодиод и фототранзистор на устройстве и счетчике. Рекомендуется немного подвигать устройство.
 * Правильное позиционирование Electricity Meter на счетчике - USB разъемом вниз
 
-<img src="https://raw.githubusercontent.com/slacky1965/electricity_meter_zrd/main/doc/images/device_3d_box1.jpg">
+<img src="https://raw.githubusercontent.com/slacky1965/electricity_meter_zrd/main/doc/images/device.jpg">
 
 ---
 
