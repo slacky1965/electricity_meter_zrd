@@ -82,48 +82,36 @@ Electricity Meter состоит из двух частей. Основной, �
 
 <div align="center">
 Схема основной части с оптопортом.
-</div>
 <img src="https://raw.githubusercontent.com/slacky1965/electricity_meter_zrd/main/doc/images/schematic_common.jpg"/>
 
-<div align="center">
 Схема zigbee на модуле E180-Z5812SP.
-</div>
 <img src="https://raw.githubusercontent.com/slacky1965/electricity_meter_zrd/main/doc/images/schematic_zigbee_e180.jpg"/>
 
-<div align="center">
 Схема zigbee на модуле ZTU.
-</div>
 <img src="https://raw.githubusercontent.com/slacky1965/electricity_meter_zrd/main/doc/images/schematic_zigbee_ztu.jpg"/>
+</div>
 
 **Плата**
 
 <div align="center">
 Плата основной части (верх).
-</div>
 <img src="https://raw.githubusercontent.com/slacky1965/electricity_meter_zrd/main/doc/images/board/board_common_top.png"/>
 
-<div align="center">
 Плата основной части (низ).
-</div>
 <img src="https://raw.githubusercontent.com/slacky1965/electricity_meter_zrd/main/doc/images/board/board_common_bottom.png"/>
 
-<div align="center">
 Плата zigbee части на модуле E180-Z5812SP (верх).
-</div>
 <img src="https://raw.githubusercontent.com/slacky1965/electricity_meter_zrd/main/doc/images/board/board_ebyte_top.png"/>
 
-<div align="center">
 Плата zigbee части на модуле E180-Z5812SP (низ).
 <img src="https://raw.githubusercontent.com/slacky1965/electricity_meter_zrd/main/doc/images/board/board_ebyte_bottom.png"/>
 
-<div align="center">
 Плата zigbee части на модуле ZTU (верх).
-</div>
 <img src="https://raw.githubusercontent.com/slacky1965/electricity_meter_zrd/main/doc/images/board/board_ztu_top.png"/>
 
-<div align="center">
 Плата zigbee части на модуле ZTU (низ).
 <img src="https://raw.githubusercontent.com/slacky1965/electricity_meter_zrd/main/doc/images/board/board_ztu_bottom.png"/>
+</div>
 
 На гребенку выведены следующие пины модуля
 
@@ -140,7 +128,7 @@ Electricity Meter состоит из двух частей. Основной, �
 
 Корпус напечатан на 3D принтере.
 
-<img src="https://raw.githubusercontent.com/slacky1965/electricity_meter_zrd/main/doc/images/box/box_detail.jpg"/>
+<img src="https://raw.githubusercontent.com/slacky1965/electricity_meter_zrd/main/doc/images/box/box_details.jpg"/>
 
 <img src="https://raw.githubusercontent.com/slacky1965/electricity_meter_zrd/main/doc/images/box/box_common.jpg"/>
 
