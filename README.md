@@ -114,6 +114,7 @@ Electricity Meter состоит из двух частей. Основной, �
 
 <div align="center">
 Плата zigbee части на модуле E180-Z5812SP (низ).
+</div>
 <img src="https://raw.githubusercontent.com/slacky1965/electricity_meter_zrd/main/doc/images/board/board_ebyte_bottom.png"/>
 
 <div align="center">
@@ -123,6 +124,7 @@ Electricity Meter состоит из двух частей. Основной, �
 
 <div align="center">
 Плата zigbee части на модуле ZTU (низ).
+</div>
 <img src="https://raw.githubusercontent.com/slacky1965/electricity_meter_zrd/main/doc/images/board/board_ztu_bottom.png"/>
 
 На гребенку выведены следующие пины модуля
