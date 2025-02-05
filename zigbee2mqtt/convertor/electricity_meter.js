@@ -9,75 +9,71 @@ const { postfixWithEndpointName, precisionRound } = require('zigbee-herdsman-con
 const e = exposes.presets;
 const ea = exposes.access;
 
+const attrModelPreset = 0xf000;
+const attrAddressPreset = 0xf001;
+const attrMeasurementPreset = 0xf002;
+const attrDateRelease = 0xf003;
+const attrModelName = 0xf004;
+const attrPasswordPreset = 0xf005;
+
 const switchDeviceModel = ['No Device', 'KASKAD-1-MT (MIRTEK)', 'KASKAD-11-C1', 'MERCURY-206', 'ENERGOMERA-CE102M', 'ENERGOMERA-CE208BY', 'NEVA-MT124', 'NARTIS-100'];
 
 const tzLocal = {
   device_address_config: {
     key: ['device_address_preset'],
-      convertSet: async (entity, key, rawValue, meta) => {
-			  const endpoint = meta.device.getEndpoint(1);
-        const lookup = {'OFF': 0x00, 'ON': 0x01};
-        const value = lookup.hasOwnProperty(rawValue) ? lookup[rawValue] : parseInt(rawValue, 10);
-        const payloads = {
-				  device_address_preset: ['seMetering', {0xf001: {value, type: 0x23}}],
-        };
-        await endpoint.write(payloads[key][0], payloads[key][1]);
-        return {
-          state: {[key]: rawValue},
-        };
-      },
+    convertSet: async (entity, key, value, meta) => {
+      const device_address_preset = parseInt(value, 10);
+      await entity.write('seMetering', {[attrAddressPreset]: {value: device_address_preset, type: 0x23}});
+      return {readAfterWriteTime: 250, state: {device_address_preset: value}};
+    },
   },
   device_model_config: {
     key: ['device_model_preset'],
-      convertSet: async (entity, key, rawValue, meta) => {
-			  const endpoint = meta.device.getEndpoint(1);
-        const value = switchDeviceModel.indexOf(rawValue);
-        const payloads = {
-          device_model_preset: ['seMetering', {0xf000: {value, type: 0x30}}],
-        };
-        await endpoint.write(payloads[key][0], payloads[key][1]);
-        return {
-          state: {[key]: rawValue},
-        };
-      },
+    convertSet: async (entity, key, rawValue, meta) => {
+      const endpoint = meta.device.getEndpoint(1);
+      const value = switchDeviceModel.indexOf(rawValue);
+      const payloads = {
+        device_model_preset: ['seMetering', {[attrModelPreset]: {value, type: 0x30}}],
+      };
+      await endpoint.write(payloads[key][0], payloads[key][1]);
+      return {
+        state: {[key]: rawValue},
+      };
+    },
   },
   device_password_config: {
     key: ['device_password_preset'],
     convertSet: async (entity, key, value, meta) => {
       const device_password_preset = value.toString();
-      await entity.write('seMetering', {0xf005: {value: device_password_preset, type: 0x41}});
+      await entity.write('seMetering', {[attrPasswordPreset]: {value: device_password_preset, type: 0x41}});
       return {readAfterWriteTime: 250, state: {device_password_preset: value}};
     },
   },
   device_measurement_config: {
     key: ['device_measurement_preset'],
-      convertSet: async (entity, key, rawValue, meta) => {
-			  const endpoint = meta.device.getEndpoint(1);
-        const lookup = {'OFF': 0x00, 'ON': 0x01};
-        const value = lookup.hasOwnProperty(rawValue) ? lookup[rawValue] : parseInt(rawValue, 10);
-        const payloads = {
-				  device_measurement_preset: ['seMetering', {0xf002: {value, type: 0x20}}],
-        };
-        await endpoint.write(payloads[key][0], payloads[key][1]);
-        return {
-          state: {[key]: rawValue},
-        };
-      },
+    convertSet: async (entity, key, value, meta) => {
+      const device_measurement_preset = parseInt(value, 10);
+      await entity.write('seMetering', {[attrMeasurementPreset]: {value: device_measurement_preset, type: 0x20}});
+      return {readAfterWriteTime: 250, state: {device_measurement_preset: value}};
+    },
+    convertGet: async (entity, key, meta) => {
+      await entity.read('seMetering', [attrMeasurementPreset]);
+    },
   },
   device_metering: {
     key:['tariff', 'tariff1', 'tariff2', 'tariff3', 'tariff4', 'tariff_summ'],
-      convertGet: async (entity, key, meta) => {
-        await entity.read('seMetering', ['currentTier1SummDelivered', 
-                                         'currentTier2SummDelivered', 
-                                         'currentTier3SummDelivered', 
-                                         'currentTier4SummDelivered', 
-                                         'currentSummDelivered', 
-                                         'multiplier', 
-                                         'divisor']);
-      },
-      convertSet: async (entity, key, value, meta) => {
+    convertGet: async (entity, key, meta) => {
+      await entity.read('seMetering', ['currentTier1SummDelivered', 
+                                       'currentTier2SummDelivered', 
+                                       'currentTier3SummDelivered', 
+                                       'currentTier4SummDelivered', 
+                                       'currentSummDelivered', 
+                                       'multiplier', 
+                                       'divisor']);
+    },
+    convertSet: async (entity, key, value, meta) => {
       return null;
-      },
+    },
   },
   device_battery_life: {
     key:['battery_life'],
@@ -100,7 +96,7 @@ const tzLocal = {
   device_date_release: {
     key:['date_release'],
     convertGet: async (entity, key, meta) => {
-      await entity.read('seMetering', [0xf003]);
+      await entity.read('seMetering', [attrDateRelease]);
     },
     convertSet: async (entity, key, value, meta) => {
       return null;
@@ -109,7 +105,7 @@ const tzLocal = {
   device_model_name: {
     key:['model_name'],
     convertGet: async (entity, key, meta) => {
-      await entity.read('seMetering', [0xf004]);
+      await entity.read('seMetering', [attrModelName]);
     },
     convertSet: async (entity, key, value, meta) => {
       return null;
@@ -173,277 +169,277 @@ const fzLocal = {
     cluster: 'seMetering',
     type: ['attributeReport', 'readResponse'],
     convert: (model, msg, publish, options, meta) => {
-        const result = {};
-        if (msg.data.hasOwnProperty('currentTier1SummDelivered')) {
-            const data = msg.data['currentTier1SummDelivered'];
-            result.tariff1 = parseInt(data)/energy_divisor*energy_multiplier;
-		}
-        return result;
+      const result = {};
+      if (msg.data.hasOwnProperty('currentTier1SummDelivered')) {
+        const data = msg.data['currentTier1SummDelivered'];
+        result.tariff1 = parseInt(data)/energy_divisor*energy_multiplier;
+      }
+      return result;
     },
   },
   tariff2: {
     cluster: 'seMetering',
     type: ['attributeReport', 'readResponse'],
     convert: (model, msg, publish, options, meta) => {
-        const result = {};
-        if (msg.data.hasOwnProperty('currentTier2SummDelivered')) {
-            const data = msg.data['currentTier2SummDelivered'];
-            result.tariff2 = parseInt(data)/energy_divisor*energy_multiplier;
-		}
-        return result;
+      const result = {};
+      if (msg.data.hasOwnProperty('currentTier2SummDelivered')) {
+        const data = msg.data['currentTier2SummDelivered'];
+        result.tariff2 = parseInt(data)/energy_divisor*energy_multiplier;
+      }
+      return result;
     },
   },
   tariff3: {
     cluster: 'seMetering',
     type: ['attributeReport', 'readResponse'],
     convert: (model, msg, publish, options, meta) => {
-        const result = {};
-        if (msg.data.hasOwnProperty('currentTier3SummDelivered')) {
-            const data = msg.data['currentTier3SummDelivered'];
-            result.tariff3 = parseInt(data)/energy_divisor*energy_multiplier;
-		}
-        return result;
+      const result = {};
+      if (msg.data.hasOwnProperty('currentTier3SummDelivered')) {
+        const data = msg.data['currentTier3SummDelivered'];
+        result.tariff3 = parseInt(data)/energy_divisor*energy_multiplier;
+      }
+      return result;
     },
   },
   tariff4: {
     cluster: 'seMetering',
     type: ['attributeReport', 'readResponse'],
     convert: (model, msg, publish, options, meta) => {
-        const result = {};
-        if (msg.data.hasOwnProperty('currentTier4SummDelivered')) {
-            const data = msg.data['currentTier4SummDelivered'];
-            result.tariff4 = parseInt(data)/energy_divisor*energy_multiplier;
-		}
-        return result;
+      const result = {};
+      if (msg.data.hasOwnProperty('currentTier4SummDelivered')) {
+        const data = msg.data['currentTier4SummDelivered'];
+        result.tariff4 = parseInt(data)/energy_divisor*energy_multiplier;
+      }
+      return result;
     },
   },
   tariff_summ: {
     cluster: 'seMetering',
     type: ['attributeReport', 'readResponse'],
     convert: (model, msg, publish, options, meta) => {
-        const result = {};
-        if (msg.data.hasOwnProperty('currentSummDelivered')) {
-            const data = msg.data['currentSummDelivered'];
-            result.tariff_summ = parseInt(data)/energy_divisor*energy_multiplier;
-		}
-        return result;
+      const result = {};
+      if (msg.data.hasOwnProperty('currentSummDelivered')) {
+        const data = msg.data['currentSummDelivered'];
+        result.tariff_summ = parseInt(data)/energy_divisor*energy_multiplier;
+      }
+      return result;
     },
   },
   status: {
     cluster: 'seMetering',
     type: ['attributeReport', 'readResponse'],
     convert: (model, msg, publish, options, meta) => {
-        const result = {};
-        if (msg.data.hasOwnProperty('status')) {
-            const data = msg.data['status'];
-            const value = parseInt(data);
-            return {
-                battery_low: (value & 1<<1) > 0,
-                tamper:      (value & 1<<2) > 0,
-            };
-        }
-		return result;
+      const result = {};
+      if (msg.data.hasOwnProperty('status')) {
+        const data = msg.data['status'];
+        const value = parseInt(data);
+        return {
+          battery_low: (value & 1<<1) > 0,
+          tamper:      (value & 1<<2) > 0,
+        };
+      }
+		  return result;
     },
   },
   battery_life: {
     cluster: 'seMetering',
     type: ['attributeReport', 'readResponse'],
     convert: (model, msg, publish, options, meta) => {
-        const result = {};
-        if (msg.data.hasOwnProperty('remainingBattLife')) {
-          const data = parseInt(msg.data['remainingBattLife']);
-          result.battery_life = data;
-		}
-        return result;
+      const result = {};
+      if (msg.data.hasOwnProperty('remainingBattLife')) {
+        const data = parseInt(msg.data['remainingBattLife']);
+        result.battery_life = data;
+      }
+      return result;
     },
   },
   serial_number: {
     cluster: 'seMetering',
     type: ['attributeReport', 'readResponse'],
     convert: (model, msg, publish, options, meta) => {
-        const result = {};
-        if (msg.data.hasOwnProperty('meterSerialNumber')) {
-            const data = msg.data['meterSerialNumber'];
-            result.serial_number = data.toString();
-		}
-        return result;
+      const result = {};
+      if (msg.data.hasOwnProperty('meterSerialNumber')) {
+        const data = msg.data['meterSerialNumber'];
+        result.serial_number = data.toString();
+      }
+      return result;
     },
   },
   device_measurement_preset: {
     cluster: 'seMetering',
     type: ['readResponse'],
     convert: (model, msg, publish, options, meta) => {
-        const result = {};
-        if (msg.data.hasOwnProperty(0xF002)) {
-          const data = parseInt(msg.data[0xF002]);
-          result.device_measurement_preset = data;
-		}
-        return result;
+      const result = {};
+      if (msg.data.hasOwnProperty(attrMeasurementPreset)) {
+        const data = parseInt(msg.data[attrMeasurementPreset]);
+        result.device_measurement_preset = data;
+      }
+      return result;
     },
   }, 
   date_release: {
     cluster: 'seMetering',
     type: ['attributeReport', 'readResponse'],
     convert: (model, msg, publish, options, meta) => {
-        const result = {};
-        if (msg.data.hasOwnProperty(0xf003)) {
-            const data = msg.data[0xf003];
-            result.date_release = data.toString();
-		}
-        return result;
+      const result = {};
+      if (msg.data.hasOwnProperty(attrDateRelease)) {
+        const data = msg.data[attrDateRelease];
+        result.date_release = data.toString();
+      }
+      return result;
     },
   },
   model_name: {
     cluster: 'seMetering',
     type: ['attributeReport', 'readResponse'],
     convert: (model, msg, publish, options, meta) => {
-        const result = {};
-        if (msg.data.hasOwnProperty(0xf004)) {
-            const data = msg.data[0xf004];
-            result.model_name = data.toString();
-		}
-        return result;
+      const result = {};
+      if (msg.data.hasOwnProperty(attrModelName)) {
+        const data = msg.data[attrModelName];
+        result.model_name = data.toString();
+      }
+      return result;
     },
   },
   e_divisor: {
     cluster: 'seMetering',
     type: ['attributeReport', 'readResponse'],
     convert: (model, msg, publish, options, meta) => {
-        const result = {};
-        if (msg.data.hasOwnProperty('divisor')) {
-          const data = parseInt(msg.data['divisor']);
-          energy_divisor = data;
-          result.e_divisor = energy_divisor;
-		}
-        return result;
+      const result = {};
+      if (msg.data.hasOwnProperty('divisor')) {
+        const data = parseInt(msg.data['divisor']);
+        energy_divisor = data;
+        result.e_divisor = energy_divisor;
+      }
+      return result;
     },
   },
   e_multiplier: {
     cluster: 'seMetering',
     type: ['attributeReport', 'readResponse'],
     convert: (model, msg, publish, options, meta) => {
-        const result = {};
-        if (msg.data.hasOwnProperty('multiplier')) {
-          const data = parseInt(msg.data['multiplier']);
-          energy_multiplier = data;
-          result.e_multiplier = energy_multiplier;
-		}
-        return result;
+      const result = {};
+      if (msg.data.hasOwnProperty('multiplier')) {
+        const data = parseInt(msg.data['multiplier']);
+        energy_multiplier = data;
+        result.e_multiplier = energy_multiplier;
+      }
+      return result;
     },
   },
   voltage: {
     cluster: 'haElectricalMeasurement',
     type: ['attributeReport', 'readResponse'],
     convert: (model, msg, publish, options, meta) => {
-        const result = {};
-        if (msg.data.hasOwnProperty('rmsVoltage')) {
-          const data = parseInt(msg.data['rmsVoltage']);
-          result.voltage = data/voltage_divisor*voltage_multiplier;
-          //meta.logger.info('Voltage: ' + data + ', multiplier: ' + voltage_multiplier + ', divisor: ' + voltage_divisor);
-		}
-        return result;
+      const result = {};
+      if (msg.data.hasOwnProperty('rmsVoltage')) {
+        const data = parseInt(msg.data['rmsVoltage']);
+        result.voltage = data/voltage_divisor*voltage_multiplier;
+        //meta.logger.info('Voltage: ' + data + ', multiplier: ' + voltage_multiplier + ', divisor: ' + voltage_divisor);
+      }
+      return result;
     },
   },
   v_multiplier: {
     cluster: 'haElectricalMeasurement',
     type: ['attributeReport', 'readResponse'],
     convert: (model, msg, publish, options, meta) => {
-        const result = {};
-        if (msg.data.hasOwnProperty('acVoltageMultiplier')) {
-          const data = parseInt(msg.data['acVoltageMultiplier']);
-          voltage_multiplier = data;
-          result.v_multiplier = voltage_multiplier;
-		}
-        return result;
+      const result = {};
+      if (msg.data.hasOwnProperty('acVoltageMultiplier')) {
+        const data = parseInt(msg.data['acVoltageMultiplier']);
+        voltage_multiplier = data;
+        result.v_multiplier = voltage_multiplier;
+      }
+      return result;
     },
   },
   v_divisor: {
     cluster: 'haElectricalMeasurement',
     type: ['attributeReport', 'readResponse'],
     convert: (model, msg, publish, options, meta) => {
-        const result = {};
-        if (msg.data.hasOwnProperty('acVoltageDivisor')) {
-          const data = parseInt(msg.data['acVoltageDivisor']);
-          voltage_divisor = data;
-          result.v_divisor = voltage_divisor;
-		}
-        return result;
+      const result = {};
+      if (msg.data.hasOwnProperty('acVoltageDivisor')) {
+        const data = parseInt(msg.data['acVoltageDivisor']);
+        voltage_divisor = data;
+        result.v_divisor = voltage_divisor;
+      }
+      return result;
     },
   },
   current: {
     cluster: 'haElectricalMeasurement',
     type: ['attributeReport', 'readResponse'],
     convert: (model, msg, publish, options, meta) => {
-        const result = {};
-        if (msg.data.hasOwnProperty('instantaneousLineCurrent')) {
-          const data = parseInt(msg.data['instantaneousLineCurrent']);
-          result.current = data/current_divisor*current_multiplier;
-		}
-        return result;
+      const result = {};
+      if (msg.data.hasOwnProperty('instantaneousLineCurrent')) {
+        const data = parseInt(msg.data['instantaneousLineCurrent']);
+        result.current = data/current_divisor*current_multiplier;
+      }
+      return result;
     },
   },
   c_multiplier: {
     cluster: 'haElectricalMeasurement',
     type: ['attributeReport', 'readResponse'],
     convert: (model, msg, publish, options, meta) => {
-        const result = {};
-        if (msg.data.hasOwnProperty('acCurrentMultiplier')) {
-          const data = parseInt(msg.data['acCurrentMultiplier']);
-          current_multiplier = data;
-          result.c_multiplier = current_multiplier;
-		}
-        return result;
+      const result = {};
+      if (msg.data.hasOwnProperty('acCurrentMultiplier')) {
+        const data = parseInt(msg.data['acCurrentMultiplier']);
+        current_multiplier = data;
+        result.c_multiplier = current_multiplier;
+      }
+      return result;
     },
   },
   c_divisor: {
     cluster: 'haElectricalMeasurement',
     type: ['attributeReport', 'readResponse'],
     convert: (model, msg, publish, options, meta) => {
-        const result = {};
-        if (msg.data.hasOwnProperty('acCurrentDivisor')) {
-          const data = parseInt(msg.data['acCurrentDivisor']);
-          current_divisor = data;
-          result.c_divisor = current_divisor;
-		}
-        return result;
+      const result = {};
+      if (msg.data.hasOwnProperty('acCurrentDivisor')) {
+        const data = parseInt(msg.data['acCurrentDivisor']);
+        current_divisor = data;
+        result.c_divisor = current_divisor;
+      }
+      return result;
     },
   },
   power: {
     cluster: 'haElectricalMeasurement',
     type: ['attributeReport', 'readResponse'],
     convert: (model, msg, publish, options, meta) => {
-        const result = {};
-        if (msg.data.hasOwnProperty('apparentPower')) {
-          const data = parseInt(msg.data['apparentPower']);
-          result.power = data/power_divisor*power_multiplier;
-		}
-        return result;
+      const result = {};
+      if (msg.data.hasOwnProperty('apparentPower')) {
+        const data = parseInt(msg.data['apparentPower']);
+        result.power = data/power_divisor*power_multiplier;
+      }
+      return result;
     },
   },
   p_multiplier: {
     cluster: 'haElectricalMeasurement',
     type: ['attributeReport', 'readResponse'],
     convert: (model, msg, publish, options, meta) => {
-        const result = {};
-        if (msg.data.hasOwnProperty('acPowerMultiplier')) {
-          const data = parseInt(msg.data['acPowerMultiplier']);
-          power_multiplier = data;
-          result.p_multiplier = power_multiplier;
-		}
-        return result;
+      const result = {};
+      if (msg.data.hasOwnProperty('acPowerMultiplier')) {
+        const data = parseInt(msg.data['acPowerMultiplier']);
+        power_multiplier = data;
+        result.p_multiplier = power_multiplier;
+      }
+      return result;
     },
   },
   p_divisor: {
     cluster: 'haElectricalMeasurement',
     type: ['attributeReport', 'readResponse'],
     convert: (model, msg, publish, options, meta) => {
-        const result = {};
-        if (msg.data.hasOwnProperty('acPowerDivisor')) {
-          const data = parseInt(msg.data['acPowerDivisor']);
-          power_divisor = data;
-          result.p_divisor = power_divisor;
-		}
-        return result;
+      const result = {};
+      if (msg.data.hasOwnProperty('acPowerDivisor')) {
+        const data = parseInt(msg.data['acPowerDivisor']);
+        power_divisor = data;
+        result.p_divisor = power_divisor;
+      }
+      return result;
     },
   },
   temperature: {
@@ -464,16 +460,16 @@ const fz_tamper = {
     cluster: 'seMetering',
     type: ['attributeReport', 'readResponse'],
     convert: (model, msg, publish, options, meta) => {
-        const result = {};
-        if (msg.data.hasOwnProperty('status')) {
-            const data = msg.data['status'];
-            const value = parseInt(data);
-            return {
-                battery_low: (value & 1<<1) > 0,
-                tamper:      (value & 1<<2) > 0,
-            };
-        }
-		return result;
+      const result = {};
+      if (msg.data.hasOwnProperty('status')) {
+        const data = msg.data['status'];
+        const value = parseInt(data);
+        return {
+          battery_low: (value & 1<<1) > 0,
+          tamper:      (value & 1<<2) > 0,
+        };
+      }
+      return result;
     },
 };
 
@@ -495,11 +491,30 @@ const definition = {
                tzLocal.device_model_name, tzLocal.device_voltage, tzLocal.device_current, tzLocal.device_power, tzLocal.device_temperature
                ],
     meta: {
-        multiEndpoint: true
+//        multiEndpoint: true
     },
     configure: async (device, coordinatorEndpoint, logger) => {
       const firstEndpoint = device.getEndpoint(1);
-      await firstEndpoint.read('seMetering', ['remainingBattLife', 'status', 0xF002]);
+      await firstEndpoint.read('seMetering', ['remainingBattLife', 'status', attrMeasurementPreset]);
+      await firstEndpoint.read('seMetering', ['divisor']);
+      await firstEndpoint.read('seMetering', ['multiplier']);
+      await firstEndpoint.read('seMetering', ['currentTier1SummDelivered']);
+      await firstEndpoint.read('seMetering', ['currentTier2SummDelivered']);
+      await firstEndpoint.read('seMetering', ['currentTier3SummDelivered']);
+      await firstEndpoint.read('seMetering', ['currentTier4SummDelivered']);
+      await firstEndpoint.read('seMetering', ['currentSummDelivered']);
+      await firstEndpoint.read('seMetering', ['meterSerialNumber']);
+      await firstEndpoint.read('seMetering', [attrMeasurementPreset]);
+      await firstEndpoint.read('seMetering', [attrModelName]);
+      await firstEndpoint.read('haElectricalMeasurement', ['acVoltageDivisor']);
+      await firstEndpoint.read('haElectricalMeasurement', ['acVoltageMultiplier']);
+      await firstEndpoint.read('haElectricalMeasurement', ['rmsVoltage']);
+      await firstEndpoint.read('haElectricalMeasurement', ['acCurrentDivisor']);
+      await firstEndpoint.read('haElectricalMeasurement', ['acCurrentMultiplier']);
+      await firstEndpoint.read('haElectricalMeasurement', ['instantaneousLineCurrent']);
+      await firstEndpoint.read('haElectricalMeasurement', ['acPowerDivisor']);
+      await firstEndpoint.read('haElectricalMeasurement', ['acPowerMultiplier']);
+      await firstEndpoint.read('haElectricalMeasurement', ['apparentPower']);
       await reporting.bind(firstEndpoint, coordinatorEndpoint, ['seMetering', 'haElectricalMeasurement', 'genDeviceTempCfg']);
       const payload_tariff1 = [{attribute: {ID: 0x0100, type: 0x25}, minimumReportInterval: 0, maximumReportInterval: 300, reportableChange: 0}];
       await firstEndpoint.configureReporting('seMetering', payload_tariff1);
@@ -516,9 +531,9 @@ const definition = {
       await firstEndpoint.configureReporting('seMetering', payload_battery_life);
       const payload_serial_number = [{attribute: {ID: 0x0308, type: 0x41}, minimumReportInterval: 0, maximumReportInterval: 300, reportableChange: 0}];
       await firstEndpoint.configureReporting('seMetering', payload_serial_number);
-      const payload_date_release = [{attribute: {ID: 0xf003, type: 0x41}, minimumReportInterval: 0, maximumReportInterval: 300, reportableChange: 0}];
+      const payload_date_release = [{attribute: {ID: [attrDateRelease], type: 0x41}, minimumReportInterval: 0, maximumReportInterval: 300, reportableChange: 0}];
       await firstEndpoint.configureReporting('seMetering', payload_date_release);
-      const payload_model_name = [{attribute: {ID: 0xf004, type: 0x41}, minimumReportInterval: 0, maximumReportInterval: 300, reportableChange: 0}];
+      const payload_model_name = [{attribute: {ID: [attrModelName], type: 0x41}, minimumReportInterval: 0, maximumReportInterval: 300, reportableChange: 0}];
       await firstEndpoint.configureReporting('seMetering', payload_model_name);
       await reporting.rmsVoltage(firstEndpoint, {min: 0, max: 300, change: 0});
       const payload_current = [{attribute: {ID: 0x0501, type: 0x21}, minimumReportInterval: 0, maximumReportInterval: 300, reportableChange: 0}];
@@ -545,12 +560,12 @@ const definition = {
       exposes.numeric('device_address_preset', ea.STATE_SET).withDescription('Device Address'),
       exposes.enum('device_model_preset', ea.STATE_SET, switchDeviceModel).withDescription('Device Model'),
       exposes.text('device_password_preset', ea.STATE_SET).withDescription('Meter Password'),
-      exposes.numeric('device_measurement_preset', ea.STATE_SET).withDescription('Measurement Period').withValueMin(1).withValueMax(255),
+      exposes.numeric('device_measurement_preset', ea.ALL).withDescription('Measurement Period').withValueMin(1).withValueMax(255),
       exposes.binary('tamper', ea.STATE, true, false).withDescription('Tamper'),
       exposes.binary('battery_low', ea.STATE, true, false).withDescription('Battery Low'),
     ],
               
-    ota: ota.zigbeeOTA,
+    ota: true,
 };
 
 module.exports = definition;
