@@ -18,6 +18,8 @@ static uint8_t def_password[] = {0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30,
 static uint8_t phases3;
 static uint8_t release_month;
 static uint8_t release_year;
+static uint8_t serial_number[SE_ATTR_SN_SIZE+1] = {0};
+static uint8_t date_release[DATA_MAX_LEN+2] = {0};
 
 
 
@@ -231,7 +233,7 @@ static void get_tariffs_data() {
     printf("\r\nCommand running to get tariffs\r\n");
 #endif
 
-    uint64_t tariff;
+    uint64_t tariff, summ_tariffs = 0;
 //    uint64_t last_tariff;
 
     for (uint8_t tariff_num = 1; tariff_num <= 4; tariff_num++) {
@@ -242,6 +244,8 @@ static void get_tariffs_data() {
                 pkt_tariff_t *pkt_tariff = (pkt_tariff_t*)&response_pkt;
 
                 tariff = pkt_tariff->value & 0xffffffffffff;
+
+                summ_tariffs += tariff;
 
                 switch (tariff_num) {
                     case 1:
@@ -295,6 +299,9 @@ static void get_tariffs_data() {
             }
         }
     }
+
+    zcl_setAttrVal(APP_ENDPOINT_1, ZCL_CLUSTER_SE_METERING, ZCL_ATTRID_CURRENT_SUMMATION_DELIVERD, (uint8_t*)&summ_tariffs);
+
 }
 
 static void set_net_parameters(uint8_t param) {
@@ -553,10 +560,16 @@ uint8_t measure_meter_kaskad_11() {
 
     if (ret) {
 
-        if (new_start) {
-            get_serial_number_data();
-            get_date_release_data();
+        if (new_start) {               /* after reset          */
+            serial_number[0] = 0;
+            date_release[0] = 0;
             new_start = false;
+        }
+        if (serial_number[0] == 0) {
+            get_serial_number_data();
+        }
+        if (date_release[0] == 0) {
+            get_date_release_data();
         }
 
         get_amps_data();            /* get amps and check phases num */

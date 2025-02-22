@@ -71,6 +71,10 @@ uint8_t set_device_model(device_model_t model) {
             dev_config.device_password.size = 0;
             measure_meter = measure_meter_kaskad_11;
             baudrate = 2400;
+            energy_divisor = 100;
+            voltage_divisor = 10;
+            current_divisor = 100;
+            power_divisor = 1000;
             if (set_zcl_str(device_model[DEVICE_KASKAD_11], name, DEVICE_NAME_LEN)) {
                 zcl_setAttrVal(APP_ENDPOINT_1, ZCL_CLUSTER_SE_METERING, ZCL_ATTRID_CUSTOM_DEVICE_MODEL, (uint8_t*)&name);
             }
