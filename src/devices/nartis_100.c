@@ -9,10 +9,12 @@
 #include "app_reporting.h"
 #include "nartis_100.h"
 
-#define PASSWORD        "111"
+//#define PASSWORD        "111"
+#define PASSWORD        "00000001"  // for Nartis-I100
 //#define PASSWORD        "12345678"
 #define CLIENT_ADDRESS  0x20
-#define PHY_DEVICE      0x10
+//#define PHY_DEVICE      0x10
+#define PHY_DEVICE      0x11        // for Nartis-I100
 #define LOGICAL_DEVICE  0x01
 #define FLAG            0x7E
 #define TYPE3           0x0A
