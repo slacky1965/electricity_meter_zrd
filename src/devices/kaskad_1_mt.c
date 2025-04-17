@@ -463,11 +463,11 @@ static void get_amps_data() {
 
         uint16_t current = amps & 0xffff;
 
-//        zcl_getAttrVal(APP_ENDPOINT_1, ZCL_CLUSTER_MS_ELECTRICAL_MEASUREMENT, ZCL_ATTRID_LINE_CURRENT, &attr_len, (uint8_t*)&attr_data);
+//        zcl_getAttrVal(APP_ENDPOINT_1, ZCL_CLUSTER_MS_ELECTRICAL_MEASUREMENT, ZCL_ATTRID_RMS_CURRENT, &attr_len, (uint8_t*)&attr_data);
 //        uint16_t last_amps = fromPtoInteger(attr_len, attr_data);
 //
 //        if (current != last_amps) {
-            zcl_setAttrVal(APP_ENDPOINT_1, ZCL_CLUSTER_MS_ELECTRICAL_MEASUREMENT, ZCL_ATTRID_LINE_CURRENT, (uint8_t*)&current);
+            zcl_setAttrVal(APP_ENDPOINT_1, ZCL_CLUSTER_MS_ELECTRICAL_MEASUREMENT, ZCL_ATTRID_RMS_CURRENT, (uint8_t*)&current);
 //        }
 
 
@@ -523,11 +523,11 @@ static void get_power_data() {
 
         uint16_t pwr = power & 0xffff;
 
-//        zcl_getAttrVal(APP_ENDPOINT_1, ZCL_CLUSTER_MS_ELECTRICAL_MEASUREMENT, ZCL_ATTRID_APPARENT_POWER, &attr_len, (uint8_t*)&attr_data);
+//        zcl_getAttrVal(APP_ENDPOINT_1, ZCL_CLUSTER_MS_ELECTRICAL_MEASUREMENT, ZCL_ATTRID_ACTIVE_POWER, &attr_len, (uint8_t*)&attr_data);
 //        uint16_t last_pwr = fromPtoInteger(attr_len, attr_data);
 //
 //        if (pwr != last_pwr) {
-            zcl_setAttrVal(APP_ENDPOINT_1, ZCL_CLUSTER_MS_ELECTRICAL_MEASUREMENT, ZCL_ATTRID_APPARENT_POWER, (uint8_t*)&pwr);
+            zcl_setAttrVal(APP_ENDPOINT_1, ZCL_CLUSTER_MS_ELECTRICAL_MEASUREMENT, ZCL_ATTRID_ACTIVE_POWER, (uint8_t*)&pwr);
 //        }
 
 #if UART_PRINTF_MODE && DEBUG_DEVICE_DATA
@@ -675,7 +675,7 @@ static void get_instant_data() {
 
         uint16_t current = amps & 0xffff;
 
-        zcl_setAttrVal(APP_ENDPOINT_1, ZCL_CLUSTER_MS_ELECTRICAL_MEASUREMENT, ZCL_ATTRID_LINE_CURRENT, (uint8_t*)&current);
+        zcl_setAttrVal(APP_ENDPOINT_1, ZCL_CLUSTER_MS_ELECTRICAL_MEASUREMENT, ZCL_ATTRID_RMS_CURRENT, (uint8_t*)&current);
 
 
 #if UART_PRINTF_MODE && DEBUG_DEVICE_DATA
@@ -688,7 +688,7 @@ static void get_instant_data() {
 
         uint16_t pwr = power & 0xffff;
 
-        zcl_setAttrVal(APP_ENDPOINT_1, ZCL_CLUSTER_MS_ELECTRICAL_MEASUREMENT, ZCL_ATTRID_APPARENT_POWER, (uint8_t*)&pwr);
+        zcl_setAttrVal(APP_ENDPOINT_1, ZCL_CLUSTER_MS_ELECTRICAL_MEASUREMENT, ZCL_ATTRID_ACTIVE_POWER, (uint8_t*)&pwr);
 
 #if UART_PRINTF_MODE && DEBUG_DEVICE_DATA
         printf("power: %d\r\n", pwr);

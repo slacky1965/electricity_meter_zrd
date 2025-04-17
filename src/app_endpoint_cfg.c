@@ -190,7 +190,7 @@ zcl_seAttr_t g_zcl_seAttrs = {
     .device_address = 0,
     .device_name = {9,'N','o',' ','D','e','v','i','c','e'},
     .device_password = {1, '0'},
-    .measurement_period = DEFAULT_MEASUREMENT_PERIOD,
+    .measurement_period = DEFAULT_MEASUREMENT_PERIOD / 60,          // in minutes
 };
 
 const zclAttrInfo_t se_attrTbl[] = {
@@ -234,13 +234,13 @@ zcl_msAttr_t g_zcl_msAttrs = {
 
 const zclAttrInfo_t ms_attrTbl[] = {
     {ZCL_ATTRID_MEASUREMENT_TYPE,           ZCL_BITMAP32, R,    (uint8_t*)&g_zcl_msAttrs.type               },
-    {ZCL_ATTRID_LINE_CURRENT,               ZCL_UINT16,   RR,   (uint8_t*)&g_zcl_msAttrs.current            },
+    {ZCL_ATTRID_RMS_CURRENT,                ZCL_UINT16,   RR,   (uint8_t*)&g_zcl_msAttrs.current            },
     {ZCL_ATTRID_AC_CURRENT_MULTIPLIER,      ZCL_UINT16,   RR,   (uint8_t*)&g_zcl_msAttrs.current_multiplier },
     {ZCL_ATTRID_AC_CURRENT_DIVISOR,         ZCL_UINT16,   RR,   (uint8_t*)&g_zcl_msAttrs.current_divisor    },
     {ZCL_ATTRID_RMS_VOLTAGE,                ZCL_UINT16,   RR,   (uint8_t*)&g_zcl_msAttrs.voltage            },
     {ZCL_ATTRID_AC_VOLTAGE_MULTIPLIER,      ZCL_UINT16,   RR,   (uint8_t*)&g_zcl_msAttrs.voltage_multiplier },
     {ZCL_ATTRID_AC_VOLTAGE_DIVISOR,         ZCL_UINT16,   RR,   (uint8_t*)&g_zcl_msAttrs.voltage_divisor    },
-    {ZCL_ATTRID_APPARENT_POWER,             ZCL_UINT16,   RR,   (uint8_t*)&g_zcl_msAttrs.power              },
+    {ZCL_ATTRID_ACTIVE_POWER,               ZCL_INT16,    RR,   (uint8_t*)&g_zcl_msAttrs.power              },
     {ZCL_ATTRID_AC_POWER_MULTIPLIER,        ZCL_UINT16,   RR,   (uint8_t*)&g_zcl_msAttrs.power_multiplier   },
     {ZCL_ATTRID_AC_POWER_DIVISOR,           ZCL_UINT16,   RR,   (uint8_t*)&g_zcl_msAttrs.power_divisor      },
 

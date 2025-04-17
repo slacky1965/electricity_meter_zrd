@@ -160,7 +160,7 @@ all: pre-build main-build
 
 flash-firmware-512k:
 	@echo ' '
-	@echo Upload file $(BOOT_FILE) to flash 1M
+	@echo Upload file $(BOOT_FILE) to flash 512K
 	@echo ' '
 	@python3 $(TOOLS_PATH)/TlsrPgm.py -p$(DOWNLOAD_PORT) -z11 -a 100 -s -m we 0 $(BOOT_FILE)
 	@echo ' '
@@ -180,7 +180,7 @@ flash-firmware-1m:
 	@python3 $(TOOLS_PATH)/TlsrPgm.py -p$(DOWNLOAD_PORT) -z11 -a 100 -s -m we 0x8000 $(BIN_PATH)/$(FIRMWARE_FILE)
 	@echo ' '
 	
-erase-flash_512k:
+erase-flash-512k:
 	@echo ' '
 	@echo Erase all flash 512K
 	@echo ' '

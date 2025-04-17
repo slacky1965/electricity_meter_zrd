@@ -955,7 +955,7 @@ static void get_power_data() {
 
             uint16_t pwr = power & 0xffff;
 
-            zcl_setAttrVal(APP_ENDPOINT_1, ZCL_CLUSTER_MS_ELECTRICAL_MEASUREMENT, ZCL_ATTRID_APPARENT_POWER, (uint8_t*)&pwr);
+            zcl_setAttrVal(APP_ENDPOINT_1, ZCL_CLUSTER_MS_ELECTRICAL_MEASUREMENT, ZCL_ATTRID_ACTIVE_POWER, (uint8_t*)&pwr);
 
 #if UART_PRINTF_MODE && DEBUG_DEVICE_DATA
             printf("power: %d\r\n", pwr);
@@ -979,7 +979,7 @@ static void get_current_data() {
 
             current = reverse32(digit_current->value) & 0xffff;
 
-            zcl_setAttrVal(APP_ENDPOINT_1, ZCL_CLUSTER_MS_ELECTRICAL_MEASUREMENT, ZCL_ATTRID_LINE_CURRENT, (uint8_t*)&current);
+            zcl_setAttrVal(APP_ENDPOINT_1, ZCL_CLUSTER_MS_ELECTRICAL_MEASUREMENT, ZCL_ATTRID_RMS_CURRENT, (uint8_t*)&current);
 
 #if UART_PRINTF_MODE && DEBUG_DEVICE_DATA
             printf("current: %d\r\n", current);
