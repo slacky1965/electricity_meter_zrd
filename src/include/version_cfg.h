@@ -41,7 +41,7 @@
  *
  */
 
-#define APP_BUILD                           0x03        //app build 01, full version - v2.0.01
+#define APP_BUILD                           0x04        //app build 01, full version - v2.0.01
 #define STACK_RELEASE                       0x30        //stack release 3.0
 #define STACK_BUILD                         0x01        //stack build 01
 #define HW_VERSION                          0x01
@@ -85,6 +85,7 @@
  * 0x10 - EKF_switch_2keys_battery
  * 0x11 - Tuya Thermostat
  * 0x12 - ECM_DIN1_counter
+ * 0x13 - Tuya CO2 Sensor
  */
 
 #define IMAGE_TYPE_APP          (0x07 | (IMAGE_TYPE_BOOT_FLAG << 7))

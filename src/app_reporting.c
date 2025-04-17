@@ -29,10 +29,10 @@ static uint8_t attr_name[ATTR_MAX][48] = {{"ZCL_ATTRID_CUSTOM_DEVICE_MODEL"},
                                           {"ZCL_ATTRID_RMS_VOLTAGE"},
                                           {"ZCL_ATTRID_AC_POWER_MULTIPLIER"},
                                           {"ZCL_ATTRID_AC_POWER_DIVISOR"},
-                                          {"ZCL_ATTRID_APPARENT_POWER"},
+                                          {"ZCL_ATTRID_ACTIVE_POWER"},
                                           {"ZCL_ATTRID_AC_CURRENT_MULTIPLIER"},
                                           {"ZCL_ATTRID_AC_CURRENT_DIVISOR"},
-                                          {"ZCL_ATTRID_LINE_CURRENT"},
+                                          {"ZCL_ATTRID_RMS_CURRENT"},
                                           {"ZCL_ATTRID_REMAINING_BATTERY_LIFE"}};
 
 static uint8_t get_attr_name(uint16_t cluster_id, uint16_t attr_id) {
@@ -103,7 +103,7 @@ static uint8_t get_attr_name(uint16_t cluster_id, uint16_t attr_id) {
             case ZCL_ATTRID_AC_POWER_DIVISOR:
                 attr_num = POWER_DIVISOR;
                 break;
-            case ZCL_ATTRID_APPARENT_POWER:
+            case ZCL_ATTRID_ACTIVE_POWER:
                 attr_num = POWER;
                 break;
             case ZCL_ATTRID_AC_CURRENT_MULTIPLIER:
@@ -112,7 +112,7 @@ static uint8_t get_attr_name(uint16_t cluster_id, uint16_t attr_id) {
             case ZCL_ATTRID_AC_CURRENT_DIVISOR:
                 attr_num = CURRENT_DIVISOR;
                 break;
-            case ZCL_ATTRID_LINE_CURRENT:
+            case ZCL_ATTRID_RMS_CURRENT:
                 attr_num = CURRENT;
                 break;
             default:
@@ -189,7 +189,7 @@ void report_divisor_multiplier(reportCfgInfo_t *pEntry) {
         }
     } else if (pEntry->clusterID == ZCL_CLUSTER_MS_ELECTRICAL_MEASUREMENT) {
         switch (pEntry->attrID) {
-            case ZCL_ATTRID_LINE_CURRENT:
+            case ZCL_ATTRID_RMS_CURRENT:
                 //printf("report current, counter_current_multdiv: %d\r\n", counter_current_multdiv);
                 if(counter_current_multdiv++ == 0) {
                     app_forcedReport(APP_ENDPOINT_1, ZCL_CLUSTER_MS_ELECTRICAL_MEASUREMENT, ZCL_ATTRID_AC_CURRENT_MULTIPLIER);
@@ -211,7 +211,7 @@ void report_divisor_multiplier(reportCfgInfo_t *pEntry) {
                     }
                 }
                 break;
-            case ZCL_ATTRID_APPARENT_POWER:
+            case ZCL_ATTRID_ACTIVE_POWER:
                 //printf("report power, counter_power_multdiv: %d\r\n", counter_power_multdiv);
                 if(counter_power_multdiv++ == 0) {
                     app_forcedReport(APP_ENDPOINT_1, ZCL_CLUSTER_MS_ELECTRICAL_MEASUREMENT, ZCL_ATTRID_AC_POWER_MULTIPLIER);
@@ -548,10 +548,10 @@ void app_all_forceReporting() {
         app_forcedReport(APP_ENDPOINT_1, ZCL_CLUSTER_MS_ELECTRICAL_MEASUREMENT, ZCL_ATTRID_RMS_VOLTAGE);
         app_forcedReport(APP_ENDPOINT_1, ZCL_CLUSTER_MS_ELECTRICAL_MEASUREMENT, ZCL_ATTRID_AC_POWER_MULTIPLIER);
         app_forcedReport(APP_ENDPOINT_1, ZCL_CLUSTER_MS_ELECTRICAL_MEASUREMENT, ZCL_ATTRID_AC_POWER_DIVISOR);
-        app_forcedReport(APP_ENDPOINT_1, ZCL_CLUSTER_MS_ELECTRICAL_MEASUREMENT, ZCL_ATTRID_APPARENT_POWER);
+        app_forcedReport(APP_ENDPOINT_1, ZCL_CLUSTER_MS_ELECTRICAL_MEASUREMENT, ZCL_ATTRID_ACTIVE_POWER);
         app_forcedReport(APP_ENDPOINT_1, ZCL_CLUSTER_MS_ELECTRICAL_MEASUREMENT, ZCL_ATTRID_AC_CURRENT_MULTIPLIER);
         app_forcedReport(APP_ENDPOINT_1, ZCL_CLUSTER_MS_ELECTRICAL_MEASUREMENT, ZCL_ATTRID_AC_CURRENT_DIVISOR);
-        app_forcedReport(APP_ENDPOINT_1, ZCL_CLUSTER_MS_ELECTRICAL_MEASUREMENT, ZCL_ATTRID_LINE_CURRENT);
+        app_forcedReport(APP_ENDPOINT_1, ZCL_CLUSTER_MS_ELECTRICAL_MEASUREMENT, ZCL_ATTRID_RMS_CURRENT);
         app_forcedReport(APP_ENDPOINT_1, ZCL_CLUSTER_SE_METERING, ZCL_ATTRID_REMAINING_BATTERY_LIFE);
     }
 
