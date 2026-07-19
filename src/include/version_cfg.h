@@ -28,7 +28,7 @@
 #include "../common/comm_cfg.h"
 
 #define APP_RELEASE                         0x30        //app release 3.0
-#define APP_BUILD                           0x06        //app build 06, full version - v3.0.06
+#define APP_BUILD                           0x07        //app build 07, full version - v3.0.07
 #define STACK_RELEASE                       0x30        //stack release 3.0
 #define STACK_BUILD                         0x01        //stack build 01
 #define HW_VERSION                          0x01

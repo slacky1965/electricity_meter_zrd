@@ -68,6 +68,7 @@ extern "C" {
 #define DEBUG_REPORTING                 OFF
 #define DEBUG_TEMPERATURE               OFF
 #define DEBUG_OTA                       OFF
+#define DEBUG_ZCL_APP                   ON
 
 #define USB_PRINTF_MODE                 OFF
 

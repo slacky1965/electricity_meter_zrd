@@ -156,6 +156,9 @@ flash-bootloader:
 reset:
 	@python3 $(TOOLS_PATH)/TlsrPgm.py -p$(DOWNLOAD_PORT) -z11 -a 100 -s -t50 -a2550 -m -w i
 
+test-flash:
+	@python3 $(TOOLS_PATH)/TlsrPgm.py -p$(DOWNLOAD_PORT) -z11 -s i
+
 
 # Main-build Target
 main-build: clean-project $(ELF_FILE) secondary-outputs

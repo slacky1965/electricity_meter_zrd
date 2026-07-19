@@ -55,7 +55,7 @@ uint8_t set_device_model(device_model_t model) {
     switch (model) {
         case DEVICE_KASKAD_1_MT: {
             /* reset password when changing model */
-            dev_config.device_password.size = 0;
+//            dev_config.device_password.size = 0;
             measure_meter = measure_meter_kaskad_1_mt;
             baudrate = 9600;
             energy_divisor = 100;
@@ -69,7 +69,7 @@ uint8_t set_device_model(device_model_t model) {
         }
         case DEVICE_KASKAD_11: {
             /* reset password when changing model */
-            dev_config.device_password.size = 0;
+//            dev_config.device_password.size = 0;
             measure_meter = measure_meter_kaskad_11;
             baudrate = 2400;
             energy_divisor = 100;
@@ -122,7 +122,7 @@ uint8_t set_device_model(device_model_t model) {
         }
         case DEVICE_NARTIS_100: {
             /* reset password when changing model */
-            dev_config.device_password.size = 0;
+//            dev_config.device_password.size = 0;
             nartis_100_init();
             measure_meter = measure_meter_nartis_100;
             baudrate = 9600;
@@ -138,7 +138,7 @@ uint8_t set_device_model(device_model_t model) {
         }
         case DEVICE_NARTIS_I100: {
             /* reset password when changing model */
-            dev_config.device_password.size = 0;
+//            dev_config.device_password.size = 0;
             nartis_i100_init();
             measure_meter = measure_meter_nartis_i100;
             baudrate = 9600;
