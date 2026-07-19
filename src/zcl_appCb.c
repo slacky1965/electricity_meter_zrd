@@ -189,9 +189,17 @@ static void app_zclWriteReqCmd(uint16_t clusterId, zclWriteCmd_t *pWriteReqCmd)
                 set_device_model(model);
                 zcl_setAttrVal(APP_ENDPOINT_1, ZCL_CLUSTER_SE_METERING, ZCL_ATTRID_CUSTOM_DEVICE_MANUFACTURER, (uint8_t*)&model);
             } else if (attr[i].attrID == ZCL_ATTRID_CUSTOM_DEVICE_PASSWORD && attr[i].dataType == ZCL_DATA_TYPE_OCTET_STR) {
-                dev_config.device_password.size = attr[i].attrData[0];
-                memset(dev_config.device_password.data, 0, sizeof(dev_config.device_password.data));
-                memcpy(dev_config.device_password.data, attr[i].attrData+1, attr[i].attrData[0]);
+                uint8_t size = attr[i].attrData[0];
+#if UART_PRINTF_MODE && DEBUG_ZCL_APP
+                printf("New device password. raw_size: %d\r\n", size);
+#endif
+                if (!size || size == 0xFF) size = 0;
+                if (size > PASSWORD_SIZE) size = PASSWORD_SIZE;
+                dev_config.device_password.size = size;
+                memset(dev_config.device_password.data, 0, PASSWORD_SIZE);
+                if (size) {
+                    memcpy(dev_config.device_password.data, attr[i].attrData+1, size);
+                }
                 switch (dev_config.device_model) {
                     case DEVICE_NARTIS_100:
                         nartis_100_init();
@@ -208,8 +216,8 @@ static void app_zclWriteReqCmd(uint16_t clusterId, zclWriteCmd_t *pWriteReqCmd)
                         break;
                 }
                 write_config();
-#if UART_PRINTF_MODE // && DEBUG_LEVEL
-                printf("New device password: %s\r\n", print_str_zcl((uint8_t*)&dev_config.device_password));
+#if UART_PRINTF_MODE && DEBUG_ZCL_APP
+                printf("New device password: %s, size: %d\r\n", print_str_zcl((uint8_t*)&dev_config.device_password), size);
 #endif
                 zcl_setAttrVal(APP_ENDPOINT_1, ZCL_CLUSTER_SE_METERING, ZCL_ATTRID_CUSTOM_DEVICE_PASSWORD, (uint8_t*)&dev_config.device_password);
             } else if (attr[i].attrID == ZCL_ATTRID_CUSTOM_MEASUREMENT_PERIOD && attr[i].dataType == ZCL_DATA_TYPE_UINT8) {

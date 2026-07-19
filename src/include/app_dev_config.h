@@ -1,9 +1,11 @@
 #ifndef SRC_INCLUDE_APP_DEV_CONFIG_H_
 #define SRC_INCLUDE_APP_DEV_CONFIG_H_
 
+#define PASSWORD_SIZE   16
+
 typedef struct __attribute__((packed)) {
     uint8_t size;
-    uint8_t data[16];
+    uint8_t data[PASSWORD_SIZE];
 } m_password_t;
 
 /* must be no more than FLASH_PAGE_SIZE (256) bytes */
